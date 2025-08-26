@@ -31,7 +31,7 @@ export function InteractiveOCR() {
     setSelectedFile(file)
     setOcrResult(null)
     
-    // 创建图片预览
+    // Create image preview
     const reader = new FileReader()
     reader.onload = (e) => {
       setImagePreview(e.target?.result as string)
@@ -48,7 +48,7 @@ export function InteractiveOCR() {
 
   const processOCR = useCallback(async () => {
     if (!selectedFile) {
-      toast.error('请先选择一张图片')
+      toast.error('Please select an image first')
       return
     }
 
@@ -57,16 +57,19 @@ export function InteractiveOCR() {
     const startTime = Date.now()
 
     try {
-      toast.info('正在初始化OCR引擎...')
+      toast.info('Initializing OCR engine...')
       const worker = await createWorker('eng+chi_sim', 1, {
         logger: (m) => {
           if (m.status === 'recognizing text') {
             setProcessingProgress(Math.round(m.progress * 100))
           }
-        }
+        },
+        workerPath: 'https://unpkg.com/tesseract.js@5.0.4/dist/worker.min.js',
+        langPath: 'https://tessdata.projectnaptha.com/4.0.0',
+        corePath: 'https://unpkg.com/tesseract.js-core@5.0.0/tesseract-core-simd.wasm.js'
       })
 
-      toast.info('正在识别文字...')
+      toast.info('Recognizing text...')
       const { data } = await worker.recognize(selectedFile)
       await worker.terminate()
 
@@ -82,10 +85,10 @@ export function InteractiveOCR() {
       }
 
       setOcrResult(result)
-      toast.success(`文字识别完成！识别出 ${result.text.length} 个字符`)
+      toast.success(`Text recognition completed! Extracted ${result.text.length} characters`)
     } catch (error) {
       console.error('OCR processing failed:', error)
-      toast.error('文字识别失败，请重试')
+      toast.error('Text recognition failed, please try again')
     } finally {
       setIsProcessing(false)
       setProcessingProgress(0)
@@ -101,9 +104,9 @@ export function InteractiveOCR() {
 
   return (
     <div className="space-y-6">
-      {/* 上传区域 */}
+      {/* Upload area */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 文件上传 */}
+        {/* File upload */}
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
             <ImageIcon className="h-5 w-5 text-blue-600" />
@@ -117,12 +120,12 @@ export function InteractiveOCR() {
           />
         </div>
 
-        {/* 图片预览 */}
+        {/* Image preview */}
         {imagePreview && (
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <ImageIcon className="h-5 w-5 text-green-600" />
-              <h3 className="text-lg font-semibold">图片预览</h3>
+              <h3 className="text-lg font-semibold">Image Preview</h3>
             </div>
             <Card>
               <CardContent className="p-4">
@@ -147,12 +150,12 @@ export function InteractiveOCR() {
                       {isProcessing ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          识别中... {processingProgress}%
+                          Processing... {processingProgress}%
                         </>
                       ) : (
                         <>
                           <Zap className="mr-2 h-4 w-4" />
-                          开始识别
+                          Start Recognition
                         </>
                       )}
                     </Button>
@@ -161,7 +164,7 @@ export function InteractiveOCR() {
                       onClick={handleReset}
                       disabled={isProcessing}
                     >
-                      重新选择
+                      Reset
                     </Button>
                   </div>
                 </div>
@@ -171,33 +174,33 @@ export function InteractiveOCR() {
         )}
       </div>
 
-      {/* 处理进度 */}
+      {/* Processing progress */}
       {isProcessing && (
         <Card>
           <CardContent className="p-6">
             <div className="text-center space-y-4">
               <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
               <div className="space-y-2">
-                <p className="text-lg font-semibold">正在识别文字...</p>
+                <p className="text-lg font-semibold">Recognizing text...</p>
                 <div className="w-full bg-muted rounded-full h-2">
                   <div 
                     className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${processingProgress}%` }}
                   />
                 </div>
-                <p className="text-sm text-muted-foreground">{processingProgress}% 完成</p>
+                <p className="text-sm text-muted-foreground">{processingProgress}% Complete</p>
               </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* OCR结果 */}
+      {/* OCR Results */}
       {ocrResult && (
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
             <FileText className="h-5 w-5 text-purple-600" />
-            <h3 className="text-lg font-semibold">识别结果</h3>
+            <h3 className="text-lg font-semibold">Recognition Results</h3>
           </div>
           <OCRResult
             result={ocrResult}

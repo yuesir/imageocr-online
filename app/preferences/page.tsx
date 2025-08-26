@@ -193,7 +193,7 @@ export default function PreferencesPage() {
                       size="sm"
                       onClick={() => updatePreference('language', 'zh')}
                     >
-                      中文
+                      Chinese
                     </Button>
                   </div>
                 </div>
