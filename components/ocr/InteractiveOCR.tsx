@@ -136,7 +136,7 @@ export function InteractiveOCR() {
                 </div>
                 <div className="mt-4 text-center">
                   <p className="text-sm text-muted-foreground mb-4">
-                    {selectedFile?.name} ({(selectedFile?.size || 0 / 1024 / 1024).toFixed(2)} MB)
+                    {selectedFile?.name} ({((selectedFile?.size || 0) / 1024 / 1024).toFixed(2)} MB)
                   </p>
                   <div className="flex gap-2 justify-center">
                     <Button
