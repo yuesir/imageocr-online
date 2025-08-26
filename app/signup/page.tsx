@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Sign Up | OCR365',
-  description: 'Create your OCR365 account to start extracting text from images with AI-powered OCR.',
+  title: 'Sign Up | ImageOCRAI',
+  description: 'Create your ImageOCRAI account to start extracting text from images with AI-powered OCR.',
 }
 
 export default function SignUpPage() {
@@ -25,7 +25,7 @@ export default function SignUpPage() {
         </div>
         
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">OCR365</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">ImageOCRAI</h1>
           <p className="text-muted-foreground">
             Extract text from images with AI-powered OCR
           </p>

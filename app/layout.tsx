@@ -7,32 +7,32 @@ import { Toaster } from 'sonner'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'OCR365 - AI-Powered Text Extraction',
+  title: 'ImageOCRAI - AI-Powered Text Extraction',
   description: 'Extract text from images instantly with our advanced OCR technology. Support for multiple languages, formats, and real-time processing.',
   keywords: 'OCR, text extraction, image to text, AI, machine learning, document processing',
-  authors: [{ name: 'OCR365 Team' }],
-  creator: 'OCR365',
-  publisher: 'OCR365',
+  authors: [{ name: 'ImageOCRAI Team' }],
+  creator: 'ImageOCRAI',
+  publisher: 'ImageOCRAI',
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://ocr365.com'),
+  metadataBase: new URL('https://imageocrai.com'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'OCR365 - AI-Powered Text Extraction',
+    title: 'ImageOCRAI - AI-Powered Text Extraction',
     description: 'Extract text from images instantly with our advanced OCR technology.',
-    url: 'https://ocr365.com',
-    siteName: 'OCR365',
+    url: 'https://imageocrai.com',
+    siteName: 'ImageOCRAI',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'OCR365 - AI-Powered Text Extraction',
+        alt: 'ImageOCRAI - AI-Powered Text Extraction',
       },
     ],
     locale: 'en_US',
@@ -40,7 +40,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OCR365 - AI-Powered Text Extraction',
+    title: 'ImageOCRAI - AI-Powered Text Extraction',
     description: 'Extract text from images instantly with our advanced OCR technology.',
     images: ['/og-image.jpg'],
   },
@@ -67,7 +67,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider
           defaultTheme="system"
-          storageKey="ocr365-ui-theme"
+          storageKey="imageocrai-ui-theme"
         >
           <AuthProvider>
             {children}

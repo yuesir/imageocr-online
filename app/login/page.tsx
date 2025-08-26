@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Sign In | OCR365',
-  description: 'Sign in to your OCR365 account to access your OCR history and preferences.',
+  title: 'Sign In | ImageOCRAI',
+  description: 'Sign in to your ImageOCRAI account to access your OCR history and preferences.',
 }
 
 export default function LoginPage() {
@@ -25,7 +25,7 @@ export default function LoginPage() {
         </div>
         
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">OCR365</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">ImageOCRAI</h1>
           <p className="text-muted-foreground">
             Extract text from images with AI-powered OCR
           </p>

@@ -19,7 +19,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Zap className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-foreground">OCR365</span>
+              <span className="text-2xl font-bold text-foreground">ImageOCRAI</span>
             </div>
             
             <div className="flex items-center space-x-4">
@@ -139,7 +139,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              Why Choose OCR365?
+              Why Choose ImageOCRAI?
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Advanced AI technology meets user-friendly design for the best OCR experience
@@ -203,7 +203,7 @@ export default function HomePage() {
               Trusted by Thousands
             </h2>
             <p className="text-xl text-muted-foreground">
-              See what our users say about OCR365
+              See what our users say about ImageOCRAI
             </p>
           </div>
           
@@ -216,7 +216,7 @@ export default function HomePage() {
                   ))}
                 </div>
                 <p className="text-muted-foreground mb-4">
-                  "OCR365 has revolutionized how I handle document digitization. 
+                  "ImageOCRAI has revolutionized how I handle document digitization. 
                   The accuracy is incredible and it saves me hours of manual typing."
                 </p>
                 <div className="flex items-center">
@@ -240,7 +240,7 @@ export default function HomePage() {
                 </div>
                 <p className="text-muted-foreground mb-4">
                   "As a researcher, I process hundreds of documents daily. 
-                  OCR365's speed and accuracy have made my workflow so much more efficient."
+                  ImageOCRAI's speed and accuracy have made my workflow so much more efficient."
                 </p>
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mr-3">
@@ -263,7 +263,7 @@ export default function HomePage() {
                 </div>
                 <p className="text-muted-foreground mb-4">
                   "The user interface is intuitive and the results are consistently accurate. 
-                  OCR365 has become an essential tool for our team."
+                  ImageOCRAI has become an essential tool for our team."
                 </p>
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mr-3">
@@ -287,7 +287,7 @@ export default function HomePage() {
             Ready to Extract Text from Your Images?
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Join thousands of users who trust OCR365 for their text extraction needs
+            Join thousands of users who trust ImageOCRAI for their text extraction needs
           </p>
           
           {user ? (
@@ -316,7 +316,7 @@ export default function HomePage() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Zap className="h-6 w-6 text-blue-400" />
-                <span className="text-xl font-bold">OCR365</span>
+                <span className="text-xl font-bold">ImageOCRAI</span>
               </div>
               <p className="text-gray-400">
                 AI-powered text extraction from images. Fast, accurate, and secure.
@@ -352,7 +352,7 @@ export default function HomePage() {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 OCR365. All rights reserved.</p>
+            <p>&copy; 2024 ImageOCRAI. All rights reserved.</p>
           </div>
         </div>
       </footer>

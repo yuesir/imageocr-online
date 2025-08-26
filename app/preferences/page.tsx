@@ -129,7 +129,7 @@ export default function PreferencesPage() {
               User Preferences
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              Customize your OCR365 experience
+              Customize your ImageOCRAI experience
             </p>
           </div>
 

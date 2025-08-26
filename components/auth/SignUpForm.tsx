@@ -51,7 +51,7 @@ export function SignUpForm() {
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Create Account</CardTitle>
         <CardDescription className="text-center">
-          Sign up to start using OCR365
+          Sign up to start using ImageOCRAI
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
