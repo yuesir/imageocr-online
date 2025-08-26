@@ -70,45 +70,7 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6">
-            Extract Text from
-            <span className="text-blue-600"> Images </span>
-            Instantly
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Transform your images into editable text with our AI-powered OCR technology. 
-            Fast, accurate, and secure text extraction in seconds.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {user ? (
-              <Link href="/ocr">
-                <Button size="lg" className="text-lg px-8 py-6">
-                  <Upload className="mr-2 h-5 w-5" />
-                  Start OCR Processing
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/signup">
-                  <Button size="lg" className="text-lg px-8 py-6">
-                    <Upload className="mr-2 h-5 w-5" />
-                    Get Started Free
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button variant="outline" size="lg" className="text-lg px-8 py-6">
-                    Sign In
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
+
 
       {/* Interactive OCR Section */}
       <section className="py-20 bg-background">
