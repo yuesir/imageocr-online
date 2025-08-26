@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { copyToClipboard, formatDate } from '@/lib/utils'
 import { toast } from 'sonner'
-import type { ChangeEvent } from 'react'
 
 interface OCRResultProps {
   result: {
@@ -37,7 +36,7 @@ export function OCRResult({
     try {
       await copyToClipboard(editedText)
       toast.success('Text copied to clipboard')
-    } catch (error) {
+    } catch {
       toast.error('Failed to copy text')
     }
   }
@@ -63,7 +62,7 @@ export function OCRResult({
       await onSave(editedText)
       setIsEditing(false)
       toast.success('Changes saved')
-    } catch (error) {
+    } catch {
       toast.error('Failed to save changes')
     } finally {
       setIsSaving(false)

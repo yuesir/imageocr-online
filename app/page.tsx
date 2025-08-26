@@ -7,7 +7,6 @@ import { LogIn, User, Zap, Upload, Shield, Clock, Star, ArrowRight, Settings, Fi
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { InteractiveOCR } from '@/components/ocr/InteractiveOCR'
-import type { ReactNode } from 'react'
 
 export default function HomePage() {
   const { user, signOut } = useAuth()

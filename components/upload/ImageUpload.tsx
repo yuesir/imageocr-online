@@ -4,7 +4,6 @@ import { useState, useCallback, useRef } from 'react'
 import { Upload, X, FileImage, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import type { ChangeEvent, DragEvent } from 'react'
 import { validateImageFile, formatFileSize } from '@/lib/utils'
 import { toast } from 'sonner'
 

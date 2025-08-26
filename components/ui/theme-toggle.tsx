@@ -4,7 +4,6 @@ import { Moon, Sun, Monitor } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useTheme } from '@/components/providers/ThemeProvider'
 import { useEffect, useState } from 'react'
-import type { MouseEvent } from 'react'
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import type { User } from '@supabase/supabase-js'
 import Tesseract from 'tesseract.js'
 import { Buffer } from 'buffer'
 

@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { validateImageFile, generateId } from '@/lib/utils'
-import type { User } from '@supabase/supabase-js'
-import { decode } from 'base64-arraybuffer'
-
-const MAX_FILE_SIZE = parseInt(process.env.NEXT_PUBLIC_MAX_FILE_SIZE?.replace(/\D/g, '') || '10') * 1024 * 1024
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,7 +42,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer())
 
     // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('ocr-files')
       .upload(filePath, buffer, {
         contentType: file.type,

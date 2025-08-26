@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, MouseEvent } from 'react'
+import { useState, useEffect, useCallback, MouseEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,12 +12,10 @@ import {
   Download, 
   Trash2, 
   Eye, 
-  Calendar,
   Clock,
   Languages,
   Percent,
-  Search,
-  Filter
+  Search
 } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -53,25 +51,7 @@ export default function DashboardPage() {
   const [filteredResults, setFilteredResults] = useState<OCRResult[]>([])
   const [selectedResult, setSelectedResult] = useState<OCRResult | null>(null)
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login')
-      return
-    }
-    loadOCRResults()
-  }, [user, router])
-
-  useEffect(() => {
-    // Filter results based on search term
-    const filtered = results.filter(result => 
-      result.extracted_text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      result.files.filename.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      result.language.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    setFilteredResults(filtered)
-  }, [results, searchTerm])
-
-  const loadOCRResults = async () => {
+  const loadOCRResults = useCallback(async () => {
     if (!user) return
 
     try {
@@ -100,7 +80,25 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login')
+      return
+    }
+    loadOCRResults()
+  }, [user, router, loadOCRResults])
+
+  useEffect(() => {
+    // Filter results based on search term
+    const filtered = results.filter(result => 
+      result.extracted_text.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      result.files.filename.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      result.language.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    setFilteredResults(filtered)
+  }, [results, searchTerm])
 
   const deleteResult = async (resultId: string) => {
     try {

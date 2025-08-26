@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import type { ChangeEvent } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/components/providers/ThemeProvider'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
@@ -23,7 +22,7 @@ type UserPreferences = {
 
 export default function PreferencesPage() {
   const { user } = useAuth()
-  const { theme, setTheme } = useTheme()
+  const { setTheme } = useTheme()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [preferences, setPreferences] = useState<UserPreferences>({
@@ -33,15 +32,7 @@ export default function PreferencesPage() {
     default_ocr_language: 'auto'
   })
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login')
-      return
-    }
-    loadPreferences()
-  }, [user, router])
-
-  const loadPreferences = async () => {
+  const loadPreferences = useCallback(async () => {
     if (!user) return
 
     try {
@@ -67,7 +58,15 @@ export default function PreferencesPage() {
       console.error('Error loading preferences:', error)
       toast.error('Failed to load preferences')
     }
-  }
+  }, [user])
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login')
+      return
+    }
+    loadPreferences()
+  }, [user, router, loadPreferences])
 
   const savePreferences = async () => {
     if (!user) return
@@ -210,7 +209,7 @@ export default function PreferencesPage() {
                         key={option.value}
                         variant={preferences.default_ocr_language === option.value ? 'default' : 'outline'}
                         size="sm"
-                        onClick={() => updatePreference('default_ocr_language', option.value as any)}
+                        onClick={() => updatePreference('default_ocr_language', option.value as 'eng' | 'chi_sim' | 'auto')}
                       >
                         {option.label}
                       </Button>

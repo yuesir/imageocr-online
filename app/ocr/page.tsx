@@ -2,12 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Metadata } from 'next'
 import { ImageUpload } from '@/components/upload/ImageUpload'
 import { OCRResult } from '@/components/ocr/OCRResult'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { ChangeEvent } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { ArrowLeft, Zap, Clock, Shield } from 'lucide-react'
