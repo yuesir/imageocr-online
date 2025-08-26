@@ -107,7 +107,7 @@ export function InteractiveOCR() {
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
             <ImageIcon className="h-5 w-5 text-blue-600" />
-            <h3 className="text-lg font-semibold">选择图片</h3>
+            <h3 className="text-lg font-semibold">Select Image</h3>
           </div>
           <ImageUpload
             onFileSelect={handleFileSelect}
