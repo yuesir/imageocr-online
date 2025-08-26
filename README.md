@@ -1,11 +1,23 @@
-# React + TypeScript + Vite
+# ImageOCR Online - Next.js OCR Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern web application for extracting text from images using OCR technology. Built with Next.js 15, React 18, TypeScript, and Supabase.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Image Upload**: Drag & drop or click to upload JPG, PNG, PDF files
+- **OCR Processing**: Extract text from images using Tesseract.js
+- **User Authentication**: Sign up, login, and user management with Supabase
+- **Dark Mode**: Toggle between light and dark themes
+- **Responsive Design**: Works on desktop and mobile devices
+- **OCR History**: View and manage your OCR processing history
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 18, TypeScript, Tailwind CSS
+- **Backend**: Supabase (PostgreSQL, Authentication, Storage)
+- **OCR Engine**: Tesseract.js
+- **UI Components**: Radix UI, Lucide React
+- **Styling**: Tailwind CSS with custom themes
 
 ## Expanding the ESLint configuration
 
