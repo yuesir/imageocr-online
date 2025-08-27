@@ -1,212 +1,213 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { ImageUpload } from '@/components/upload/ImageUpload'
-import { OCRResult } from '@/components/ocr/OCRResult'
+import React, { useState, useCallback, useEffect } from 'react'
+import { MultiImageUpload } from '@/components/upload/MultiImageUpload'
+import { MultiImagePreview } from '@/src/components/MultiImagePreview'
+import { MultiImageResult } from '@/src/components/MultiImageResult'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Loader2, Image as ImageIcon, FileText, Zap } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Loader2, Images } from 'lucide-react'
 import { toast } from 'sonner'
 import { createWorker } from 'tesseract.js'
-import Image from 'next/image'
 
-interface OCRResultData {
+// Removed OCRResultData interface - unified to use MultiOCRResult
+
+interface ImageFile {
   id: string
+  file: File
+  preview: string
+  selected: boolean
+}
+
+interface MultiOCRResult {
+  id: string
+  imageId: string
   text: string
   confidence: number
   language: string
   processingTime: number
-  status: string
-  createdAt: string
+  status: 'success' | 'error' | 'processing'
+  error?: string
 }
 
+type ViewMode = 'multi-upload' | 'multi-preview' | 'multi-result'
+
 export function InteractiveOCR() {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [ocrResult, setOcrResult] = useState<OCRResultData | null>(null)
-  const [processingProgress, setProcessingProgress] = useState(0)
+  // Multi image mode states (unified approach)
+  const [viewMode, setViewMode] = useState<ViewMode>('multi-upload')
+  const [multiImages, setMultiImages] = useState<ImageFile[]>([])
+  const [multiResults, setMultiResults] = useState<MultiOCRResult[]>([])
+  const [isMultiProcessing, setIsMultiProcessing] = useState(false)
 
-  const handleFileSelect = useCallback((file: File) => {
-    setSelectedFile(file)
-    setOcrResult(null)
-    
-    // Create image preview
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      setImagePreview(e.target?.result as string)
+  // Removed single image mode handlers - unified to multi-image approach
+
+  // Multi-image handlers
+  const handleMultiFileSelect = useCallback((files: File[]) => {
+    const imageFiles: ImageFile[] = files.map(file => ({
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      file,
+      preview: URL.createObjectURL(file),
+      selected: false
+    }))
+    setMultiImages(prev => {
+      const newImages = [...prev, ...imageFiles]
+      return newImages
+    })
+  }, [])
+
+  // Auto-switch to preview mode when images are added
+  useEffect(() => {
+    if (multiImages.length > 0 && viewMode === 'multi-upload') {
+      setViewMode('multi-preview')
     }
-    reader.readAsDataURL(file)
+  }, [multiImages.length, viewMode])
+
+  const handleImageToggle = useCallback((imageId: string) => {
+    setMultiImages(prev => prev.map(img => 
+      img.id === imageId ? { ...img, selected: !img.selected } : img
+    ))
   }, [])
 
-  const handleFileRemove = useCallback(() => {
-    setSelectedFile(null)
-    setImagePreview(null)
-    setOcrResult(null)
-    setProcessingProgress(0)
+  const handleDeleteSelected = useCallback(() => {
+    setMultiImages(prev => {
+      const remaining = prev.filter(img => !img.selected)
+      // Clean up object URLs for deleted images
+      prev.filter(img => img.selected).forEach(img => {
+        URL.revokeObjectURL(img.preview)
+      })
+      return remaining
+    })
   }, [])
 
-  const processOCR = useCallback(async () => {
-    if (!selectedFile) {
-      toast.error('Please select an image first')
+  const handleAddMoreImages = useCallback((files: File[]) => {
+    const imageFiles: ImageFile[] = files.map(file => ({
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      file,
+      preview: URL.createObjectURL(file),
+      selected: false
+    }))
+    setMultiImages(prev => [...prev, ...imageFiles])
+  }, [])
+
+  const processMultiOCR = useCallback(async () => {
+    if (multiImages.length === 0) {
+      toast.error('Please select images first')
       return
     }
 
-    setIsProcessing(true)
-    setProcessingProgress(0)
-    const startTime = Date.now()
+    setIsMultiProcessing(true)
+    setMultiResults([])
+    setViewMode('multi-result')
 
     try {
       toast.info('Initializing OCR engine...')
       const worker = await createWorker('eng+chi_sim', 1, {
-        logger: (m) => {
-          if (m.status === 'recognizing text') {
-            setProcessingProgress(Math.round(m.progress * 100))
-          }
-        },
         workerPath: 'https://unpkg.com/tesseract.js@5.0.4/dist/worker.min.js',
         langPath: 'https://tessdata.projectnaptha.com/4.0.0',
         corePath: 'https://unpkg.com/tesseract.js-core@5.0.0/tesseract-core-simd.wasm.js'
       })
 
-      toast.info('Recognizing text...')
-      const { data } = await worker.recognize(selectedFile)
-      await worker.terminate()
-
-      const processingTime = Date.now() - startTime
-      const result: OCRResultData = {
-        id: Date.now().toString(),
-        text: data.text.trim(),
-        confidence: data.confidence / 100,
-        language: 'eng',
-        processingTime,
-        status: 'completed',
-        createdAt: new Date().toISOString()
+      const results: MultiOCRResult[] = []
+      
+      for (let i = 0; i < multiImages.length; i++) {
+        const image = multiImages[i]
+        const startTime = Date.now()
+        
+        try {
+          toast.info(`Processing image ${i + 1} of ${multiImages.length}...`)
+          
+          // Add processing result
+          const processingResult: MultiOCRResult = {
+            id: Date.now().toString() + i,
+            imageId: image.id,
+            text: '',
+            confidence: 0,
+            language: 'eng',
+            processingTime: 0,
+            status: 'processing'
+          }
+          results.push(processingResult)
+          setMultiResults([...results])
+          
+          const { data } = await worker.recognize(image.file)
+          const processingTime = Date.now() - startTime
+          
+          // Update with success result
+          results[i] = {
+            ...processingResult,
+            text: data.text.trim(),
+            confidence: data.confidence / 100,
+            processingTime,
+            status: 'success'
+          }
+          setMultiResults([...results])
+          
+        } catch (error) {
+          console.error(`OCR processing failed for image ${i + 1}:`, error)
+          results[i] = {
+            ...results[i],
+            status: 'error',
+            error: 'Processing failed'
+          }
+          setMultiResults([...results])
+        }
       }
-
-      setOcrResult(result)
-      toast.success(`Text recognition completed! Extracted ${result.text.length} characters`)
+      
+      await worker.terminate()
+      toast.success(`Completed processing ${multiImages.length} images`)
+      
     } catch (error) {
-      console.error('OCR processing failed:', error)
-      toast.error('Text recognition failed, please try again')
+      console.error('Multi OCR processing failed:', error)
+      toast.error('OCR processing failed, please try again')
     } finally {
-      setIsProcessing(false)
-      setProcessingProgress(0)
+      setIsMultiProcessing(false)
     }
-  }, [selectedFile])
+  }, [multiImages])
 
-  const handleReset = useCallback(() => {
-    setSelectedFile(null)
-    setImagePreview(null)
-    setOcrResult(null)
-    setProcessingProgress(0)
-  }, [])
+  // Removed handleModeSwitch - unified to multi-image mode only
 
   return (
     <div className="space-y-6">
-      {/* Upload area */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* File upload */}
+      {/* Removed single image mode - unified to multi-image mode only */}
+
+      {/* Multi Image Upload Mode */}
+      {viewMode === 'multi-upload' && multiImages.length === 0 && (
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
-            <ImageIcon className="h-5 w-5 text-blue-600" />
-            <h3 className="text-lg font-semibold">Select Image</h3>
+            <Images className="h-5 w-5 text-blue-600" />
+            <h3 className="text-lg font-semibold">Select Multiple Images</h3>
           </div>
-          <ImageUpload
-            onFileSelect={handleFileSelect}
-            onFileRemove={handleFileRemove}
-            selectedFile={selectedFile}
-            isProcessing={isProcessing}
+          <MultiImageUpload
+            onFilesSelect={handleMultiFileSelect}
+            onFilesChange={setMultiImages}
+            selectedFiles={multiImages}
+            maxFiles={10}
           />
         </div>
-
-        {/* Image preview */}
-        {imagePreview && (
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <ImageIcon className="h-5 w-5 text-green-600" />
-              <h3 className="text-lg font-semibold">Image Preview</h3>
-            </div>
-            <Card>
-              <CardContent className="p-4">
-                <div className="relative w-full h-64 bg-muted rounded-lg overflow-hidden">
-                  <Image
-                    src={imagePreview}
-                    alt="Preview"
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {selectedFile?.name} ({((selectedFile?.size || 0) / 1024 / 1024).toFixed(2)} MB)
-                  </p>
-                  <div className="flex gap-2 justify-center">
-                    <Button
-                      onClick={processOCR}
-                      disabled={isProcessing}
-                      className="flex-1 max-w-xs"
-                    >
-                      {isProcessing ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Processing... {processingProgress}%
-                        </>
-                      ) : (
-                        <>
-                          <Zap className="mr-2 h-4 w-4" />
-                          Start Recognition
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={handleReset}
-                      disabled={isProcessing}
-                    >
-                      Reset
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      </div>
-
-      {/* Processing progress */}
-      {isProcessing && (
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center space-y-4">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
-              <div className="space-y-2">
-                <p className="text-lg font-semibold">Recognizing text...</p>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${processingProgress}%` }}
-                  />
-                </div>
-                <p className="text-sm text-muted-foreground">{processingProgress}% Complete</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       )}
 
-      {/* OCR Results */}
-      {ocrResult && (
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <FileText className="h-5 w-5 text-purple-600" />
-            <h3 className="text-lg font-semibold">Recognition Results</h3>
-          </div>
-          <OCRResult
-            result={ocrResult}
-            onClose={() => setOcrResult(null)}
-          />
-        </div>
+      {/* Multi Image Preview Mode */}
+      {viewMode === 'multi-preview' && (
+        <MultiImagePreview
+          images={multiImages}
+          onImagesChange={setMultiImages}
+          onBack={() => setViewMode('multi-upload')}
+          onConvert={processMultiOCR}
+          isProcessing={isMultiProcessing}
+        />
+      )}
+
+      {/* Multi Image Result Mode */}
+      {viewMode === 'multi-result' && (
+        <MultiImageResult
+          images={multiImages}
+          results={multiResults}
+          isProcessing={isMultiProcessing}
+          onBack={() => setViewMode('multi-preview')}
+          onAddMore={() => setViewMode('multi-upload')}
+          onImageToggle={handleImageToggle}
+        />
       )}
     </div>
   )
