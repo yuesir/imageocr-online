@@ -3,13 +3,19 @@
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { LogIn, User, Zap, Upload, Shield, Clock, Star, ArrowRight, Settings, FileText } from 'lucide-react'
+import { LogIn, User, Zap, Upload, Shield, Clock, Star, ArrowRight, Settings, FileText, ChevronDown, ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { InteractiveOCR } from '@/components/ocr/InteractiveOCR'
+import { useState } from 'react'
 
 export default function HomePage() {
   const { user, signOut } = useAuth()
+  const [openFAQ, setOpenFAQ] = useState<number | null>(null)
+
+  const toggleFAQ = (index: number) => {
+    setOpenFAQ(openFAQ === index ? null : index)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
@@ -129,6 +135,194 @@ export default function HomePage() {
                   View and copy the converted text results. You can edit, format, or save the extracted text as needed.
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 bg-white dark:bg-gray-800">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Get answers to common questions about our OCR technology
+            </p>
+          </div>
+          
+          <div className="max-w-4xl mx-auto space-y-4">
+            {/* FAQ Item 1 */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg">
+              <button
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                onClick={() => toggleFAQ(0)}
+              >
+                <h3 className="text-lg font-semibold text-foreground">
+                  What is image OCR?
+                </h3>
+                {openFAQ === 0 ? (
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                )}
+              </button>
+              {openFAQ === 0 && (
+                <div className="px-6 pb-4">
+                  <p className="text-muted-foreground leading-relaxed">
+                    Image OCR (Optical Character Recognition) is an advanced technology that automatically identifies and extracts text from images, scanned documents, photos, and PDFs. It uses artificial intelligence and machine learning algorithms to analyze visual patterns and convert them into editable, searchable text. Modern OCR systems can recognize multiple languages, various fonts, and even handwritten text with high accuracy. This technology is essential for digitizing physical documents, automating data entry, and making image-based content accessible and searchable.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* FAQ Item 2 */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg">
+              <button
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                onClick={() => toggleFAQ(1)}
+              >
+                <h3 className="text-lg font-semibold text-foreground">
+                  How to convert image to text?
+                </h3>
+                {openFAQ === 1 ? (
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                )}
+              </button>
+              {openFAQ === 1 && (
+                <div className="px-6 pb-4">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Converting images to text is simple with our OCR tool. Follow these steps for best results:
+                  </p>
+                  <ol className="list-decimal list-inside text-muted-foreground space-y-2 mb-4">
+                    <li><strong>Prepare your image:</strong> Ensure the image is clear, well-lit, and text is readable. Higher resolution images (300+ DPI) produce better results.</li>
+                    <li><strong>Upload the file:</strong> Drag and drop or click to upload your image. We support JPG, PNG, WebP, BMP, TIFF, and PDF formats up to 10MB.</li>
+                    <li><strong>Process the image:</strong> Click the "Convert" button to start OCR processing. Our AI will analyze the image and extract all visible text.</li>
+                    <li><strong>Review and edit:</strong> Check the extracted text for accuracy. You can edit, format, or copy the results as needed.</li>
+                  </ol>
+                  <p className="text-muted-foreground">
+                    <strong>Pro tip:</strong> For optimal results, ensure text is horizontal, avoid shadows or glare, and use images with good contrast between text and background.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* FAQ Item 3 */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg">
+              <button
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                onClick={() => toggleFAQ(2)}
+              >
+                <h3 className="text-lg font-semibold text-foreground">
+                  How to use OCR to extract text from image?
+                </h3>
+                {openFAQ === 2 ? (
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                )}
+              </button>
+              {openFAQ === 2 && (
+                <div className="px-6 pb-4">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Our OCR system uses advanced AI algorithms to extract text with high precision. Here's how to maximize extraction accuracy:
+                  </p>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Image Quality Tips:</h4>
+                      <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
+                        <li>Use high-resolution images (minimum 300 DPI for scanned documents)</li>
+                        <li>Ensure good lighting and avoid shadows or reflections</li>
+                        <li>Keep text horizontal and avoid skewed or rotated images</li>
+                        <li>Maintain clear contrast between text and background</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Processing Steps:</h4>
+                      <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
+                        <li>Upload your image using the drag-and-drop interface</li>
+                        <li>Wait for automatic processing - our AI will detect text regions</li>
+                        <li>Review the confidence score for each extracted text block</li>
+                        <li>Use the copy function to transfer text to your clipboard</li>
+                        <li>Edit any misrecognized characters if necessary</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Supported Content:</h4>
+                      <p className="text-muted-foreground ml-4">
+                        Our OCR works with printed text, typed documents, screenshots, photos of signs, handwritten notes (with varying accuracy), and multi-language content including English, Chinese, Spanish, French, and more.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* FAQ Item 4 */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg">
+              <button
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                onClick={() => toggleFAQ(3)}
+              >
+                <h3 className="text-lg font-semibold text-foreground">
+                  How to batch OCR images?
+                </h3>
+                {openFAQ === 3 ? (
+                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                )}
+              </button>
+              {openFAQ === 3 && (
+                <div className="px-6 pb-4">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Batch processing allows you to extract text from multiple images simultaneously, saving time and effort. Here's a comprehensive guide:
+                  </p>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Preparation Phase:</h4>
+                      <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
+                        <li>Organize all images in a single folder on your computer</li>
+                        <li>Ensure consistent naming convention (e.g., doc_001.jpg, doc_002.jpg)</li>
+                        <li>Verify all images meet quality standards mentioned above</li>
+                        <li>Check file formats are supported (JPG, PNG, WebP, BMP, TIFF, PDF)</li>
+                        <li>Ensure total file size doesn't exceed processing limits</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Batch Processing Steps:</h4>
+                      <ol className="list-decimal list-inside text-muted-foreground space-y-1 ml-4">
+                        <li>Select multiple files using Ctrl+Click (Windows) or Cmd+Click (Mac)</li>
+                        <li>Drag and drop all selected files into the upload area</li>
+                        <li>Wait for the upload progress to complete for all files</li>
+                        <li>Click "Process All" to start batch OCR processing</li>
+                        <li>Monitor the progress bar showing completion status</li>
+                        <li>Review results for each processed image individually</li>
+                        <li>Export all results as a combined text file or individual files</li>
+                      </ol>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Important Considerations:</h4>
+                      <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
+                        <li><strong>Processing Time:</strong> Batch processing may take longer depending on image count and complexity</li>
+                        <li><strong>File Limits:</strong> Maximum 50 images per batch, 10MB per individual file</li>
+                        <li><strong>Quality Control:</strong> Review results carefully as batch processing may have varying accuracy across different images</li>
+                        <li><strong>Output Options:</strong> Choose between combined output or separate text files for each image</li>
+                        <li><strong>Error Handling:</strong> Failed images will be reported separately - you can reprocess them individually</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Best Practices:</h4>
+                      <p className="text-muted-foreground ml-4">
+                        Start with a small test batch (5-10 images) to verify quality and processing time. Use consistent image settings and formats for better results. Keep backup copies of original images. For large volumes (100+ images), consider processing in smaller batches to maintain system performance and easier error management.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
