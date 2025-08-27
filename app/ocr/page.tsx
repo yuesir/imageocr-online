@@ -39,11 +39,8 @@ export default function OCRPage() {
   const [isUploading, setIsUploading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
 
-  // Redirect if not authenticated
-  if (!user) {
-    router.push('/login')
-    return null
-  }
+  // Allow both authenticated and unauthenticated users
+  // Unauthenticated users can use OCR with daily limits
 
   const handleFileSelect = (file: File) => {
     setSelectedFile(file)
@@ -62,22 +59,37 @@ export default function OCRPage() {
 
     setIsUploading(true)
     try {
-      const formData = new FormData()
-      formData.append('file', selectedFile)
+      // For authenticated users, upload to server
+      if (user) {
+        const formData = new FormData()
+        formData.append('file', selectedFile)
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      })
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        })
 
-      const data = await response.json()
+        const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Upload failed')
+        if (!response.ok) {
+          throw new Error(data.error || 'Upload failed')
+        }
+
+        setUploadedFile(data.file)
+        toast.success('File uploaded successfully')
+      } else {
+        // For unauthenticated users, create a mock uploaded file object
+        // We'll convert to Base64 during OCR processing
+        const mockFile: UploadedFile = {
+          id: 'temp-' + Date.now(),
+          filename: selectedFile.name,
+          url: URL.createObjectURL(selectedFile),
+          size: selectedFile.size,
+          type: selectedFile.type
+        }
+        setUploadedFile(mockFile)
+        toast.success('File ready for processing')
       }
-
-      setUploadedFile(data.file)
-      toast.success('File uploaded successfully')
     } catch (error) {
       console.error('Upload error:', error)
       toast.error(error instanceof Error ? error.message : 'Upload failed')
@@ -87,25 +99,54 @@ export default function OCRPage() {
   }
 
   const handleProcessOCR = async () => {
-    if (!uploadedFile) return
+    if (!uploadedFile || !selectedFile) return
 
     setIsProcessing(true)
     try {
-      const response = await fetch('/api/ocr', {
+      let requestBody: any
+
+      // For authenticated users, use fileId
+      if (user) {
+        requestBody = {
+          fileId: uploadedFile.id
+        }
+      } else {
+        // For unauthenticated users, convert to Base64
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => {
+            const result = reader.result as string
+            // Remove data:image/...;base64, prefix
+            const base64Data = result.split(',')[1]
+            resolve(base64Data)
+          }
+          reader.onerror = reject
+          reader.readAsDataURL(selectedFile)
+        })
+
+        requestBody = {
+          imageBase64: base64
+        }
+      }
+
+      const response = await fetch('/api/ocr/tencent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          fileId: uploadedFile.id,
-          imageUrl: uploadedFile.url
-        })
+        body: JSON.stringify(requestBody)
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'OCR processing failed')
+        // Handle daily limit exceeded
+        if (response.status === 429) {
+          toast.error(data.message || 'Daily usage limit exceeded. Please try again tomorrow or sign up for unlimited access.')
+        } else {
+          throw new Error(data.error || 'OCR processing failed')
+        }
+        return
       }
 
       setOcrResult({

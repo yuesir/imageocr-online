@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
+import { getClientIP, checkIPDailyLimit, updateIPUsage } from '@/lib/ip-usage'
 import { Buffer } from 'buffer'
 
 // 腾讯云OCR SDK
@@ -153,17 +154,44 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 检查用户认证
+    // 获取客户端IP
+    const clientIP = getClientIP(request)
+    
+    // 检查用户认证（可选）
     const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const isAuthenticated = !authError && user
+    
+    // 如果用户未登录，检查IP使用限制
+    if (!isAuthenticated) {
+      const ipLimitCheck = await checkIPDailyLimit(clientIP)
+      
+      if (!ipLimitCheck.allowed) {
+        return NextResponse.json(
+          { 
+            error: 'Daily usage limit exceeded', 
+            message: `You have reached the daily limit of ${ipLimitCheck.limit} free OCR requests. Please try again tomorrow or sign up for unlimited access.`,
+            currentCount: ipLimitCheck.currentCount,
+            limit: ipLimitCheck.limit
+          }, 
+          { status: 429 }
+        )
+      }
     }
 
     const body = await request.json()
     const { fileId, imageUrl, imageBase64 } = body
+    
+    console.log('OCR Request received:', {
+      hasFileId: !!fileId,
+      hasImageUrl: !!imageUrl,
+      hasImageBase64: !!imageBase64,
+      imageBase64Length: imageBase64?.length,
+      imageBase64Prefix: imageBase64?.substring(0, 50)
+    })
 
     // 参数校验
     if (!fileId && !imageUrl && !imageBase64) {
+      console.log('Error: No image parameter provided')
       return NextResponse.json(
         { error: 'Either fileId, imageUrl, or imageBase64 is required' },
         { status: 400 }
@@ -175,6 +203,14 @@ export async function POST(request: NextRequest) {
 
     // 处理文件ID方式
     if (fileId) {
+      // 只有已登录用户才能访问文件
+      if (!isAuthenticated) {
+        return NextResponse.json(
+          { error: 'File access requires authentication. Please use imageUrl or imageBase64 for anonymous access.' },
+          { status: 401 }
+        )
+      }
+      
       // 验证文件所有权
       const { data: fileData, error: fileError } = await supabase
         .from('files')
@@ -208,7 +244,9 @@ export async function POST(request: NextRequest) {
     // 处理直接传入的图片
     else {
       const validation = validateImageInput(imageUrl, imageBase64)
+      console.log('Image validation result:', validation)
       if (!validation.isValid) {
+        console.log('Validation failed:', validation.error)
         return NextResponse.json({ error: validation.error }, { status: 400 })
       }
 
@@ -233,9 +271,14 @@ export async function POST(request: NextRequest) {
 
     // 格式化结果
     const formattedResult = formatOCRResult(ocrResult)
+    
+    // 如果用户未登录，更新IP使用次数
+    if (!isAuthenticated) {
+      await updateIPUsage(clientIP)
+    }
 
-    // 如果有fileId，保存OCR结果到数据库
-    if (fileId && file) {
+    // 如果有fileId且用户已登录，保存OCR结果到数据库
+    if (fileId && file && isAuthenticated) {
       const { data: savedResult, error: saveError } = await supabase
         .from('ocr_results')
         .insert({
@@ -265,7 +308,8 @@ export async function POST(request: NextRequest) {
           ...formattedResult,
           processing_time: processingTime,
           status: 'completed',
-          provider: 'tencent'
+          provider: 'tencent',
+          user_type: 'authenticated'
         }
       })
     }
@@ -277,7 +321,8 @@ export async function POST(request: NextRequest) {
         ...formattedResult,
         processing_time: processingTime,
         status: 'completed',
-        provider: 'tencent'
+        provider: 'tencent',
+        user_type: isAuthenticated ? 'authenticated' : 'anonymous'
       }
     })
 

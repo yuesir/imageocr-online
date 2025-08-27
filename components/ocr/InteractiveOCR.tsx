@@ -9,7 +9,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Loader2, Images } from 'lucide-react'
 import { toast } from 'sonner'
-import { createWorker } from 'tesseract.js'
 
 // Removed OCRResultData interface - unified to use MultiOCRResult
 
@@ -90,6 +89,20 @@ export function InteractiveOCR() {
     setMultiImages(prev => [...prev, ...imageFiles])
   }, [])
 
+  // Helper function to convert file to base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => {
+        const result = reader.result as string
+        // Keep the full data URL format for Tencent Cloud OCR API
+        resolve(result)
+      }
+      reader.onerror = error => reject(error)
+    })
+  }
+
   const processMultiOCR = useCallback(async () => {
     if (multiImages.length === 0) {
       toast.error('Please select images first')
@@ -102,12 +115,7 @@ export function InteractiveOCR() {
 
     try {
       toast.info('Initializing OCR engine...')
-      const worker = await createWorker('eng+chi_sim', 1, {
-        workerPath: 'https://unpkg.com/tesseract.js@5.0.4/dist/worker.min.js',
-        langPath: 'https://tessdata.projectnaptha.com/4.0.0',
-        corePath: 'https://unpkg.com/tesseract.js-core@5.0.0/tesseract-core-simd.wasm.js'
-      })
-
+      
       const results: MultiOCRResult[] = []
       
       for (let i = 0; i < multiImages.length; i++) {
@@ -123,24 +131,55 @@ export function InteractiveOCR() {
             imageId: image.id,
             text: '',
             confidence: 0,
-            language: 'eng',
+            language: 'zh',
             processingTime: 0,
             status: 'processing'
           }
           results.push(processingResult)
           setMultiResults([...results])
           
-          const { data } = await worker.recognize(image.file)
+          // Convert image to base64
+          const base64Image = await fileToBase64(image.file)
+          
+          console.log('Sending OCR request:', {
+            imageBase64Length: base64Image.length,
+            imageBase64Prefix: base64Image.substring(0, 50),
+            fileName: image.file.name,
+            fileType: image.file.type
+          })
+          
+          // Call Tencent Cloud OCR API
+          const response = await fetch('/api/ocr/tencent', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              imageBase64: base64Image
+            })
+          })
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+          }
+          
+          const ocrResult = await response.json()
           const processingTime = Date.now() - startTime
           
-          // Update with success result
-          results[i] = {
-            ...processingResult,
-            text: data.text.trim(),
-            confidence: data.confidence / 100,
-            processingTime,
-            status: 'success'
+          if (ocrResult.success) {
+            // Update with success result
+            results[i] = {
+              ...processingResult,
+              text: ocrResult.result.text || '',
+              confidence: ocrResult.result.confidence || 0,
+              language: ocrResult.result.language || 'zh',
+              processingTime,
+              status: 'success'
+            }
+          } else {
+            throw new Error(ocrResult.error || 'OCR processing failed')
           }
+          
           setMultiResults([...results])
           
         } catch (error) {
@@ -148,13 +187,12 @@ export function InteractiveOCR() {
           results[i] = {
             ...results[i],
             status: 'error',
-            error: 'Processing failed'
+            error: error instanceof Error ? error.message : 'Processing failed'
           }
           setMultiResults([...results])
         }
       }
       
-      await worker.terminate()
       toast.success(`Completed processing ${multiImages.length} images`)
       
     } catch (error) {

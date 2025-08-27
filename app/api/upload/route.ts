@@ -4,15 +4,11 @@ import { validateImageFile, generateId } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
-    // Get user from session
+    // Get user from session (optional for anonymous users)
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+    // Allow both authenticated and anonymous users
+    const isAuthenticated = !authError && user
 
     const formData = await request.formData()
     const file = formData.get('file') as File
@@ -36,7 +32,10 @@ export async function POST(request: NextRequest) {
     // Generate unique filename
     const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg'
     const fileName = `${generateId()}.${fileExtension}`
-    const filePath = `uploads/${user.id}/${fileName}`
+    // Use different path for authenticated vs anonymous users
+    const filePath = isAuthenticated 
+      ? `uploads/${user!.id}/${fileName}`
+      : `temp/${fileName}`
 
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer())
@@ -63,41 +62,55 @@ export async function POST(request: NextRequest) {
       .from('ocr-files')
       .getPublicUrl(filePath)
 
-    // Save file record to database
-    const { data: fileRecord, error: dbError } = await supabase
-      .from('files')
-      .insert({
-        id: generateId(),
-        user_id: user.id,
-        filename: file.name,
-        file_path: filePath,
-        file_size: file.size,
-        mime_type: file.type,
-        storage_url: publicUrl
-      })
-      .select()
-      .single()
+    // Save file record to database only for authenticated users
+    if (isAuthenticated) {
+      const { data: fileRecord, error: dbError } = await supabase
+        .from('files')
+        .insert({
+          id: generateId(),
+          user_id: user!.id,
+          filename: file.name,
+          file_path: filePath,
+          file_size: file.size,
+          mime_type: file.type,
+          storage_url: publicUrl
+        })
+        .select()
+        .single()
 
-    if (dbError) {
-      console.error('Database error:', dbError)
-      // Clean up uploaded file
-      await supabase.storage.from('ocr-files').remove([filePath])
-      return NextResponse.json(
-        { error: 'Failed to save file record' },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json({
-      success: true,
-      file: {
-        id: fileRecord.id,
-        filename: fileRecord.filename,
-        url: publicUrl,
-        size: fileRecord.file_size,
-        type: fileRecord.mime_type
+      if (dbError) {
+        console.error('Database error:', dbError)
+        // Clean up uploaded file
+        await supabase.storage.from('ocr-files').remove([filePath])
+        return NextResponse.json(
+          { error: 'Failed to save file record' },
+          { status: 500 }
+        )
       }
-    })
+
+      return NextResponse.json({
+        success: true,
+        file: {
+          id: fileRecord.id,
+          filename: fileRecord.filename,
+          url: publicUrl,
+          size: fileRecord.file_size,
+          type: fileRecord.mime_type
+        }
+      })
+    } else {
+      // For anonymous users, return temporary file info without database record
+      return NextResponse.json({
+        success: true,
+        file: {
+          id: generateId(), // Temporary ID for frontend compatibility
+          filename: file.name,
+          url: publicUrl,
+          size: file.size,
+          type: file.type
+        }
+      })
+    }
 
   } catch (error) {
     console.error('Upload API error:', error)
