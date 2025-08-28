@@ -2,8 +2,8 @@
 
 import React, { useState, useCallback, useEffect } from 'react'
 import { MultiImageUpload } from '@/components/upload/MultiImageUpload'
-import { MultiImagePreview } from '@/src/components/MultiImagePreview'
-import { MultiImageResult } from '@/src/components/MultiImageResult'
+import { MultiImagePreview } from '@/components/MultiImagePreview'
+import { MultiImageResult } from '@/components/MultiImageResult'
 import { Images } from 'lucide-react'
 import { toast } from 'sonner'
 
