@@ -7,9 +7,9 @@ import { Toaster } from 'sonner'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'ImageOCRAI - AI-Powered Text Extraction',
-  description: 'Extract text from images instantly with our advanced OCR technology. Support for multiple languages, formats, and real-time processing.',
-  keywords: 'OCR, text extraction, image to text, AI, machine learning, document processing',
+  title: 'Free Online Image to Text OCR Converter& Batch Photo Scanner - ImageOCRAI',
+  description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Batch OCR multiple files, extract text on any device—no software needed.',
+  keywords: '',
   authors: [{ name: 'ImageOCRAI Team' }],
   creator: 'ImageOCRAI',
   publisher: 'ImageOCRAI',
@@ -23,8 +23,8 @@ export const metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'ImageOCRAI - AI-Powered Text Extraction',
-    description: 'Extract text from images instantly with our advanced OCR technology.',
+    title: 'ImageOCRAI - Free Online Image to Text OCR Converter& Batch Photo Scanner',
+    description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Batch OCR multiple files, extract text on any device—no software needed.',
     url: 'https://imageocrai.com',
     siteName: 'ImageOCRAI',
     images: [
@@ -32,7 +32,7 @@ export const metadata = {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'ImageOCRAI - AI-Powered Text Extraction',
+        alt: 'ImageOCRAI - Free Online Image to Text OCR Converter& Batch Photo Scanner',
       },
     ],
     locale: 'en_US',
@@ -40,8 +40,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ImageOCRAI - AI-Powered Text Extraction',
-    description: 'Extract text from images instantly with our advanced OCR technology.',
+    title: 'ImageOCRAI - Free Online Image to Text OCR Converter& Batch Photo Scanner',
+    description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Batch OCR multiple files, extract text on any device—no software needed.',
     images: ['/og-image.jpg'],
   },
   robots: {
