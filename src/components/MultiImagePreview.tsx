@@ -19,7 +19,6 @@ interface ImageFile {
 interface MultiImagePreviewProps {
   images: ImageFile[]
   onImagesChange: (images: ImageFile[]) => void
-  onBack: () => void
   onConvert: (images: ImageFile[]) => void
   isProcessing?: boolean
 }
@@ -28,7 +27,6 @@ export function MultiImagePreview({
   images,
   onImagesChange,
   onConvert,
-  onBack,
   isProcessing = false
 }: MultiImagePreviewProps) {
   const [isDragOver, setIsDragOver] = useState(false)

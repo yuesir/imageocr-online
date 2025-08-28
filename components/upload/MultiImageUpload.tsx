@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
-import { Upload, X, FileImage, AlertCircle, Plus, Trash2 } from 'lucide-react'
+import { Upload, X, AlertCircle, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { validateImageFile, formatFileSize } from '@/lib/utils'
@@ -17,7 +17,6 @@ interface ImageFile {
 
 interface MultiImageUploadProps {
   onFilesChange: (files: ImageFile[]) => void
-  onFilesSelect?: (files: File[]) => void
   selectedFiles: ImageFile[]
   isProcessing?: boolean
   className?: string
@@ -26,7 +25,6 @@ interface MultiImageUploadProps {
 
 export function MultiImageUpload({
   onFilesChange,
-  onFilesSelect,
   selectedFiles,
   isProcessing = false,
   className = '',

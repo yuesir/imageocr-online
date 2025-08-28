@@ -4,10 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { MultiImageUpload } from '@/components/upload/MultiImageUpload'
 import { MultiImagePreview } from '@/src/components/MultiImagePreview'
 import { MultiImageResult } from '@/src/components/MultiImageResult'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Loader2, Images } from 'lucide-react'
+import { Images } from 'lucide-react'
 import { toast } from 'sonner'
 
 // Removed OCRResultData interface - unified to use MultiOCRResult
@@ -42,18 +39,6 @@ export function InteractiveOCR() {
   // Removed single image mode handlers - unified to multi-image approach
 
   // Multi-image handlers
-  const handleMultiFileSelect = useCallback((files: File[]) => {
-    const imageFiles: ImageFile[] = files.map(file => ({
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      file,
-      preview: URL.createObjectURL(file),
-      selected: false
-    }))
-    setMultiImages(prev => {
-      const newImages = [...prev, ...imageFiles]
-      return newImages
-    })
-  }, [])
 
   // Auto-switch to preview mode when images are added
   useEffect(() => {
@@ -62,32 +47,7 @@ export function InteractiveOCR() {
     }
   }, [multiImages.length, viewMode])
 
-  const handleImageToggle = useCallback((imageId: string) => {
-    setMultiImages(prev => prev.map(img => 
-      img.id === imageId ? { ...img, selected: !img.selected } : img
-    ))
-  }, [])
 
-  const handleDeleteSelected = useCallback(() => {
-    setMultiImages(prev => {
-      const remaining = prev.filter(img => !img.selected)
-      // Clean up object URLs for deleted images
-      prev.filter(img => img.selected).forEach(img => {
-        URL.revokeObjectURL(img.preview)
-      })
-      return remaining
-    })
-  }, [])
-
-  const handleAddMoreImages = useCallback((files: File[]) => {
-    const imageFiles: ImageFile[] = files.map(file => ({
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      file,
-      preview: URL.createObjectURL(file),
-      selected: false
-    }))
-    setMultiImages(prev => [...prev, ...imageFiles])
-  }, [])
 
   // Helper function to convert file to base64
   const fileToBase64 = (file: File): Promise<string> => {
@@ -217,7 +177,6 @@ export function InteractiveOCR() {
             <h3 className="text-lg font-semibold">Select Multiple Images</h3>
           </div>
           <MultiImageUpload
-            onFilesSelect={handleMultiFileSelect}
             onFilesChange={setMultiImages}
             selectedFiles={multiImages}
             maxFiles={10}
@@ -230,8 +189,7 @@ export function InteractiveOCR() {
         <MultiImagePreview
           images={multiImages}
           onImagesChange={setMultiImages}
-          onBack={() => setViewMode('multi-upload')}
-          onConvert={processMultiOCR}
+          onConvert={() => processMultiOCR()}
           isProcessing={isMultiProcessing}
         />
       )}
@@ -241,10 +199,7 @@ export function InteractiveOCR() {
         <MultiImageResult
           images={multiImages}
           results={multiResults}
-          isProcessing={isMultiProcessing}
           onBack={() => setViewMode('multi-preview')}
-          onAddMore={() => setViewMode('multi-upload')}
-          onImageToggle={handleImageToggle}
         />
       )}
     </div>

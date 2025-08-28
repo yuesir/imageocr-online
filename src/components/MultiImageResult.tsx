@@ -44,19 +44,13 @@ interface MultiImageResultProps {
   results: OCRResult[]
   onBack: () => void
   onRetry?: (imageIds: string[]) => void
-  onAddMore: () => void
-  onImageToggle: (imageId: string) => void
-  isProcessing: boolean
 }
 
 export function MultiImageResult({
   images,
   results,
   onBack,
-  onRetry,
-  onAddMore,
-  onImageToggle,
-  isProcessing
+  onRetry
 }: MultiImageResultProps) {
   const [editingResults, setEditingResults] = useState<Record<string, string>>({})
   const [previewImage, setPreviewImage] = useState<string | null>(null)
@@ -106,14 +100,7 @@ export function MultiImageResult({
     }
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'success': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-      case 'error': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-      case 'processing': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-    }
-  }
+
 
   return (
     <div className="space-y-6">

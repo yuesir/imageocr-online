@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { ImageUpload } from '@/components/upload/ImageUpload'
 import { OCRResult } from '@/components/ocr/OCRResult'
 import { Button } from '@/components/ui/button'
@@ -30,9 +29,13 @@ interface OCRResultData {
   createdAt?: string
 }
 
+interface OCRRequestBody {
+  fileId?: string
+  imageBase64?: string
+}
+
 export default function OCRPage() {
   const { user } = useAuth()
-  const router = useRouter()
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null)
   const [ocrResult, setOcrResult] = useState<OCRResultData | null>(null)
@@ -103,7 +106,7 @@ export default function OCRPage() {
 
     setIsProcessing(true)
     try {
-      let requestBody: any
+      let requestBody: OCRRequestBody
 
       // For authenticated users, use fileId
       if (user) {

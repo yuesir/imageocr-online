@@ -4,7 +4,7 @@ import { getClientIP, checkIPDailyLimit, updateIPUsage } from '@/lib/ip-usage'
 import { Buffer } from 'buffer'
 
 // 腾讯云OCR SDK
-const tencentcloud = require('tencentcloud-sdk-nodejs-ocr')
+import * as tencentcloud from 'tencentcloud-sdk-nodejs-ocr'
 const OcrClient = tencentcloud.ocr.v20181119.Client
 
 // 腾讯云配置
@@ -64,8 +64,14 @@ function validateImageInput(imageUrl?: string, imageBase64?: string): { isValid:
   return { isValid: true }
 }
 
+// 腾讯云错误类型定义
+interface TencentError {
+  code?: string;
+  message?: string;
+}
+
 // 错误处理函数
-function handleTencentError(error: any): { status: number; message: string } {
+function handleTencentError(error: TencentError): { status: number; message: string } {
   console.error('Tencent OCR Error:', error)
 
   // 腾讯云特定错误码处理
@@ -107,18 +113,29 @@ function handleTencentError(error: any): { status: number; message: string } {
   return { status: 500, message: 'Unknown error occurred' }
 }
 
+// 腾讯云OCR检测结果类型（匹配SDK类型）
+interface TencentTextDetection {
+  DetectedText: string;
+  Confidence: number;
+  Polygon: Array<{ X?: number; Y?: number }>;
+}
+
+interface TencentOCRResult {
+  TextDetections?: TencentTextDetection[];
+}
+
 // 标准化OCR结果格式
-function formatOCRResult(tencentResult: any) {
+function formatOCRResult(tencentResult: TencentOCRResult) {
   const textDetections = tencentResult.TextDetections || []
   
   // 提取所有文本
   const extractedText = textDetections
-    .map((detection: any) => detection.DetectedText)
+    .map((detection: TencentTextDetection) => detection.DetectedText)
     .join('\n')
 
   // 计算平均置信度
   const avgConfidence = textDetections.length > 0
-    ? textDetections.reduce((sum: number, detection: any) => sum + (detection.Confidence || 0), 0) / textDetections.length / 100
+    ? textDetections.reduce((sum: number, detection: TencentTextDetection) => sum + (detection.Confidence || 0), 0) / textDetections.length / 100
     : 0
 
   // 检测语言（简单启发式）
@@ -136,10 +153,10 @@ function formatOCRResult(tencentResult: any) {
     language: detectedLanguage,
     word_count: wordCount,
     character_count: characterCount,
-    text_detections: textDetections.map((detection: any) => ({
+    text_detections: textDetections.map((detection: TencentTextDetection) => ({
       text: detection.DetectedText,
       confidence: detection.Confidence / 100,
-      polygon: detection.Polygon
+      polygon: detection.Polygon.map(coord => ({ X: coord.X || 0, Y: coord.Y || 0 }))
     }))
   }
 }
@@ -198,8 +215,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let ocrParams: any = {}
-    let file: any = null
+    // OCR参数类型
+    interface OCRParams {
+      ImageBase64?: string;
+      ImageUrl?: string;
+    }
+
+    // 文件数据类型
+    interface FileData {
+      id: string;
+      user_id: string;
+      file_path: string;
+      filename: string;
+      file_size: number;
+      mime_type: string;
+      created_at: string;
+    }
+
+    const ocrParams: OCRParams = {}
+    let file: FileData | null = null
 
     // 处理文件ID方式
     if (fileId) {
@@ -228,7 +262,7 @@ export async function POST(request: NextRequest) {
       // 从Supabase Storage获取文件
       const { data: fileBlob, error: downloadError } = await supabase.storage
         .from('ocr-files')
-        .download(file.file_path)
+        .download(file!.file_path)
 
       if (downloadError || !fileBlob) {
         return NextResponse.json({ error: 'Failed to download file' }, { status: 500 })
@@ -326,8 +360,9 @@ export async function POST(request: NextRequest) {
       }
     })
 
-  } catch (error: any) {
-    const errorInfo = handleTencentError(error)
+  } catch (error: unknown) {
+    const tencentError = error as TencentError
+    const errorInfo = handleTencentError(tencentError)
     return NextResponse.json(
       { error: errorInfo.message },
       { status: errorInfo.status }
