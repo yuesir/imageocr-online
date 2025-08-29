@@ -7,7 +7,7 @@ import { Toaster } from 'sonner'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Free Online Image to Text OCR Converter& Batch Photo Scanner - ImageOCRAI',
+  title: 'Free Online Image to Text OCR Converter & Batch Photo Scanner - ImageOCRAI',
   description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Batch OCR multiple files, extract text on any device—no software needed.',
   keywords: '',
   authors: [{ name: 'ImageOCRAI Team' }],
@@ -54,6 +54,18 @@ export const metadata = {
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
+  },
+  icons: {
+    icon: [
+      {
+        url: '/favicon.svg',
+        type: 'image/svg+xml',
+      },
+      {
+        url: '/favicon.ico',
+        type: 'image/x-icon',
+      },
+    ],
   },
 }
 
