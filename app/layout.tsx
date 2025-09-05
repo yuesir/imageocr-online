@@ -3,6 +3,9 @@ import './globals.css'
 import { AuthProvider } from '@/hooks/useAuth'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { Toaster } from 'sonner'
+import { GoogleAnalytics } from '@next/third-parties/google'
+import { CookieConsent } from '@/components/analytics/CookieConsent'
+import { PageTrackingProvider } from '@/hooks/usePageTracking'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -74,18 +77,52 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // 获取 Google Analytics 测量 ID
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Google Analytics - 预加载和隐私配置 */}
+        {gaId && (
+          <>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  
+                  // 默认拒绝所有 cookies，等待用户同意
+                  gtag('consent', 'default', {
+                    'analytics_storage': 'denied',
+                    'ad_storage': 'denied',
+                    'wait_for_update': 500
+                  });
+                `,
+              }}
+            />
+          </>
+        )}
+      </head>
       <body className={inter.className}>
         <ThemeProvider
           defaultTheme="system"
           storageKey="imageocrai-ui-theme"
         >
           <AuthProvider>
-            {children}
-            <Toaster position="top-right" richColors />
+            <PageTrackingProvider>
+              {children}
+              <Toaster position="top-right" richColors />
+              {/* Cookie 同意组件 */}
+              <CookieConsent />
+            </PageTrackingProvider>
           </AuthProvider>
         </ThemeProvider>
+        {/* Google Analytics - 仅在有有效 GA ID 时加载 */}
+        {gaId && (
+          <GoogleAnalytics gaId={gaId} />
+        )}
       </body>
     </html>
   )
