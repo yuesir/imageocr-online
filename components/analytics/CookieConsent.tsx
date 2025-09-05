@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { X, Cookie, Shield } from 'lucide-react'
 
 /**
- * Cookie 同意组件
- * 符合 GDPR 和其他隐私法规要求
+ * Cookie Consent Component
+ * Complies with GDPR and other privacy regulations
  */
 export function CookieConsent() {
   const [showConsent, setShowConsent] = useState(false)
@@ -32,11 +32,11 @@ export function CookieConsent() {
       localStorage.setItem('cookie-consent', 'accepted')
       localStorage.setItem('cookie-consent-date', new Date().toISOString())
       
-      // 启用 Google Analytics
+      // Enable Google Analytics
       if (typeof window !== 'undefined' && window.gtag) {
         window.gtag('consent', 'update', {
           analytics_storage: 'granted',
-          ad_storage: 'denied', // 我们不使用广告，所以拒绝
+          ad_storage: 'denied', // We don't use ads, so deny
         })
       }
       
@@ -55,7 +55,7 @@ export function CookieConsent() {
       localStorage.setItem('cookie-consent', 'declined')
       localStorage.setItem('cookie-consent-date', new Date().toISOString())
       
-      // 拒绝所有非必要 cookies
+      // Deny all non-essential cookies
       if (typeof window !== 'undefined' && window.gtag) {
         window.gtag('consent', 'update', {
           analytics_storage: 'denied',
@@ -80,13 +80,13 @@ export function CookieConsent() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center p-4 pointer-events-none">
-      <Card className="w-full max-w-md pointer-events-auto animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pointer-events-none">
+      <Card className="w-full pointer-events-auto animate-in slide-in-from-bottom-4 duration-300">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Cookie className="h-5 w-5 text-orange-500" />
-              <CardTitle className="text-lg">Cookie 使用通知</CardTitle>
+              <CardTitle className="text-lg">Cookie Usage Notice</CardTitle>
             </div>
             <Button
               variant="ghost"
@@ -100,13 +100,13 @@ export function CookieConsent() {
         </CardHeader>
         <CardContent className="space-y-4">
           <CardDescription className="text-sm leading-relaxed">
-            我们使用 cookies 来改善您的体验并分析网站使用情况。这些数据帮助我们了解用户如何使用我们的 OCR 服务，以便持续改进。
+            We use cookies to improve your experience and analyze website usage. This data helps us understand how users interact with our OCR service for continuous improvement.
           </CardDescription>
           
           <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
             <Shield className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
             <div className="text-xs text-blue-700 dark:text-blue-300">
-              <strong>隐私保护：</strong>我们不会收集个人身份信息，所有数据都经过匿名化处理。您可以随时在设置中更改这些偏好。
+              <strong>Privacy Protection:</strong> We do not collect personal identification information, and all data is anonymized. You can change these preferences at any time in settings.
             </div>
           </div>
 
@@ -117,7 +117,7 @@ export function CookieConsent() {
               className="flex-1"
               size="sm"
             >
-              {isLoading ? '处理中...' : '接受'}
+              {isLoading ? 'Processing...' : 'Accept'}
             </Button>
             <Button
               onClick={handleDecline}
@@ -126,14 +126,14 @@ export function CookieConsent() {
               className="flex-1"
               size="sm"
             >
-              {isLoading ? '处理中...' : '拒绝'}
+              {isLoading ? 'Processing...' : 'Decline'}
             </Button>
           </div>
           
           <p className="text-xs text-muted-foreground text-center">
-            继续使用本网站即表示您同意我们的
+            By continuing to use this website, you agree to our
             <a href="/privacy" className="underline hover:no-underline ml-1">
-              隐私政策
+              Privacy Policy
             </a>
           </p>
         </CardContent>
@@ -143,8 +143,8 @@ export function CookieConsent() {
 }
 
 /**
- * 检查用户的 cookie 同意状态
- * @returns {'accepted' | 'declined' | null} 同意状态
+ * Check user's cookie consent status
+ * @returns {'accepted' | 'declined' | null} Consent status
  */
 export function getCookieConsent(): 'accepted' | 'declined' | null {
   if (typeof window === 'undefined') return null
@@ -154,7 +154,7 @@ export function getCookieConsent(): 'accepted' | 'declined' | null {
 }
 
 /**
- * 重置 cookie 同意状态（用于设置页面）
+ * Reset cookie consent status (for settings page)
  */
 export function resetCookieConsent(): void {
   if (typeof window === 'undefined') return
@@ -162,13 +162,13 @@ export function resetCookieConsent(): void {
   localStorage.removeItem('cookie-consent')
   localStorage.removeItem('cookie-consent-date')
   
-  // 重新加载页面以显示同意对话框
+  // Reload page to show consent dialog
   window.location.reload()
 }
 
 /**
- * 获取 cookie 同意的日期
- * @returns {Date | null} 同意日期
+ * Get cookie consent date
+ * @returns {Date | null} Consent date
  */
 export function getCookieConsentDate(): Date | null {
   if (typeof window === 'undefined') return null
