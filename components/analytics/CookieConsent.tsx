@@ -102,6 +102,10 @@ export function CookieConsent() {
           <div className="flex-1 space-y-2">
             <CardDescription className="text-sm leading-snug">
               We use cookies to improve your experience and analyze website usage. This data helps us understand how users interact with our OCR service for continuous improvement.
+              By continuing to use this website, you agree to our
+              <a href="/privacy" className="underline hover:no-underline ml-1">
+                Privacy Policy
+              </a>
             </CardDescription>
             
             <div className="flex items-start gap-2 p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
@@ -110,13 +114,6 @@ export function CookieConsent() {
                 <strong>Privacy Protection:</strong> We do not collect personal identification information, and all data is anonymized. You can change these preferences at any time in settings.
               </div>
             </div>
-
-            <p className="text-xs text-muted-foreground pt-1">
-              By continuing to use this website, you agree to our
-              <a href="/privacy" className="underline hover:no-underline ml-1">
-                Privacy Policy
-              </a>
-            </p>
           </div>
 
           <div className="flex flex-col gap-2 min-w-[160px]">
