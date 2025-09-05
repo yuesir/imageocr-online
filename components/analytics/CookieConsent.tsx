@@ -98,23 +98,32 @@ export function CookieConsent() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-2 pt-0">
-          <CardDescription className="text-sm leading-snug">
-            We use cookies to improve your experience and analyze website usage. This data helps us understand how users interact with our OCR service for continuous improvement.
-          </CardDescription>
-          
-          <div className="flex items-start gap-2 p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-            <Shield className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-            <div className="text-xs text-blue-700 dark:text-blue-300">
-              <strong>Privacy Protection:</strong> We do not collect personal identification information, and all data is anonymized. You can change these preferences at any time in settings.
+        <CardContent className="flex items-start gap-4 pt-0">
+          <div className="flex-1 space-y-2">
+            <CardDescription className="text-sm leading-snug">
+              We use cookies to improve your experience and analyze website usage. This data helps us understand how users interact with our OCR service for continuous improvement.
+            </CardDescription>
+            
+            <div className="flex items-start gap-2 p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+              <Shield className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+              <div className="text-xs text-blue-700 dark:text-blue-300">
+                <strong>Privacy Protection:</strong> We do not collect personal identification information, and all data is anonymized. You can change these preferences at any time in settings.
+              </div>
             </div>
+
+            <p className="text-xs text-muted-foreground pt-1">
+              By continuing to use this website, you agree to our
+              <a href="/privacy" className="underline hover:no-underline ml-1">
+                Privacy Policy
+              </a>
+            </p>
           </div>
 
-          <div className="flex gap-2 pt-1">
+          <div className="flex flex-col gap-2 min-w-[160px]">
             <Button
               onClick={handleAccept}
               disabled={isLoading}
-              className="flex-1"
+              className="w-full"
               size="sm"
             >
               {isLoading ? 'Processing...' : 'Accept'}
@@ -123,19 +132,12 @@ export function CookieConsent() {
               onClick={handleDecline}
               disabled={isLoading}
               variant="outline"
-              className="flex-1"
+              className="w-full"
               size="sm"
             >
               {isLoading ? 'Processing...' : 'Decline'}
             </Button>
           </div>
-          
-          <p className="text-xs text-muted-foreground text-center pt-1">
-            By continuing to use this website, you agree to our
-            <a href="/privacy" className="underline hover:no-underline ml-1">
-              Privacy Policy
-            </a>
-          </p>
         </CardContent>
       </Card>
     </div>
