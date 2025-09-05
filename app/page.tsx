@@ -538,15 +538,15 @@ export default function HomePage() {
             <div>
               <h3 className="font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Cookie Policy</Link></li>
+                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+                <li><Link href="/cookie-policy" className="hover:text-white transition-colors">Cookie Policy</Link></li>
               </ul>
             </div>
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 ImageOCRAI. All rights reserved.</p>
+            <p>&copy; 2025 ImageOCRAI. All rights reserved.</p>
           </div>
         </div>
       </footer>
