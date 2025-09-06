@@ -192,7 +192,9 @@ export async function POST(request: NextRequest) {
       hasImageUrl: !!imageUrl,
       hasImageBase64: !!imageBase64,
       imageBase64Length: imageBase64?.length,
-      imageBase64Prefix: imageBase64?.substring(0, 50)
+      imageBase64Prefix: imageBase64?.substring(0, 100),
+      imageBase64Type: typeof imageBase64,
+      isValidDataUrl: imageBase64 ? /^data:image\/(jpeg|jpg|png|bmp|gif|webp|tiff|heic);base64,/.test(imageBase64) : false
     })
 
     // 参数校验
@@ -277,6 +279,13 @@ export async function POST(request: NextRequest) {
 
     const startTime = Date.now()
 
+    console.log('About to call Ali VL API with:', {
+      imageDataUrlLength: imageDataUrl.length,
+      imageDataUrlPrefix: imageDataUrl.substring(0, 100),
+      isDataUrl: imageDataUrl.startsWith('data:'),
+      hasBase64Comma: imageDataUrl.includes(';base64,')
+    })
+
     // 调用阿里云视觉API
     const response = await aliVLClient.chat.completions.create({
       model: "qwen-vl-max-2025-04-02",
@@ -295,7 +304,8 @@ export async function POST(request: NextRequest) {
           }
         }, {
           type: "text",
-          text: "Please extract all text from this image. Return only the text content without any additional explanation."
+          // text: "Please extract all text from this image. Return only the text content without any additional explanation."
+          text: "提取图片文字并原样输出"
         }]
       }]
     })

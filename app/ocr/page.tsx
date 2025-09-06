@@ -119,9 +119,9 @@ export default function OCRPage() {
           const reader = new FileReader()
           reader.onload = () => {
             const result = reader.result as string
-            // Remove data:image/...;base64, prefix
-            const base64Data = result.split(',')[1]
-            resolve(base64Data)
+            // Keep the full data URL format for Ali Cloud Vision API
+            // Required format: data:image/[type];base64,[data]
+            resolve(result)
           }
           reader.onerror = reject
           reader.readAsDataURL(selectedFile)
@@ -132,7 +132,7 @@ export default function OCRPage() {
         }
       }
 
-      const response = await fetch('/api/ocr/tencent', {
+      const response = await fetch('/api/ocr/ali_vl', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -56,7 +56,8 @@ export function InteractiveOCR() {
       reader.readAsDataURL(file)
       reader.onload = () => {
         const result = reader.result as string
-        // Keep the full data URL format for Tencent Cloud OCR API
+        // Keep the full data URL format for Ali Cloud Vision API
+        // Required format: data:image/[type];base64,[data]
         resolve(result)
       }
       reader.onerror = error => reject(error)
@@ -101,15 +102,24 @@ export function InteractiveOCR() {
           // Convert image to base64
           const base64Image = await fileToBase64(image.file)
           
+
+          
+          // Validate Base64 format for Ali Cloud API
+          const base64Regex = /^data:image\/(jpeg|jpg|png|bmp|gif|webp|tiff|heic);base64,/
+          if (!base64Regex.test(base64Image)) {
+            throw new Error(`Invalid Base64 format. Expected: data:image/[type];base64,[data], Got: ${base64Image.substring(0, 50)}...`)
+          }
+          
           console.log('Sending OCR request:', {
             imageBase64Length: base64Image.length,
             imageBase64Prefix: base64Image.substring(0, 50),
             fileName: image.file.name,
-            fileType: image.file.type
+            fileType: image.file.type,
+            base64Valid: base64Regex.test(base64Image)
           })
           
-          // Call Tencent Cloud OCR API
-          const response = await fetch('/api/ocr/tencent', {
+          // Call Ali Cloud Vision OCR API
+          const response = await fetch('/api/ocr/ali_vl', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -127,7 +137,7 @@ export function InteractiveOCR() {
           const processingTime = Date.now() - startTime
           
           if (ocrResult.success) {
-            // Update with success result
+            // Update with success result from Ali Cloud Vision API
             results[i] = {
               ...processingResult,
               text: ocrResult.result.text || '',
