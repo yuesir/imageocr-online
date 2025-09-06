@@ -1,0 +1,62 @@
+# 阿里视觉理解 API 接口文档（https://help.aliyun.com/zh/model-studio/vision/?spm=a2c4g.11186623.0.i30#afa499b5b1rl5）
+
+## OpenAI 兼容方式调用接口示例
+
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  // 若没有配置环境变量，请用百炼API Key将下行替换为：apiKey: "sk-xxx"
+  apiKey: 'sk-d0ad6e7a48094160acaa9aea8eebb71d',
+  baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+});
+
+async function main() {
+  const response = await openai.chat.completions.create({
+    model: "qwen-vl-max-2025-04-02",  // 此处以qwen-vl-max-latest为例，可按需更换模型名称。模型列表：https://help.aliyun.com/zh/model-studio/models
+    messages: [{
+        role: "system",
+        content: [{
+          type: "text",
+          text: "You are a helpful assistant."
+        }]
+      },
+      {
+        role: "user",
+        content: [{
+            type: "image_url",
+            image_url: {
+              "url": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20241022/emyrja/dog_and_girl.jpeg"
+            }
+          },
+          {
+            type: "text",
+            text: "图中描绘的是什么景象?"
+          }
+        ]
+      }
+    ]
+  });
+  console.log(response.choices[0].message.content);
+}
+
+
+## 传入本地图片
+将文件转换为 Base64 编码字符串，再传入模型。适用于 OpenAI 和 DashScope SDK 及 HTTP 方式
+**传入 Base64 编码字符串的步骤（以图像为例）**
+      
+1. 文件编码：将本地图像转换为 Base64 编码；
+2. 构建[Data URL](https://www.rfc-editor.org/rfc/rfc2397)：格式如下：data:[MIME_type];base64,{base64_image}；
+1. MIME_type需替换为实际的媒体类型，确保与[支持的图像](#afa499b5b1rl5)表格中MIME Type 的值匹配（如image/jpeg、image/png）；
+2. base64_image为上一步生成的 Base64 字符串；
+3. 调用模型：通过image或image_url参数传递Data URL并调用模型。
+
+## base64 图片格式
+
+| 图像格式 | 常见扩展名 | MIME Type |
+| --- | --- | --- |
+| BMP | .bmp | image/bmp |
+| JPEG | .jpe, .jpeg, .jpg | image/jpeg |
+| PNG | .png | image/png |
+| TIFF | .tif, .tiff | image/tiff |
+| WEBP | .webp | image/webp |
+| HEIC | .heic | image/heic |
