@@ -217,7 +217,7 @@ export default function HomePage() {
                 onClick={() => toggleFAQ(2)}
               >
                 <h3 className="text-lg font-semibold text-foreground">
-                  How to use OCR to extract text from image?
+                  How to transcribe text from image?
                 </h3>
                 {openFAQ === 2 ? (
                   <ChevronUp className="h-5 w-5 text-muted-foreground" />
@@ -228,7 +228,7 @@ export default function HomePage() {
               {openFAQ === 2 && (
                 <div className="px-6 pb-4">
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    Our OCR system uses advanced AI algorithms to extract text with high precision. Here's how to maximize extraction accuracy:
+                    ImageOcrAI transcribes text from images using advanced AI algorithms. Here's how to maximize accuracy:
                   </p>
                   <div className="space-y-4">
                     <div>

@@ -4,13 +4,13 @@ import { AuthProvider } from '@/hooks/useAuth'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { Toaster } from 'sonner'
 import { GoogleAnalytics } from '@next/third-parties/google'
-import { CookieConsent } from '@/components/analytics/CookieConsent'
 import { PageTrackingProvider } from '@/hooks/usePageTracking'
 
 const inter = Inter({ subsets: ['latin'] })
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const metadata = {
-  title: 'Free Online Image to Text OCR Converter & Batch Photo Scanner - ImageOCRAI',
+  title: 'Free Online Image to Text OCR Converter & Batch Transcribe Image to Text - ImageOCRAI',
   description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Batch OCR multiple files, extract text on any device—no software needed.',
   keywords: '',
   authors: [{ name: 'ImageOCRAI Team' }],
@@ -26,7 +26,7 @@ export const metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'ImageOCRAI - Free Online Image to Text OCR Converter& Batch Photo Scanner',
+    title: 'ImageOCRAI - Free Online Image to Text OCR Converter & Batch Photo Scanner',
     description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Batch OCR multiple files, extract text on any device—no software needed.',
     url: 'https://imageocrai.com',
     siteName: 'ImageOCRAI',
@@ -35,7 +35,7 @@ export const metadata = {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'ImageOCRAI - Free Online Image to Text OCR Converter& Batch Photo Scanner',
+        alt: 'ImageOCRAI - Free Online Image to Text OCR Converter & Batch Photo Scanner',
       },
     ],
     locale: 'en_US',
@@ -43,7 +43,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ImageOCRAI - Free Online Image to Text OCR Converter& Batch Photo Scanner',
+    title: 'ImageOCRAI - Free Online Image to Text OCR Converter & Batch Photo Scanner',
     description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Batch OCR multiple files, extract text on any device—no software needed.',
     images: ['/og-image.jpg'],
   },
@@ -114,8 +114,6 @@ export default function RootLayout({
             <PageTrackingProvider>
               {children}
               <Toaster position="top-right" richColors />
-              {/* Cookie 同意组件 */}
-              <CookieConsent />
             </PageTrackingProvider>
           </AuthProvider>
         </ThemeProvider>

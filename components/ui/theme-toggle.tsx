@@ -40,6 +40,10 @@ export function ThemeToggle() {
   }
 
   const getTooltip = () => {
+    if (!mounted) {
+      return 'Toggle theme'
+    }
+    
     if (theme === 'light') {
       return 'Switch to dark mode'
     } else if (theme === 'dark') {
