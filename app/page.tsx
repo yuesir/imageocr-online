@@ -3,14 +3,14 @@
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { LogIn, User, Zap, Upload, Shield, Clock, Star, ArrowRight, Settings, FileText, ChevronDown, ChevronUp } from 'lucide-react'
+import { Upload, Shield, Clock, Star, ArrowRight, ChevronDown, ChevronUp, Zap, User } from 'lucide-react'
 import Link from 'next/link'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { InteractiveOCR } from '@/components/ocr/InteractiveOCR'
+import { Header } from '@/components/layout/Header'
 import { useState } from 'react'
 
 export default function HomePage() {
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
   const [openFAQ, setOpenFAQ] = useState<number | null>(null)
 
   const toggleFAQ = (index: number) => {
@@ -19,61 +19,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      {/* Navigation */}
-      <nav className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Zap className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-foreground">ImageOCRAI</span>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <ThemeToggle />
-              {user ? (
-                <>
-                  <span className="text-sm text-muted-foreground">
-                    Welcome, {user.email}
-                  </span>
-                  <Link href="/dashboard">
-                    <Button variant="ghost" size="sm">
-                      <FileText className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <Link href="/preferences">
-                    <Button variant="ghost" size="sm">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => signOut()}
-                  >
-                    Sign Out
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Link href="/login">
-                    <Button variant="ghost" size="sm">
-                      <LogIn className="mr-2 h-4 w-4" />
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link href="/signup">
-                    <Button size="sm">
-                      Sign Up
-                    </Button>
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
 
 
