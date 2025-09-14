@@ -96,6 +96,11 @@ export function Footer() {
                   Image OCR Japanese
                 </Link>
               </li>
+              <li>
+                <Link href="/png-to-text" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                  PNG Image to Text
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
