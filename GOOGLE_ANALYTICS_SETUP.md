@@ -93,7 +93,7 @@ setUserProperties({
 ### Cookie 同意管理
 
 ```typescript
-import { getCookieConsent, resetCookieConsent } from '@/components/analytics/CookieConsent'
+import { getCookieConsent, resetCookieConsent } from '@/lib/cookie-consent'
 
 // 检查同意状态
 const consent = getCookieConsent() // 'accepted' | 'declined' | null

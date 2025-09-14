@@ -2,11 +2,12 @@ import { Metadata } from 'next'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const metadata: Metadata = {
-  title: 'Privacy Policy | ImageOCR Online',
-  description: 'Privacy Policy for ImageOCR Online - Learn how we collect, use, and protect your personal information.',
-  keywords: 'privacy policy, data protection, GDPR, personal information, cookies',
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Privacy Policy | ImageOCR Online',
+    description: 'Privacy Policy for ImageOCR Online - Learn how we collect, use, and protect your personal information.',
+    keywords: 'privacy policy, data protection, GDPR, personal information, cookies',
+  }
 }
 
 export default function PrivacyPolicy() {

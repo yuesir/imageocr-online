@@ -23,14 +23,14 @@ export function Header() {
             <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Home
             </Link>
-            <Link href="/#ocr-services" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              OCR Services
+            <Link href="/invoices-ocr" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Invoice OCR
             </Link>
-            <Link href="/#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Features
+            <Link href="/jpg-to-text" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              JPG to Text
             </Link>
-            <Link href="/#faq" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              FAQ
+            <Link href="/receipts-ocr" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Receipt OCR
             </Link>
           </div>
           

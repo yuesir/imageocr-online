@@ -1,6 +1,6 @@
 "use client";
 
-import { PassportOCR } from "@/components/ocr/PassportOCR";
+import { InteractiveOCR } from "@/components/ocr/InteractiveOCR";
 
 export default function PassportOCRPage() {
   return (
@@ -20,7 +20,7 @@ export default function PassportOCRPage() {
 
         {/* OCR Section */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
-          <PassportOCR />
+          <InteractiveOCR />
         </div>
 
         {/* How to Use Section */}

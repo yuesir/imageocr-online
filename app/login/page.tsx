@@ -4,10 +4,11 @@ import { ThemeToggle } from '@/components/ui/theme-toggle'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const metadata: Metadata = {
-  title: 'Sign In | ImageOCRAI',
-  description: 'Sign in to your ImageOCRAI account to access your OCR history and preferences.',
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Sign In | ImageOCRAI',
+    description: 'Sign in to your ImageOCRAI account to access your OCR history and preferences.',
+  }
 }
 
 export default function LoginPage() {

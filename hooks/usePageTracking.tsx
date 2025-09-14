@@ -3,7 +3,7 @@
 import { useEffect, Suspense } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { trackPageView, shouldEnableGA } from '@/lib/analytics'
-import { getCookieConsent } from '@/components/analytics/CookieConsent'
+import { getCookieConsent } from '@/lib/cookie-consent'
 
 /**
  * 页面浏览量自动跟踪 Hook

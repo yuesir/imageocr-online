@@ -466,7 +466,7 @@ export default function HomePage() {
             <div>
               <h3 className="font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/ocr" className="hover:text-white transition-colors">OCR Processing</Link></li>
+                <li><Link href="/jpg-to-text" className="hover:text-white transition-colors">JPG Image to text</Link></li>
                 <li><Link href="#" className="hover:text-white transition-colors">API Access</Link></li>
                 <li><Link href="#" className="hover:text-white transition-colors">Pricing</Link></li>
               </ul>

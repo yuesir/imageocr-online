@@ -35,28 +35,28 @@ export function Footer() {
             <h3 className="text-white dark:text-gray-100 font-semibold mb-4">Services</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
-                  Image OCR
+                <Link href="/jpg-to-text" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                  JPG Image OCR
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
-                  Business Card OCR
-                </Link>
-              </li>
-              <li>
-                <Link href="/" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                <Link href="/invoices-ocr" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
                   Invoice OCR
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
-                  ID Card OCR
+                <Link href="/receipts-ocr" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                  Receipt OCR
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
-                  Receipt OCR
+                <Link href="/passports-ocr" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                  Passport OCR
+                </Link>
+              </li>
+              <li>
+                <Link href="/ids-ocr" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                  ID Card OCR
                 </Link>
               </li>
             </ul>
