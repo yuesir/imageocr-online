@@ -39,9 +39,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null)
       setLoading(false)
 
-      if (event === 'SIGNED_IN') {
-        toast.success('Successfully signed in!')
-      } else if (event === 'SIGNED_OUT') {
+      // Only show toast for explicit sign in/out actions, not for initial session recovery
+      if (event === 'SIGNED_OUT') {
         toast.success('Successfully signed out!')
       }
     })
@@ -87,6 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error }
       }
 
+      toast.success('Successfully signed in!')
       return { error: null }
     } catch (error) {
       const authError = error as AuthError
