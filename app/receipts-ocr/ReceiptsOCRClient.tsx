@@ -1,11 +1,13 @@
 "use client";
 
 import { InteractiveOCR } from "@/components/ocr/InteractiveOCR";
+import { Footer } from "@/components/layout/Footer";
+import { Header } from "@/components/layout/Header";
 
 export default function ReceiptsOCRClient() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-100">
-      
+      <Header />
       {/* Header Section */}
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
@@ -159,11 +161,7 @@ export default function ReceiptsOCRClient() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p>&copy; 2024 Receipt OCR Tool. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

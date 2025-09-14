@@ -1,163 +1,26 @@
-"use client";
+import { Metadata } from 'next'
+import PassportOCRClient from './PassportOCRClient'
 
-import { InteractiveOCR } from "@/components/ocr/InteractiveOCR";
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Passport OCR - Extract Text from Passport Images | ImageOCRAI',
+    description: 'Advanced Passport OCR tool to extract text from passport images. Convert JPG, PNG, and WEBP passport documents to editable text with high accuracy using AI-powered optical character recognition.',
+    keywords: 'Passport OCR, passport text extraction, passport to text, OCR passport, passport data extraction, passport processing, passport digitization, passport scanner, travel document OCR',
+    openGraph: {
+      title: 'Passport OCR - Extract Text from Passport Images',
+      description: 'Convert your passport images to editable text instantly with our advanced AI-powered Passport OCR technology.',
+      type: 'website',
+      url: 'https://imageocr.ai/passports-ocr',
+      siteName: 'ImageOCRAI',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Passport OCR - Extract Text from Passport Images',
+      description: 'Convert your passport images to editable text instantly with our advanced AI-powered Passport OCR technology.',
+    },
+  }
+}
 
 export default function PassportOCRPage() {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
-      
-      {/* Header Section */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Passport OCR Tool
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Extract text from passport images with high accuracy. Our advanced OCR technology 
-            recognizes passport information including personal details, passport numbers, and dates.
-          </p>
-        </div>
-
-        {/* OCR Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
-          <InteractiveOCR />
-        </div>
-
-        {/* How to Use Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-            How to Use Our Passport OCR Tool
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-blue-600">1</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Upload Passport Image</h3>
-              <p className="text-gray-600">
-                Select your passport image file (JPG, PNG, or WEBP format) from your device.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-blue-600">2</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Process Image</h3>
-              <p className="text-gray-600">
-                Our AI-powered OCR technology analyzes your passport image and extracts all readable text.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-blue-600">3</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Get Results</h3>
-              <p className="text-gray-600">
-                View, copy, or download the extracted passport information in an organized format.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Why Choose Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-            Why Choose Our Passport OCR?
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="bg-green-100 rounded-lg p-4 mb-4">
-                <svg className="w-8 h-8 text-green-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="font-semibold mb-2">High Accuracy</h3>
-              <p className="text-sm text-gray-600">Advanced AI ensures precise text extraction from passport images</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-blue-100 rounded-lg p-4 mb-4">
-                <svg className="w-8 h-8 text-blue-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <h3 className="font-semibold mb-2">Secure &amp; Private</h3>
-              <p className="text-sm text-gray-600">Your passport images are processed securely and not stored</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-purple-100 rounded-lg p-4 mb-4">
-                <svg className="w-8 h-8 text-purple-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="font-semibold mb-2">Fast Processing</h3>
-              <p className="text-sm text-gray-600">Get your passport text extracted in seconds</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-orange-100 rounded-lg p-4 mb-4">
-                <svg className="w-8 h-8 text-orange-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                </svg>
-              </div>
-              <h3 className="font-semibold mb-2">Completely Free</h3>
-              <p className="text-sm text-gray-600">No registration or payment required</p>
-            </div>
-          </div>
-        </div>
-
-        {/* FAQ Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-6">
-            <div className="border-b border-gray-200 pb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                What passport formats are supported?
-              </h3>
-              <p className="text-gray-600">
-                Our OCR tool supports JPG, PNG, and WEBP image formats. For best results, 
-                ensure your passport image is clear and well-lit.
-              </p>
-            </div>
-            <div className="border-b border-gray-200 pb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Is my passport information secure?
-              </h3>
-              <p className="text-gray-600">
-                Yes, your privacy is our priority. Passport images are processed in real-time 
-                and are not stored on our servers. All data is handled securely.
-              </p>
-            </div>
-            <div className="border-b border-gray-200 pb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                What information can be extracted from passports?
-              </h3>
-              <p className="text-gray-600">
-                Our OCR can extract various passport details including name, passport number, 
-                nationality, date of birth, issue and expiry dates, and other printed information.
-              </p>
-            </div>
-            <div className="border-b border-gray-200 pb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                How accurate is the passport OCR?
-              </h3>
-              <p className="text-gray-600">
-                Our advanced AI technology provides high accuracy rates, typically above 95% 
-                for clear, high-quality passport images.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Can I process multiple passport images at once?
-              </h3>
-              <p className="text-gray-600">
-                Currently, our tool processes one passport image at a time to ensure optimal 
-                accuracy and performance for each document.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <PassportOCRClient />
 }

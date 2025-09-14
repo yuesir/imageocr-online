@@ -10,6 +10,8 @@ export async function generateMetadata(): Promise<Metadata> {
       title: 'Receipt OCR - Extract Text from Receipt Images',
       description: 'Convert your receipt images to editable text instantly with our advanced AI-powered Receipt OCR technology.',
       type: 'website',
+      url: 'https://imageocr.ai/receipts-ocr',
+      siteName: 'ImageOCRAI',
     },
     twitter: {
       card: 'summary_large_image',
