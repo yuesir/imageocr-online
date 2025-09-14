@@ -6,16 +6,16 @@ import { Footer } from "@/components/layout/Footer";
 
 export default function IDOCRClient() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-violet-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header />
       
       {/* Header Section */}
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4">
             ID Document OCR: Extract Text from ID Images
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Convert your ID document images to editable text instantly. Our advanced OCR technology 
             accurately extracts text from identity documents in JPG, PNG, and PDF formats.
           </p>
@@ -28,9 +28,9 @@ export default function IDOCRClient() {
       </div>
 
       {/* How to Use Section */}
-      <div className="bg-white py-16">
+      <div className="bg-white dark:bg-gray-800 py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+          <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-white mb-12">
             How to Use Our ID Document OCR Tool
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -38,8 +38,8 @@ export default function IDOCRClient() {
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-purple-600">1</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Upload ID Document</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold mb-2 dark:text-white">Upload ID Document</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Select your ID document image file (JPG, PNG, PDF) or drag and drop it into the upload area.
               </p>
             </div>
@@ -47,8 +47,8 @@ export default function IDOCRClient() {
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-purple-600">2</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Process Document</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold mb-2 dark:text-white">Process Document</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Click the "Convert" button and our AI will analyze your ID document and extract all text content.
               </p>
             </div>
@@ -56,8 +56,8 @@ export default function IDOCRClient() {
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-purple-600">3</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Get Results</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold mb-2 dark:text-white">Get Results</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 View, copy, or download the extracted text from your ID document. Perfect for data entry and verification.
               </p>
             </div>
@@ -66,9 +66,9 @@ export default function IDOCRClient() {
       </div>
 
       {/* Features Section */}
-      <div className="bg-gray-50 py-16">
+      <div className="bg-gray-50 dark:bg-gray-900 py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+          <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-white mb-12">
             Why Choose Our ID Document OCR?
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -78,8 +78,8 @@ export default function IDOCRClient() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2">High Accuracy</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold mb-2 dark:text-white">High Accuracy</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Advanced AI ensures precise text extraction from ID document images
               </p>
             </div>
@@ -89,8 +89,8 @@ export default function IDOCRClient() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Fast Processing</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold mb-2 dark:text-white">Fast Processing</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Get your ID document text extracted in seconds, not minutes
               </p>
             </div>
@@ -100,8 +100,8 @@ export default function IDOCRClient() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Secure & Private</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold mb-2 dark:text-white">Secure & Private</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Your ID data is processed securely and not stored on our servers
               </p>
             </div>
@@ -111,8 +111,8 @@ export default function IDOCRClient() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2">Free to Use</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold mb-2 dark:text-white">Free to Use</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 No registration required, completely free ID document OCR service
               </p>
             </div>
@@ -121,39 +121,39 @@ export default function IDOCRClient() {
       </div>
 
       {/* FAQ Section */}
-      <div className="bg-white py-16">
+      <div className="bg-white dark:bg-gray-800 py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+          <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-white mb-12">
             Frequently Asked Questions
           </h2>
           <div className="max-w-3xl mx-auto space-y-6">
-            <div className="border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-2">What ID document formats are supported?</h3>
-              <p className="text-gray-600">
+            <div className="border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-2 dark:text-white">What ID document formats are supported?</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Our ID Document OCR tool supports JPG, PNG, and PDF formats. You can upload identity documents in any of these formats for text extraction.
               </p>
             </div>
-            <div className="border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-2">How accurate is the ID document text extraction?</h3>
-              <p className="text-gray-600">
+            <div className="border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-2 dark:text-white">How accurate is the ID document text extraction?</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Our advanced OCR technology provides high accuracy for ID document text extraction, especially for clear, well-formatted document images. The accuracy may vary depending on image quality and document layout.
               </p>
             </div>
-            <div className="border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-2">Is my ID document data secure?</h3>
-              <p className="text-gray-600">
+            <div className="border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-2 dark:text-white">Is my ID document data secure?</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Yes, your privacy is our priority. ID document images are processed securely and are not stored on our servers after processing is complete.
               </p>
             </div>
-            <div className="border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-2">Can I extract data from multiple ID documents at once?</h3>
-              <p className="text-gray-600">
+            <div className="border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-2 dark:text-white">Can I extract data from multiple ID documents at once?</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Currently, our tool processes one ID document at a time to ensure optimal accuracy and performance. You can upload and process multiple documents sequentially.
               </p>
             </div>
-            <div className="border border-gray-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold mb-2">What should I do if the OCR results are not accurate?</h3>
-              <p className="text-gray-600">
+            <div className="border border-gray-200 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-2 dark:text-white">What should I do if the OCR results are not accurate?</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 For best results, ensure your ID document image is clear, well-lit, and high resolution. Avoid blurry or skewed images. You can also try adjusting the image orientation before uploading.
               </p>
             </div>
