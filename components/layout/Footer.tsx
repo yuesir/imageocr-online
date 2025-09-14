@@ -36,7 +36,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/jpg-to-text" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
-                  JPG Image OCR
+                  JPG to Text
                 </Link>
               </li>
               <li>
@@ -59,26 +59,41 @@ export function Footer() {
                   ID Card OCR
                 </Link>
               </li>
+              <li>
+                <Link href="/drivers-licenses-ocr" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                  Drivers License OCR
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Legal Section */}
           <div>
-            <h3 className="text-white dark:text-gray-100 font-semibold mb-4">Legal</h3>
+            <h3 className="text-white dark:text-gray-100 font-semibold mb-4"></h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/privacy" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
-                  Privacy Policy
+                <Link href="/image-ocr-arabic" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                  Image OCR Arabic
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
-                  Terms of Service
+                <Link href="/image-ocr-chinese" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                  Image OCR Chinese
                 </Link>
               </li>
               <li>
-                <Link href="/cookie-policy" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
-                  Cookie Policy
+                <Link href="/image-ocr-greek" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                  Image OCR Greek
+                </Link>
+              </li>
+              <li>
+                <Link href="/image-ocr-indian" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                  Image OCR Indian
+                </Link>
+              </li>
+              <li>
+                <Link href="/image-ocr-japanese" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                  Image OCR Japanese
                 </Link>
               </li>
             </ul>
