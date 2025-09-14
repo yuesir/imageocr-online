@@ -69,11 +69,10 @@ export async function POST(request: NextRequest) {
         .insert({
           id: generateId(),
           user_id: user!.id,
-          filename: file.name,
+          original_name: file.name,
           file_path: filePath,
           file_size: file.size,
-          mime_type: file.type,
-          storage_url: publicUrl
+          mime_type: file.type
         })
         .select()
         .single()
@@ -92,7 +91,7 @@ export async function POST(request: NextRequest) {
         success: true,
         file: {
           id: fileRecord.id,
-          filename: fileRecord.filename,
+          filename: fileRecord.original_name,
           url: publicUrl,
           size: fileRecord.file_size,
           type: fileRecord.mime_type

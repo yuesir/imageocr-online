@@ -2,9 +2,10 @@
 
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
-import { LogIn, Zap, FileText, Settings } from 'lucide-react'
+import { LogIn, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { UserMenu } from '@/components/ui/user-menu'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -36,30 +37,10 @@ export function Header() {
           <div className="flex items-center space-x-4">
             <ThemeToggle />
             {user ? (
-              <>
-                <span className="hidden sm:inline text-sm text-muted-foreground">
-                  Welcome, {user.email}
-                </span>
-                <Link href="/dashboard">
-                  <Button variant="ghost" size="sm">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Dashboard
-                  </Button>
-                </Link>
-                <Link href="/preferences">
-                  <Button variant="ghost" size="sm">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </Button>
-                </Link>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => signOut()}
-                >
-                  Sign Out
-                </Button>
-              </>
+              <UserMenu 
+                userEmail={user.email || ''} 
+                onSignOut={() => signOut()}
+              />
             ) : (
               <>
                 <Link href="/login">

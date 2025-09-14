@@ -3,9 +3,10 @@
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { LogIn, Zap, Upload, Shield, Star, Settings, FileText, FileImage, CheckCircle } from 'lucide-react'
+import { LogIn, Zap, Upload, Shield, Star, FileImage, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { UserMenu } from '@/components/ui/user-menu'
 import { JapaneseOCR } from '@/components/ocr/JapaneseOCR'
 
 export default function JapaneseOCRPage() {
@@ -25,30 +26,10 @@ export default function JapaneseOCRPage() {
             <div className="flex items-center space-x-4">
               <ThemeToggle />
               {user ? (
-                <>
-                  <span className="text-sm text-muted-foreground">
-                    Welcome, {user.email}
-                  </span>
-                  <Link href="/dashboard">
-                    <Button variant="ghost" size="sm">
-                      <FileText className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <Link href="/preferences">
-                    <Button variant="ghost" size="sm">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => signOut()}
-                  >
-                    Sign Out
-                  </Button>
-                </>
+                <UserMenu 
+                  userEmail={user.email || ''} 
+                  onSignOut={() => signOut()}
+                />
               ) : (
                 <>
                   <Link href="/login">

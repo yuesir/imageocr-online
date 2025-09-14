@@ -6,7 +6,8 @@ import { IndianOCR } from '@/components/ocr/IndianOCR'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import Link from 'next/link'
-import { Zap, Shield, FileText, ChevronDown, ChevronUp, LogIn, Settings, Star, Image } from 'lucide-react'
+import { Zap, Shield, ChevronDown, ChevronUp, LogIn, Star, Image } from 'lucide-react'
+import { UserMenu } from '@/components/ui/user-menu'
 
 export default function IndianOCRPage() {
   const { user, signOut } = useAuth()
@@ -32,30 +33,10 @@ export default function IndianOCRPage() {
             <div className="flex items-center space-x-4">
               <ThemeToggle />
               {user ? (
-                <>
-                  <span className="text-sm text-muted-foreground">
-                    Welcome, {user.email}
-                  </span>
-                  <Link href="/dashboard">
-                    <Button variant="ghost" size="sm">
-                      <FileText className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <Link href="/preferences">
-                    <Button variant="ghost" size="sm">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => signOut()}
-                  >
-                    Sign Out
-                  </Button>
-                </>
+                <UserMenu 
+                  userEmail={user.email || ''} 
+                  onSignOut={() => signOut()}
+                />
               ) : (
                 <>
                   <Link href="/login">

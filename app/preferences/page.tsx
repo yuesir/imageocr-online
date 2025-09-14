@@ -16,8 +16,9 @@ import { supabase } from '@/lib/supabase'
 type UserPreferences = {
   theme: 'light' | 'dark' | 'system'
   language: 'en' | 'zh'
-  auto_save_results: boolean
-  default_ocr_language: 'eng' | 'chi_sim' | 'auto'
+  auto_detect_language: boolean
+  save_history: boolean
+  ocr_language: 'eng' | 'chi_sim' | 'auto'
 }
 
 export default function PreferencesPage() {
@@ -28,8 +29,9 @@ export default function PreferencesPage() {
   const [preferences, setPreferences] = useState<UserPreferences>({
     theme: 'system',
     language: 'en',
-    auto_save_results: true,
-    default_ocr_language: 'auto'
+    auto_detect_language: true,
+    save_history: true,
+    ocr_language: 'auto'
   })
 
   const loadPreferences = useCallback(async () => {
@@ -38,7 +40,7 @@ export default function PreferencesPage() {
     try {
       const { data, error } = await supabase
         .from('user_preferences')
-        .select('*')
+        .select('theme, language, auto_detect_language, save_history, ocr_language')
         .eq('user_id', user.id)
         .single()
 
@@ -50,8 +52,9 @@ export default function PreferencesPage() {
         setPreferences({
           theme: data.theme || 'system',
           language: data.language || 'en',
-          auto_save_results: data.auto_save_results ?? true,
-          default_ocr_language: data.default_ocr_language || 'auto'
+          auto_detect_language: data.auto_detect_language ?? true,
+          save_history: data.save_history ?? true,
+          ocr_language: data.ocr_language || 'auto'
         })
       }
     } catch (error) {
@@ -79,9 +82,12 @@ export default function PreferencesPage() {
           user_id: user.id,
           theme: preferences.theme,
           language: preferences.language,
-          auto_save_results: preferences.auto_save_results,
-          default_ocr_language: preferences.default_ocr_language,
+          auto_detect_language: preferences.auto_detect_language,
+          save_history: preferences.save_history,
+          ocr_language: preferences.ocr_language,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         })
 
       if (error) throw error
@@ -207,9 +213,9 @@ export default function PreferencesPage() {
                     ].map((option) => (
                       <Button
                         key={option.value}
-                        variant={preferences.default_ocr_language === option.value ? 'default' : 'outline'}
+                        variant={preferences.ocr_language === option.value ? 'default' : 'outline'}
                         size="sm"
-                        onClick={() => updatePreference('default_ocr_language', option.value as 'eng' | 'chi_sim' | 'auto')}
+                        onClick={() => updatePreference('ocr_language', option.value as 'eng' | 'chi_sim' | 'auto')}
                       >
                         {option.label}
                       </Button>
@@ -233,17 +239,33 @@ export default function PreferencesPage() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Auto-save OCR Results</Label>
+                    <Label>Auto-detect Language</Label>
                     <p className="text-sm text-muted-foreground">
-                      Automatically save OCR results to your history
+                      Automatically detect the language in images
                     </p>
                   </div>
                   <Button
-                    variant={preferences.auto_save_results ? 'default' : 'outline'}
+                    variant={preferences.auto_detect_language ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => updatePreference('auto_save_results', !preferences.auto_save_results)}
+                    onClick={() => updatePreference('auto_detect_language', !preferences.auto_detect_language)}
                   >
-                    {preferences.auto_save_results ? 'Enabled' : 'Disabled'}
+                    {preferences.auto_detect_language ? 'Enabled' : 'Disabled'}
+                  </Button>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Save History</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Save OCR results to your history
+                    </p>
+                  </div>
+                  <Button
+                    variant={preferences.save_history ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => updatePreference('save_history', !preferences.save_history)}
+                  >
+                    {preferences.save_history ? 'Enabled' : 'Disabled'}
                   </Button>
                 </div>
               </CardContent>

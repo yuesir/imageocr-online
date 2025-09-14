@@ -27,18 +27,18 @@ type OCRResult = {
   id: string
   file_id: string
   extracted_text: string
-  confidence: number
-  language: string
+  confidence_score: number
+  language_detected: string
   processing_time: number
   word_count: number
   character_count: number
   created_at: string
   files: {
     id: string
-    filename: string
+    original_name: string
     file_size: number
-    file_type: string
-    storage_path: string
+    mime_type: string
+    file_path: string
   }
 }
 
@@ -62,10 +62,10 @@ export default function DashboardPage() {
           *,
           files (
             id,
-            filename,
+            original_name,
             file_size,
-            file_type,
-            storage_path
+            mime_type,
+            file_path
           )
         `)
         .eq('user_id', user.id)
@@ -94,8 +94,8 @@ export default function DashboardPage() {
     // Filter results based on search term
     const filtered = results.filter(result => 
       result.extracted_text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      result.files.filename.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      result.language.toLowerCase().includes(searchTerm.toLowerCase())
+      result.files.original_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      result.language_detected.toLowerCase().includes(searchTerm.toLowerCase())
     )
     setFilteredResults(filtered)
   }, [results, searchTerm])
@@ -124,7 +124,7 @@ export default function DashboardPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${result.files.filename}_ocr_result.txt`
+    a.download = `${result.files.original_name}_ocr_result.txt`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -225,7 +225,7 @@ export default function DashboardPage() {
                         <div className="flex-1">
                           <CardTitle className="text-lg flex items-center gap-2">
                             <FileText className="h-5 w-5" />
-                            {result.files.filename}
+                            {result.files.original_name}
                           </CardTitle>
                           <CardDescription className="mt-1">
                             {formatDate(result.created_at)}
@@ -273,11 +273,11 @@ export default function DashboardPage() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div className="flex items-center gap-2">
                           <Languages className="h-4 w-4 text-gray-400" />
-                          <span className="capitalize">{result.language}</span>
+                          <span className="capitalize">{result.language_detected}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Percent className="h-4 w-4 text-gray-400" />
-                          <span>{Math.round(result.confidence)}%</span>
+                          <span>{Math.round(result.confidence_score)}%</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-gray-400" />
@@ -312,17 +312,17 @@ export default function DashboardPage() {
                       <div>
                         <h4 className="font-medium mb-2">File Information</h4>
                         <div className="space-y-1 text-sm">
-                          <p><strong>Name:</strong> {selectedResult.files.filename}</p>
+                          <p><strong>Name:</strong> {selectedResult.files.original_name}</p>
                           <p><strong>Size:</strong> {formatFileSize(selectedResult.files.file_size)}</p>
-                          <p><strong>Type:</strong> {selectedResult.files.file_type}</p>
+                          <p><strong>Type:</strong> {selectedResult.files.mime_type}</p>
                         </div>
                       </div>
 
                       <div>
                         <h4 className="font-medium mb-2">OCR Statistics</h4>
                         <div className="space-y-1 text-sm">
-                          <p><strong>Language:</strong> {selectedResult.language}</p>
-                          <p><strong>Confidence:</strong> {Math.round(selectedResult.confidence)}%</p>
+                          <p><strong>Language:</strong> {selectedResult.language_detected}</p>
+                           <p><strong>Confidence:</strong> {Math.round(selectedResult.confidence_score)}%</p>
                           <p><strong>Processing Time:</strong> {selectedResult.processing_time}ms</p>
                           <p><strong>Words:</strong> {selectedResult.word_count}</p>
                           <p><strong>Characters:</strong> {selectedResult.character_count}</p>
