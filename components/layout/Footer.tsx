@@ -101,6 +101,11 @@ export function Footer() {
                   PNG Image to Text
                 </Link>
               </li>
+              <li>
+                <Link href="/handwriting-to-text" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-100 transition-colors">
+                  Handwriting to Text
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
