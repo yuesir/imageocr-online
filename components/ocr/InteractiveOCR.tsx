@@ -44,6 +44,8 @@ export function InteractiveOCR() {
   useEffect(() => {
     if (multiImages.length > 0 && viewMode === 'multi-upload') {
       setViewMode('multi-preview')
+    } else if (multiImages.length === 0 && viewMode === 'multi-preview') {
+      setViewMode('multi-upload')
     }
   }, [multiImages.length, viewMode])
 
@@ -180,7 +182,7 @@ export function InteractiveOCR() {
       {/* Removed single image mode - unified to multi-image mode only */}
 
       {/* Multi Image Upload Mode */}
-      {viewMode === 'multi-upload' && multiImages.length === 0 && (
+      {viewMode === 'multi-upload' && (
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
             <Images className="h-5 w-5 text-blue-600" />
