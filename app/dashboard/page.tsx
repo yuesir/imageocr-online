@@ -200,7 +200,7 @@ export default function DashboardPage() {
                   }
                 </p>
                 {!searchTerm && (
-                  <Link href="/ocr">
+                  <Link href="/">
                     <Button>
                       Start OCR Processing
                     </Button>
