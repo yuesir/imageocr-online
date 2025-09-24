@@ -94,7 +94,20 @@ export function ChineseOCR() {
           })
 
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
+            // 尝试解析错误响应中的message字段
+            try {
+              const errorData = await response.json()
+              if (errorData.message) {
+                throw new Error(errorData.message)
+              } else if (errorData.error) {
+                throw new Error(errorData.error)
+              } else {
+                throw new Error(`HTTP error! status: ${response.status}`)
+              }
+            } catch {
+              // 如果解析失败，使用默认错误信息
+              throw new Error(`HTTP error! status: ${response.status}`)
+            }
           }
 
           const ocrResult = await response.json()

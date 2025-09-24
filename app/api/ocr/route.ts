@@ -5,8 +5,22 @@ import { Buffer } from 'buffer'
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    // Get authorization token from request headers
+    const authHeader = request.headers.get('authorization')
+    const token = authHeader?.replace('Bearer ', '')
+    
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    
+    // Create authenticated supabase client
+    const _authenticatedSupabase = supabase.auth.setSession({
+      access_token: token,
+      refresh_token: ''
+    })
+    
+    // Check authentication with the token
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

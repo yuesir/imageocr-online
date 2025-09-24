@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { Upload, FileText, Download, Copy, RotateCcw, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from '@/hooks/useAuth';
 
 interface OCRResult {
   text: string;
@@ -12,6 +13,9 @@ interface OCRResult {
 type ViewMode = "upload" | "preview" | "result";
 
 export function PassportOCR() {
+  // Auth hook
+  const { user: _user, session } = useAuth();
+  
   const [viewMode, setViewMode] = useState<ViewMode>("upload");
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [ocrResults, setOcrResults] = useState<OCRResult[]>([]);
@@ -73,11 +77,18 @@ export function PassportOCR() {
       for (const image of selectedImages) {
         const base64Image = await convertToBase64(image);
         
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        
+        // Add Authorization header if user is authenticated
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+        
         const response = await fetch("/api/ocr", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers,
           body: JSON.stringify({
             image: base64Image,
             imageType: image.type,

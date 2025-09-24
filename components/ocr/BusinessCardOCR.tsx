@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { MultiImageUpload } from '@/components/upload/MultiImageUpload'
 import { MultiImagePreview } from '@/components/MultiImagePreview'
 import { MultiImageResult } from '@/components/MultiImageResult'
+import { useAuth } from '@/hooks/useAuth'
 
 type ViewMode = 'multi-upload' | 'multi-preview' | 'multi-result'
 
@@ -30,6 +31,9 @@ interface OCRResult {
 }
 
 export function BusinessCardOCR() {
+  // Auth hook
+  const { user: _user, session } = useAuth()
+  
   const [viewMode, setViewMode] = useState<ViewMode>('multi-upload')
   const [selectedImages, setSelectedImages] = useState<ImageFile[]>([])
   const [ocrResults, setOcrResults] = useState<OCRResult[]>([])
@@ -82,18 +86,38 @@ export function BusinessCardOCR() {
         try {
           const base64Image = await fileToBase64(image.file)
           
+          const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+          }
+          
+          // Add Authorization header if user is authenticated
+          if (session?.access_token) {
+            headers['Authorization'] = `Bearer ${session.access_token}`
+          }
+          
           const response = await fetch('/api/ocr/tencent', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({
               imageBase64: base64Image
             })
           })
 
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
+            // 尝试解析错误响应中的message字段
+            try {
+              const errorData = await response.json()
+              if (errorData.message) {
+                throw new Error(errorData.message)
+              } else if (errorData.error) {
+                throw new Error(errorData.error)
+              } else {
+                throw new Error(`HTTP error! status: ${response.status}`)
+              }
+            } catch {
+              // 如果解析失败，使用默认错误信息
+              throw new Error(`HTTP error! status: ${response.status}`)
+            }
           }
 
           const ocrResult = await response.json()

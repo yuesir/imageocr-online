@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from 'react'
 import { Upload, FileText, Loader2 } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
 
 interface OCRResult {
   text: string
@@ -9,6 +10,9 @@ interface OCRResult {
 }
 
 const ReceiptOCR: React.FC = () => {
+  // Auth hook
+  const { user: _user, session } = useAuth()
+  
   const [viewMode, setViewMode] = useState<'upload' | 'preview' | 'result'>('upload')
   const [selectedImages, setSelectedImages] = useState<File[]>([])
   const [ocrResults, setOcrResults] = useState<OCRResult[]>([])
@@ -68,11 +72,18 @@ const ReceiptOCR: React.FC = () => {
       for (const image of selectedImages) {
         const base64Image = await convertToBase64(image)
         
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        }
+        
+        // Add Authorization header if user is authenticated
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`
+        }
+        
         const response = await fetch('/api/ocr', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers,
           body: JSON.stringify({
             image: base64Image,
             imageType: image.type

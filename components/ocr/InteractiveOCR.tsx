@@ -6,6 +6,7 @@ import { MultiImagePreview } from '@/components/MultiImagePreview'
 import { MultiImageResult } from '@/components/MultiImageResult'
 import { Images } from 'lucide-react'
 import { toast } from 'sonner'
+import { useAuth } from '@/hooks/useAuth'
 
 // Removed OCRResultData interface - unified to use MultiOCRResult
 
@@ -30,6 +31,9 @@ interface MultiOCRResult {
 type ViewMode = 'multi-upload' | 'multi-preview' | 'multi-result'
 
 export function InteractiveOCR() {
+  // Auth hook
+  const { user: _user, session } = useAuth()
+  
   // Multi image mode states (unified approach)
   const [viewMode, setViewMode] = useState<ViewMode>('multi-upload')
   const [multiImages, setMultiImages] = useState<ImageFile[]>([])
@@ -121,18 +125,38 @@ export function InteractiveOCR() {
           })
           
           // Call Ali Cloud Vision OCR API
+          const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+          }
+          
+          // Add Authorization header if user is authenticated
+          if (session?.access_token) {
+            headers['Authorization'] = `Bearer ${session.access_token}`
+          }
+          
           const response = await fetch('/api/ocr/ali_vl', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({
               imageBase64: base64Image
             })
           })
           
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
+            // 尝试解析错误响应中的message字段
+            try {
+              const errorData = await response.json()
+              if (errorData.message) {
+                throw new Error(errorData.message)
+              } else if (errorData.error) {
+                throw new Error(errorData.error)
+              } else {
+                throw new Error(`HTTP error! status: ${response.status}`)
+              }
+            } catch {
+              // 如果解析失败，使用默认错误信息
+              throw new Error(`HTTP error! status: ${response.status}`)
+            }
           }
           
           const ocrResult = await response.json()
@@ -173,7 +197,7 @@ export function InteractiveOCR() {
     } finally {
       setIsMultiProcessing(false)
     }
-  }, [multiImages])
+  }, [multiImages, session?.access_token])
 
   // Removed handleModeSwitch - unified to multi-image mode only
 
