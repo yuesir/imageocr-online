@@ -32,6 +32,9 @@ export function Header() {
             <Link href="/receipts-ocr" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Receipt OCR
             </Link>
+            <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Pricing
+            </Link>
           </div>
           
           <div className="flex items-center space-x-4">

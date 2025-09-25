@@ -36,9 +36,7 @@ const pricingTiers = [
       'Advanced OCR accuracy',
       'Priority processing',
       'Priority email support',
-      'All file formats supported',
       'Batch processing',
-      'API access',
       'Export to multiple formats'
     ],
     cta: 'Start Monthly Plan',
@@ -55,13 +53,8 @@ const pricingTiers = [
       '15,000 images per year',
       'Highest OCR accuracy',
       'Fastest processing speed',
-      '24/7 priority support',
-      'All file formats supported',
+      'Priority email support',
       'Advanced batch processing',
-      'Full API access',
-      'Custom integrations',
-      'Analytics dashboard',
-      'Team collaboration tools'
     ],
     cta: 'Save with Annual',
     popular: false,
@@ -226,9 +219,6 @@ export default function PricingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="text-lg px-8 py-3">
               Start Free Trial
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-3 border-white text-white hover:bg-white hover:text-blue-600">
-              Contact Sales
             </Button>
           </div>
         </div>
