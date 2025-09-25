@@ -81,17 +81,17 @@ function handleAliVLError(error: AliVLError): { status: number; message: string 
         return { status: 404, message: 'Model not found' }
       case 'InternalError':
       case 'ServiceUnavailable':
-        return { status: 500, message: 'Ali Cloud internal error' }
+        return { status: 500, message: 'internal error' }
       case 'RequestTimeout':
         return { status: 504, message: 'Request timeout' }
       default:
-        return { status: 500, message: `Ali Cloud error: ${error.code}` }
+        return { status: 500, message: `OCR error: ${error.code}` }
     }
   }
 
   // 网络错误
   if (error.message && error.message.includes('network')) {
-    return { status: 503, message: 'Network error when connecting to Ali Cloud' }
+    return { status: 503, message: 'Network error when connecting to cloud service' }
   }
 
   // 超时错误
