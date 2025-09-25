@@ -188,8 +188,8 @@ export async function POST(request: NextRequest) {
       if (!userLimitCheck.allowed) {
         return NextResponse.json(
           { 
-            error: 'Daily usage limit exceeded', 
-            message: `您今日的OCR使用次数已达上限（${userLimitCheck.limit}次），请明天再试。`,
+            error: 'Daily usage limit exceeded',
+            message: 'You have reached the upper limit for today\'s usage. Please try again tomorrow or purchase a package.',
             currentCount: userLimitCheck.currentCount,
             limit: userLimitCheck.limit
           }, 
