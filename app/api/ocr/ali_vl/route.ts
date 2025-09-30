@@ -323,7 +323,7 @@ export async function POST(request: NextRequest) {
 
     // 调用阿里云视觉API
     const response = await aliVLClient.chat.completions.create({
-      model: "qwen-vl-max-2025-04-02",
+      model: "qwen-vl-max-2025-04-08",
       messages: [{
         role: "system",
         content: [{
