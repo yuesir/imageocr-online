@@ -28,7 +28,7 @@ const pricingTiers = [
   },
   {
     name: 'Monthly Pro',
-    price: '$10',
+    price: '$15',
     period: 'per month',
     description: 'Ideal for regular users and small businesses',
     features: [
@@ -45,9 +45,9 @@ const pricingTiers = [
   },
   {
     name: 'Annual Pro',
-    price: '$99',
+    price: '$150',
     period: 'per year',
-    originalPrice: '$120',
+    originalPrice: '$180',
     description: 'Best value for power users and enterprises',
     features: [
       '15,000 images per year',
@@ -59,7 +59,7 @@ const pricingTiers = [
     cta: 'Save with Annual',
     popular: false,
     buttonVariant: 'default' as const,
-    savings: 'Save $21'
+    savings: 'Save $30'
   }
 ]
 

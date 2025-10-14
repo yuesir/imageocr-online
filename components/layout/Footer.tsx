@@ -28,6 +28,7 @@ export function Footer() {
                 <Mail className="h-5 w-5" />
               </a>
             </div>
+            <p className="mt-2 text-gray-400 dark:text-gray-500 mb-4 max-w-md text-xs">ImageOCRAI is an independent tool and is not affiliated with, endorsed by, or officially connected to OpenAI, ChatGPT, Google, Anthropic, or any AI model provider. All product and company names are trademarks™ or registered® trademarks of their respective holders.</p>
           </div>
 
           {/* Services Section */}
