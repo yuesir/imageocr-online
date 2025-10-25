@@ -109,9 +109,9 @@ export default function CookiePolicy() {
               </div>
               
               <div className="mb-6">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-3">Cookie Consent</h3>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-3">Cookie Usage</h3>
                 <p className="text-gray-700 dark:text-gray-300 mb-4">
-                  When you first visit our website, you may see a cookie consent banner. You can choose to accept or decline non-essential cookies. Your preferences will be remembered for future visits.
+                  Our website uses cookies to provide essential functionality and analytics. By using our website, you consent to our use of cookies as described in this policy. You can manage cookie settings through your browser preferences.
                 </p>
               </div>
             </section>

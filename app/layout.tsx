@@ -90,7 +90,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         
-        {/* Google Analytics - 预加载和隐私配置 */}
+        {/* Google Analytics - 基础配置 */}
         {gaId && (
           <>
             <script
@@ -99,13 +99,7 @@ export default function RootLayout({
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
-                  
-                  // 默认拒绝所有 cookies，等待用户同意
-                  gtag('consent', 'default', {
-                    'analytics_storage': 'denied',
-                    'ad_storage': 'denied',
-                    'wait_for_update': 500
-                  });
+                  gtag('config', '${gaId}');
                 `,
               }}
             />
