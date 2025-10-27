@@ -28,7 +28,7 @@ export default function HomePage() {
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Experience OCR Image to Text Recognition Instantly</h2>
+            <h1 className="text-3xl font-bold mb-4">Free Image to Text Converter (OCR) — Extract & Transcribe Text Instantly</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Upload images, photos and get accurate text extract results instantly
             </p>
