@@ -1,10 +1,19 @@
+import createMDX from '@next/mdx'
+import remarkGfm from 'remark-gfm'
+import remarkReadingTime from 'remark-reading-time'
+import rehypeSlug from 'rehype-slug'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+import rehypePrismPlus from 'rehype-prism-plus'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
     serverActions: {
       allowedOrigins: ['localhost:3000', 'localhost:5173']
-    }
+    },
+    mdxRs: true
   },
+  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
   images: {
     domains: ['localhost'],
     remotePatterns: [
@@ -36,4 +45,26 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: [
+      remarkGfm,
+      remarkReadingTime
+    ],
+    rehypePlugins: [
+      rehypeSlug,
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: 'wrap',
+          properties: {
+            className: ['anchor'],
+          },
+        },
+      ],
+      [rehypePrismPlus, { ignoreMissing: true }]
+    ],
+  },
+})
+
+export default withMDX(nextConfig);

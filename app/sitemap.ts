@@ -1,10 +1,15 @@
 import { MetadataRoute } from 'next'
+import { getAllPosts } from '@/lib/blog'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://imageocrai.com'
   const currentDate = new Date()
 
-  return [
+  // 获取所有博客文章
+  const posts = await getAllPosts()
+
+  // 静态路由
+  const staticRoutes: MetadataRoute.Sitemap = [
     // 主要页面
     {
       url: baseUrl,
@@ -137,5 +142,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.4,
     },
+
+    // 博客主页
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: currentDate,
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
   ]
+
+  // 博客文章路由
+  const blogRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }))
+
+  // 合并所有路由
+  return [...staticRoutes, ...blogRoutes]
 }
