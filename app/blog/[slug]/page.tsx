@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getPostBySlug, getAllPosts, getRelatedPosts } from '@/lib/blog'
 import MarkdownContent from '@/components/blog/MarkdownContent'
-import ShareButtons from '@/components/blog/ShareButtons'
 import TableOfContents from '@/components/blog/TableOfContents'
 import RelatedPosts from '@/components/blog/RelatedPosts'
 import { Header } from '@/components/layout/Header'
@@ -154,7 +153,7 @@ async function ArticleContent({ slug }: { slug: string }) {
             </p>
 
             {/* Meta information */}
-            <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 dark:text-gray-400 mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 dark:text-gray-400 mb-6">
               <div className="flex items-center">
                 <User className="w-4 h-4 mr-2" />
                 <span>{post.author}</span>
@@ -175,23 +174,20 @@ async function ArticleContent({ slug }: { slug: string }) {
               </div>
             </div>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-8">
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
-                >
-                  {tag}
-                </span>
-              ))}
+            {/* Tags and Share buttons */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2">
+                {post.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
-
-            {/* Share buttons */}
-            <ShareButtons 
-              url={`https://imageocrai.com/blog/${post.slug}`}
-              title={post.title}
-            />
 
             {/* Article content */}
             <div className="article-content prose prose-lg dark:prose-invert max-w-none mt-8">

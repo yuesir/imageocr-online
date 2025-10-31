@@ -50,6 +50,8 @@ export default function TableOfContents({ items, className = "" }: TableOfConten
         top: elementPosition,
         behavior: 'smooth'
       })
+    } else {
+      console.warn(`Element with id "${id}" not found`)
     }
   }
 
