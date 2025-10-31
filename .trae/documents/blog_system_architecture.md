@@ -31,22 +31,28 @@ graph TD
 
 ## 2. 技术描述
 
-- **前端**：Next.js@14 + React@18 + TypeScript + Tailwind CSS
-- **内容处理**：@next/mdx + remark + rehype 插件生态
-- **构建优化**：静态生成 (SSG) + 增量静态再生 (ISR)
-- **样式系统**：Tailwind CSS + 现有 UI 组件库
-- **图标库**：Lucide React
-- **代码高亮**：Prism.js 或 Shiki
-- **搜索功能**：客户端 Fuse.js 模糊搜索
+* **前端**：Next.js\@14 + React\@18 + TypeScript + Tailwind CSS
+
+* **内容处理**：@next/mdx + remark + rehype 插件生态
+
+* **构建优化**：静态生成 (SSG) + 增量静态再生 (ISR)
+
+* **样式系统**：Tailwind CSS + 现有 UI 组件库
+
+* **图标库**：Lucide React
+
+* **代码高亮**：Prism.js 或 Shiki
+
+* **搜索功能**：客户端 Fuse.js 模糊搜索
 
 ## 3. 路由定义
 
-| 路由 | 用途 |
-|------|------|
-| /blog | 博客列表页面，显示所有文章 |
-| /blog/[slug] | 博客详情页面，显示具体文章内容 |
-| /blog/category/[category] | 分类页面，显示特定分类的文章 |
-| /blog/search | 搜索结果页面，显示搜索匹配的文章 |
+| 路由                         | 用途               |
+| -------------------------- | ---------------- |
+| /blog                      | 博客列表页面，显示所有文章    |
+| /blog/\[slug]              | 博客详情页面，显示具体文章内容  |
+| /blog/category/\[category] | 分类页面，显示特定分类的文章   |
+| /blog/search               | 搜索结果页面，显示搜索匹配的文章 |
 
 ## 4. API 定义
 
@@ -198,6 +204,7 @@ OCR 是一种将图像中的文字转换为可编辑文本的技术...
 ### 6.3 配置文件
 
 Next.js MDX 配置 (next.config.js):
+
 ```javascript
 const withMDX = require('@next/mdx')({
   extension: /\.mdx?$/,
@@ -261,3 +268,4 @@ components/
 3. **站点地图**：自动生成博客文章的 sitemap
 4. **内部链接**：相关文章推荐增强内部链接结构
 5. **社交分享**：Open Graph 和 Twitter Card 元数据
+

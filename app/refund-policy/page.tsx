@@ -177,7 +177,7 @@ export default function RefundPolicy() {
                 For refund requests or questions about this policy, please contact us:
               </p>
               <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 mb-4">
-                <li><strong>Email:</strong> support@imageocr-online.com</li>
+                <li><strong>Email:</strong> support@imageocrai.com</li>
                 <li><strong>Response Time:</strong> Within 24-48 hours</li>
                 <li><strong>Business Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM (UTC)</li>
               </ul>

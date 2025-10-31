@@ -189,7 +189,7 @@ async function ArticleContent({ slug }: { slug: string }) {
 
             {/* Share buttons */}
             <ShareButtons 
-              url={`https://imageocr-online.com/blog/${post.slug}`}
+              url={`https://imageocrai.com/blog/${post.slug}`}
               title={post.title}
             />
 

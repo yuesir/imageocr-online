@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'OCR Technology Blog - Image Recognition & Text Extraction Technology Sharing',
     description: 'Professional OCR technology blog sharing image recognition, text extraction, machine learning and other cutting-edge technologies',
     type: 'website',
-    url: 'https://imageocr-online.com/blog'
+    url: 'https://imageocrai.com/blog'
   }
 }
 
