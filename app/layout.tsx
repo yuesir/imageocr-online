@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { Toaster } from 'sonner'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { PageTrackingProvider } from '@/hooks/usePageTracking'
+import { Clarity } from '@/components/analytics/Clarity'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -79,17 +80,19 @@ export default function RootLayout({
 }) {
   // 获取 Google Analytics 测量 ID
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+  // 获取 Microsoft Clarity 项目 ID
+  const clarityId = process.env.NEXT_PUBLIC_CLARITY_ID
 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Google AdSense */}
-        <script 
-          async 
+        <script
+          async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3161682431818340"
           crossOrigin="anonymous"
         />
-        
+
         {/* Google Analytics - 基础配置 */}
         {gaId && (
           <>
@@ -121,6 +124,10 @@ export default function RootLayout({
         {/* Google Analytics - 仅在有有效 GA ID 时加载 */}
         {gaId && (
           <GoogleAnalytics gaId={gaId} />
+        )}
+        {/* Microsoft Clarity - 仅在有有效 Clarity ID 时加载 */}
+        {clarityId && (
+          <Clarity clarityId={clarityId} />
         )}
       </body>
     </html>
