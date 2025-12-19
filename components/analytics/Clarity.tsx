@@ -33,8 +33,8 @@ export function Clarity({ clarityId }: ClarityProps) {
 
     // Initialize Clarity
     (function(c: Window, l: Document, a: string, r: string, i: string, t: HTMLScriptElement, y: HTMLScriptElement) {
-      // @ts-expect-error - Clarity global initialization
-      c[a] = c[a] || function() { (c[a].q = c[a].q || []).push(arguments) }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (c as any)[a] = (c as any)[a] || function(...args: unknown[]) { ((c as any)[a].q = (c as any)[a].q || []).push(args) }
       t = l.createElement(r) as HTMLScriptElement
       t.async = true
       t.src = 'https://www.clarity.ms/tag/' + i
