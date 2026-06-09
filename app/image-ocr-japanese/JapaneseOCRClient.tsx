@@ -9,7 +9,7 @@ import { Footer } from '@/components/layout/Footer'
 export default function JapaneseOCRClient() {
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-accent/60 to-transparent dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Header />
       
       {/* Header Section */}
@@ -20,7 +20,7 @@ export default function JapaneseOCRClient() {
               <FileImage className="mr-2 h-4 w-4" />
               Japanese Text Recognition
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground mb-6">
               Japanese Image OCR: Extract Japanese Text from Images
             </h1>
             <p className="text-xl text-muted-foreground mb-8 leading-relaxed">

@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Zap, Upload, Shield, Star, ArrowRight, ChevronDown, ChevronUp, Image } from 'lucide-react'
+import { Zap, Upload, Star, ArrowRight, ChevronDown, ChevronUp, Image } from 'lucide-react'
 import { useState } from 'react'
 import { InteractiveOCR } from '@/components/ocr/InteractiveOCR'
 import { Footer } from '@/components/layout/Footer'
@@ -19,43 +19,14 @@ export function JPGToTextClient() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <Header />
 
-      {/* Header Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <div className="flex items-center justify-center mb-6">
-            <Image className="h-16 w-16 text-white/90 mr-4" />
-            <h1 className="text-5xl font-bold">
-              JPG to Text Converter: JPG Image OCR
-            </h1>
-          </div>
-          <p className="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
-            Convert JPG images to text instantly with our advanced AI-powered OCR technology. 
-            Extract text from JPG files with high accuracy and speed.
-          </p>
-          <div className="flex items-center justify-center space-x-6 text-sm opacity-80">
-            <div className="flex items-center">
-              <Shield className="h-4 w-4 mr-2" />
-              <span>Secure Processing</span>
-            </div>
-            <div className="flex items-center">
-              <Zap className="h-4 w-4 mr-2" />
-              <span>Lightning Fast</span>
-            </div>
-            <div className="flex items-center">
-              <Star className="h-4 w-4 mr-2" />
-              <span>High Accuracy</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* JPG OCR Section */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Upload Your JPG Images</h2>
+            <h1 className="text-5xl font-bold mb-4">JPG to Text Converter: JPG Image OCR</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Drag and drop your JPG files or click to browse. Our OCR will extract all text content instantly.
+              Convert JPG images to text instantly with our advanced AI-powered OCR technology. 
+            Extract text from JPG files with high accuracy and speed.
             </p>
           </div>
           <div className="max-w-6xl mx-auto">

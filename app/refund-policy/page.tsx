@@ -1,7 +1,6 @@
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const metadata = {
   title: 'Refund Policy - ImageOCR Online',
   description: 'Comprehensive refund policy for ImageOCR Online services, including eligibility criteria, processing timelines, and payment processor requirements.',

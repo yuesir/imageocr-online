@@ -3,7 +3,6 @@ import { Header } from '@/components/layout/Header'
 import { Button } from '@/components/ui/button'
 import { Check } from 'lucide-react'
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const metadata: Metadata = {
   title: 'Pricing - ImageOCR Online',
   description: 'Choose the perfect plan for your OCR needs. Extract text from images with our powerful AI technology.',

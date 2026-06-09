@@ -9,7 +9,6 @@ import { Clarity } from '@/components/analytics/Clarity'
 
 const inter = Inter({ subsets: ['latin'] })
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const metadata = {
   title: 'Free Online Image to Text OCR Converter & Batch Transcribe Image to Text - ImageOCRAI',
   description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Batch OCR multiple files, extract text on any device—no software needed.',
