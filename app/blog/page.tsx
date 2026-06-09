@@ -7,7 +7,6 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { BookOpen } from 'lucide-react'
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const metadata: Metadata = {
   title: 'OCR Technology Blog - Image Recognition & Text Extraction Technology Sharing',
   description: 'Professional OCR technology blog sharing image recognition, text extraction, machine learning and other cutting-edge technologies to help developers master OCR application development skills.',
