@@ -64,7 +64,7 @@ export async function checkIPDailyLimit(ip: string): Promise<{ allowed: boolean;
     }
   } catch (error) {
     console.error('Error in checkIPDailyLimit:', error)
-    return { allowed: true, currentCount: 0, limit } // 出错时允许使用
+    return { allowed: false, currentCount: 0, limit } // 出错时拒绝使用
   }
 }
 
@@ -149,7 +149,7 @@ export async function checkUserDailyLimit(email: string): Promise<{ allowed: boo
     }
   } catch (error) {
     console.error('Error in checkUserDailyLimit:', error)
-    return { allowed: true, currentCount: 0, limit } // 出错时允许使用
+    return { allowed: false, currentCount: 0, limit } // 出错时拒绝使用
   }
 }
 
