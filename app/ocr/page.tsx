@@ -132,7 +132,8 @@ export default function OCRPage() {
         }
       }
 
-      const response = await fetch('/api/ocr/ali_vl', {
+      // Backend randomly picks Ali Cloud VL or Baidu OCR
+      const response = await fetch('/api/ocr/auto', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

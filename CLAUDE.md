@@ -66,7 +66,7 @@ npm start
 
 ### Multi-Provider OCR System
 
-The application supports three OCR processing methods:
+The application supports four OCR processing methods:
 
 1. **Tesseract.js (Default)** - Client-side OCR processing via `app/api/ocr/route.ts`
    - Supports multiple languages: English, Chinese (Simplified & Traditional)
@@ -79,7 +79,13 @@ The application supports three OCR processing methods:
    - See `TENCENT_OCR_SETUP.md` for detailed setup
 
 3. **Alibaba Cloud VL API** - Server-side via `app/api/ocr/ali_vl/route.ts`
-   - Alternative cloud OCR provider
+   - Requires `ALI_VL_API_KEY` environment variable
+
+4. **Baidu OCR (general_basic)** - Server-side via `app/api/ocr/baidu/route.ts`
+   - Requires `BAIDU_OCR_API_KEY` and `BAIDU_OCR_SECRET_KEY` environment variables
+   - Docs: https://cloud.baidu.com/doc/OCR/s/zk3h7xz52
+
+There is also an **auto endpoint** at `app/api/ocr/auto/route.ts` (used by the main OCR pages) that randomly picks between Alibaba Cloud VL and Baidu OCR on each request and falls back to the other provider if the selected one fails. Shared request handling (auth, rate limiting, file download, result saving) lives in `lib/ocr-handler.ts`, and provider implementations live in `lib/ocr-providers.ts`.
 
 ### Authentication & Database
 
@@ -159,6 +165,10 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 TENCENT_SECRET_ID=your_tencent_secret_id
 TENCENT_SECRET_KEY=your_tencent_secret_key
 TENCENT_REGION=ap-beijing
+
+# Baidu OCR (optional)
+BAIDU_OCR_API_KEY=your_baidu_ocr_api_key
+BAIDU_OCR_SECRET_KEY=your_baidu_ocr_secret_key
 
 # Google Analytics (optional)
 NEXT_PUBLIC_GA_MEASUREMENT_ID=your_ga_measurement_id
