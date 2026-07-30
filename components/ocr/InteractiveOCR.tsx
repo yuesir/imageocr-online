@@ -124,7 +124,7 @@ export function InteractiveOCR() {
             base64Valid: base64Regex.test(base64Image)
           })
           
-          // Call Ali Cloud Vision OCR API
+          // Call OCR API (backend randomly picks Ali Cloud VL or Baidu OCR)
           const headers: Record<string, string> = {
             'Content-Type': 'application/json',
           }
@@ -134,7 +134,7 @@ export function InteractiveOCR() {
             headers['Authorization'] = `Bearer ${session.access_token}`
           }
           
-          const response = await fetch('/api/ocr/ali_vl', {
+          const response = await fetch('/api/ocr/auto', {
             method: 'POST',
             headers,
             body: JSON.stringify({
