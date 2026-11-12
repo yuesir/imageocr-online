@@ -7,7 +7,7 @@ import OpenAI from 'openai'
 // 阿里云视觉API配置
 const aliVLClient = new OpenAI({
   apiKey: process.env.ALI_VL_API_KEY || 'sk-04d1c56672e94809be1009cfe7345126',
-  baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  baseURL: "https://llm-rr2wkq7dbif1x2pb.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
 })
 
 // 参数校验函数
@@ -324,7 +324,7 @@ export async function POST(request: NextRequest) {
     // 调用阿里云视觉API
     const response = await aliVLClient.chat.completions.create({
       // model: "qwen-vl-max-2025-08-13",
-      model: "qwen3-vl-plus-2025-09-23",
+      model: "qwen3-vl-plus",
       messages: [{
         role: "system",
         content: [{
