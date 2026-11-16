@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { LoginForm } from '@/components/auth/LoginForm'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
@@ -13,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="mb-8 flex items-center justify-between">
           <Link
@@ -23,7 +22,6 @@ export default function LoginPage() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to home
           </Link>
-          <ThemeToggle />
         </div>
         
         <div className="text-center mb-8">

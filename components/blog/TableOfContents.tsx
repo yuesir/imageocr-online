@@ -65,8 +65,8 @@ export default function TableOfContents({ items, className = "" }: TableOfConten
           onClick={() => scrollToHeading(item.id)}
           className={`block w-full text-left py-1 px-2 rounded text-sm transition-colors ${
             isActive
-              ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 font-medium'
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800'
+              ? 'text-primary  bg-secondary  font-medium'
+              : 'text-muted-foreground  hover:text-foreground  hover:bg-background '
           }`}
         >
           <span className={`inline-block ${level > 0 ? 'text-xs' : 'text-sm'}`}>
@@ -88,19 +88,19 @@ export default function TableOfContents({ items, className = "" }: TableOfConten
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`bg-card  rounded-lg border border-border  ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between p-4 border-b border-border ">
         <div className="flex items-center gap-2">
-          <List className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-          <h3 className="font-semibold text-gray-900 dark:text-white">Table of Contents</h3>
+          <List className="h-5 w-5 text-muted-foreground " />
+          <h3 className="font-semibold text-foreground ">Table of Contents</h3>
         </div>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="p-1 rounded hover:bg-secondary  transition-colors"
         >
           <ChevronRight 
-            className={`h-4 w-4 text-gray-500 transition-transform ${isOpen ? 'rotate-90' : ''}`} 
+            className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? 'rotate-90' : ''}`} 
           />
         </button>
       </div>
@@ -115,11 +115,11 @@ export default function TableOfContents({ items, className = "" }: TableOfConten
           </nav>
           
           {/* Progress Indicator */}
-          <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-              <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1">
+          <div className="mt-4 pt-3 border-t border-border ">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground ">
+              <div className="flex-1 bg-secondary  rounded-full h-1">
                 <div 
-                  className="bg-blue-600 h-1 rounded-full transition-all duration-300"
+                  className="bg-primary h-1 rounded-full transition-all duration-300"
                   style={{ 
                     width: `${items.findIndex(item => item.id === activeId) >= 0 
                       ? ((items.findIndex(item => item.id === activeId) + 1) / items.length) * 100 

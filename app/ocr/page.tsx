@@ -1,12 +1,13 @@
 'use client'
 
+import { Balance } from '@/components/billing/Balance'
+
 import { useState } from 'react'
 import { ImageUpload } from '@/components/upload/ImageUpload'
 import { OCRResult } from '@/components/ocr/OCRResult'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { ArrowLeft, Zap, Clock, Shield } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
@@ -35,7 +36,7 @@ interface OCRRequestBody {
 }
 
 export default function OCRPage() {
-  const { user } = useAuth()
+  const { user, session } = useAuth()
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null)
   const [ocrResult, setOcrResult] = useState<OCRResultData | null>(null)
@@ -69,10 +70,12 @@ export default function OCRPage() {
 
         const response = await fetch('/api/upload', {
           method: 'POST',
+          headers: session ? { Authorization: `Bearer ${session.access_token}` } : {},
           body: formData
         })
 
         const data = await response.json()
+      window.dispatchEvent(new Event('billing:refresh'))
 
         if (!response.ok) {
           throw new Error(data.error || 'Upload failed')
@@ -135,17 +138,20 @@ export default function OCRPage() {
       const response = await fetch('/api/ocr/ali_vl', {
         method: 'POST',
         headers: {
+          'Idempotency-Key': crypto.randomUUID(),
+          ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(requestBody)
       })
 
       const data = await response.json()
+      window.dispatchEvent(new Event('billing:refresh'))
 
       if (!response.ok) {
         // Handle daily limit exceeded
         if (response.status === 429) {
-          toast.error(data.message || 'Daily usage limit exceeded. Please try again tomorrow or sign up for unlimited access.')
+          toast.error(data.message || 'Daily usage limit exceeded. Please try again tomorrow or sign in for 4 daily free images or buy an image pack.')
         } else {
           throw new Error(data.error || 'OCR processing failed')
         }
@@ -181,7 +187,7 @@ export default function OCRPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background ">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -193,7 +199,6 @@ export default function OCRPage() {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to home
             </Link>
-            <ThemeToggle />
           </div>
           
           <div className="text-center">
@@ -205,11 +210,12 @@ export default function OCRPage() {
         </div>
 
         <div className="max-w-4xl mx-auto space-y-8">
+          <Balance />
           {/* Process Steps */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className={`${selectedFile ? 'border-green-500 bg-green-50 dark:bg-green-950/20' : ''}`}>
+            <Card className={`${selectedFile ? 'border-border bg-secondary ' : ''}`}>
               <CardContent className="p-4 text-center">
-                <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center mx-auto mb-2 text-sm font-semibold">
+                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center mx-auto mb-2 text-sm font-semibold">
                   1
                 </div>
                 <h3 className="font-semibold text-sm">Upload Image</h3>
@@ -219,10 +225,10 @@ export default function OCRPage() {
               </CardContent>
             </Card>
             
-            <Card className={`${uploadedFile ? 'border-green-500 bg-green-50 dark:bg-green-950/20' : ''}`}>
+            <Card className={`${uploadedFile ? 'border-border bg-secondary ' : ''}`}>
               <CardContent className="p-4 text-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-semibold ${
-                  uploadedFile ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'
+                  uploadedFile ? 'bg-primary text-white' : 'bg-foreground text-muted-foreground'
                 }`}>
                   2
                 </div>
@@ -233,10 +239,10 @@ export default function OCRPage() {
               </CardContent>
             </Card>
             
-            <Card className={`${ocrResult ? 'border-green-500 bg-green-50 dark:bg-green-950/20' : ''}`}>
+            <Card className={`${ocrResult ? 'border-border bg-secondary ' : ''}`}>
               <CardContent className="p-4 text-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-semibold ${
-                  ocrResult ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'
+                  ocrResult ? 'bg-primary text-white' : 'bg-foreground text-muted-foreground'
                 }`}>
                   3
                 </div>
@@ -279,8 +285,8 @@ export default function OCRPage() {
                 
                 {uploadedFile && (
                   <div className="text-center space-y-4">
-                    <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
-                      <p className="text-sm text-green-700 dark:text-green-300 mb-2">
+                    <div className="p-4 bg-secondary  rounded-lg border border-border ">
+                      <p className="text-sm text-sage  mb-2">
                         ✓ File uploaded successfully
                       </p>
                       <p className="text-xs text-muted-foreground">
@@ -292,7 +298,7 @@ export default function OCRPage() {
                       onClick={handleProcessOCR}
                       disabled={isProcessing}
                       size="lg"
-                      className="bg-blue-600 hover:bg-blue-700"
+                      className="bg-primary hover:bg-primary"
                     >
                       {isProcessing ? (
                         <>
@@ -335,8 +341,8 @@ export default function OCRPage() {
           {/* Features */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Zap className="h-6 w-6 text-blue-600" />
+              <div className="w-12 h-12 bg-secondary  rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Zap className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-semibold mb-2">Fast Processing</h3>
               <p className="text-sm text-muted-foreground">
@@ -345,8 +351,8 @@ export default function OCRPage() {
             </div>
             
             <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-6 w-6 text-green-600" />
+              <div className="w-12 h-12 bg-secondary  rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-6 w-6 text-sage" />
               </div>
               <h3 className="font-semibold mb-2">Secure & Private</h3>
               <p className="text-sm text-muted-foreground">
@@ -355,8 +361,8 @@ export default function OCRPage() {
             </div>
             
             <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Clock className="h-6 w-6 text-purple-600" />
+              <div className="w-12 h-12 bg-secondary  rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Clock className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-semibold mb-2">24/7 Available</h3>
               <p className="text-sm text-muted-foreground">

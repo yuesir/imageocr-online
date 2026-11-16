@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { billingDB } from '@/lib/billing/server'
+import { meteredOCR } from '@/lib/billing/ocr'
 import Tesseract from 'tesseract.js'
 import { Buffer } from 'buffer'
 
-export async function POST(request: NextRequest) {
+async function processOCR(request: NextRequest) {
   try {
+    const supabase = billingDB()
     // Get authorization token from request headers
     const authHeader = request.headers.get('authorization')
     const token = authHeader?.replace('Bearer ', '')
@@ -12,12 +14,6 @@ export async function POST(request: NextRequest) {
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    
-    // Create authenticated supabase client
-    const _authenticatedSupabase = supabase.auth.setSession({
-      access_token: token,
-      refresh_token: ''
-    })
     
     // Check authentication with the token
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
@@ -116,3 +112,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
+export const POST = meteredOCR(processOCR)

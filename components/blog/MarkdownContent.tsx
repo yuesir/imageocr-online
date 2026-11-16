@@ -54,9 +54,9 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
   if (!htmlContent) {
     return (
       <div className="animate-pulse">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
+        <div className="h-4 bg-secondary  rounded mb-2" />
+        <div className="h-4 bg-secondary  rounded mb-2" />
+        <div className="h-4 bg-secondary  rounded mb-4" />
       </div>
     )
   }

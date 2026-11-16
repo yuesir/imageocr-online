@@ -1,5 +1,7 @@
 'use client'
 
+import { Balance } from '@/components/billing/Balance'
+
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -71,6 +73,7 @@ export function CreditCardOCR() {
       return
     }
 
+    if (!window.confirm('Each successfully processed image uses 1 image allowance, including images with no text. Running images again uses another allowance. Continue?')) return
     setIsProcessing(true)
     setViewMode('multi-result')
     setProcessingProgress(0)
@@ -87,7 +90,8 @@ export function CreditCardOCR() {
           const base64Image = await fileToBase64(image.file)
           
           const headers: Record<string, string> = {
-            'Content-Type': 'application/json',
+            'Idempotency-Key': crypto.randomUUID(),
+          'Content-Type': 'application/json',
           }
           
           // Add Authorization header if user is authenticated
@@ -104,23 +108,12 @@ export function CreditCardOCR() {
           })
 
           if (!response.ok) {
-            // 尝试解析错误响应中的message字段
-            try {
-              const errorData = await response.json()
-              if (errorData.message) {
-                throw new Error(errorData.message)
-              } else if (errorData.error) {
-                throw new Error(errorData.error)
-              } else {
-                throw new Error(`HTTP error! status: ${response.status}`)
-              }
-            } catch {
-              // 如果解析失败，使用默认错误信息
-              throw new Error(`HTTP error! status: ${response.status}`)
-            }
+            const errorData = await response.json().catch(() => ({}))
+            throw new Error(errorData.message || errorData.error || `HTTP error: ${response.status}`)
           }
 
           const ocrResult = await response.json()
+          window.dispatchEvent(new Event('billing:refresh'))
           const processingTime = Date.now() - Date.now()
           
           if (ocrResult.success) {
@@ -172,12 +165,13 @@ export function CreditCardOCR() {
 
   return (
     <div className="w-full max-w-6xl mx-auto" id="credit-card-ocr-section">
-      <Card className="border-2 border-dashed border-gray-300 dark:border-gray-600">
+      <Balance />
+      <Card className="border-2 border-dashed border-border ">
         <CardContent className="p-8">
           {viewMode === 'multi-upload' && selectedImages.length === 0 && (
             <div className="text-center">
               <div className="mb-8">
-                <CreditCard className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+                <CreditCard className="h-16 w-16 text-primary mx-auto mb-4" />
                 <h3 className="text-2xl font-semibold mb-2">Upload Credit Card Images</h3>
                 <p className="text-muted-foreground mb-6">
                   Select credit card images to extract text and information. Maximum 10MB per file, up to 50 files.
@@ -218,7 +212,7 @@ export function CreditCardOCR() {
                   <Button 
                     onClick={handleProcessImages}
                     disabled={isProcessing || selectedImages.length === 0}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-primary hover:bg-primary"
                   >
                     {isProcessing ? (
                       <>
@@ -268,9 +262,9 @@ export function CreditCardOCR() {
                     <span className="text-sm font-medium">Processing credit card images...</span>
                     <span className="text-sm text-muted-foreground">{Math.round(processingProgress)}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-secondary rounded-full h-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                      className="bg-primary h-2 rounded-full transition-all duration-300" 
                       style={{ width: `${processingProgress}%` }}
                     ></div>
                   </div>

@@ -8,7 +8,11 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: { serif: ["var(--font-editorial)", "Georgia", "serif"], sans: ["var(--font-ui)", "Arial", "sans-serif"], mono: ["var(--font-technical)", "monospace"] },
+      boxShadow: { tactile: "0 2px 0 hsl(var(--border))" },
+      container: { center: true, screens: { "2xl": "1280px" } },
       colors: {
+        sage: '#2A6F4E',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

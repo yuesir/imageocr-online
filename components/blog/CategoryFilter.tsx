@@ -27,14 +27,14 @@ export default function CategoryFilter({ categories, currentCategory, baseUrl }:
   }
 
   const allCategories = ['all', ...categories]
-  const activeCategoryClass = "bg-blue-600 text-white border-blue-600"
-  const inactiveCategoryClass = "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+  const activeCategoryClass = "bg-primary text-white border-border"
+  const inactiveCategoryClass = "bg-card  text-muted-foreground  border-border  hover:bg-background "
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+    <div className="bg-card  rounded-lg border border-border  p-4">
       <div className="flex items-center gap-2 mb-3">
-        <Filter className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-        <h3 className="font-semibold text-gray-900 dark:text-white">Categories</h3>
+        <Filter className="h-5 w-5 text-muted-foreground " />
+        <h3 className="font-semibold text-foreground ">Categories</h3>
       </div>
       
       <div className="space-y-2">
@@ -57,8 +57,8 @@ export default function CategoryFilter({ categories, currentCategory, baseUrl }:
       </div>
       
       {/* Category Statistics */}
-      <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
-        <p className="text-xs text-gray-500 dark:text-gray-400">
+      <div className="mt-4 pt-3 border-t border-border ">
+        <p className="text-xs text-muted-foreground ">
           {categories.length} categories total
         </p>
       </div>

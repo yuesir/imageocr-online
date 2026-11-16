@@ -1,5 +1,8 @@
 'use client'
 
+import { supabase } from '@/lib/supabase'
+import { Balance } from '@/components/billing/Balance'
+
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -67,6 +70,7 @@ export function ChineseOCR() {
       return
     }
 
+    if (!window.confirm('Each successfully processed image uses 1 image allowance, including images with no text. Running images again uses another allowance. Continue?')) return
     setIsProcessing(true)
     setViewMode('multi-result')
     setProcessingProgress(0)
@@ -82,9 +86,12 @@ export function ChineseOCR() {
         try {
           const base64Image = await fileToBase64(image.file)
           
+          const { data: { session } } = await supabase.auth.getSession()
           const response = await fetch('/api/ocr/tencent', {
             method: 'POST',
             headers: {
+              ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
+              'Idempotency-Key': crypto.randomUUID(),
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
@@ -94,23 +101,12 @@ export function ChineseOCR() {
           })
 
           if (!response.ok) {
-            // 尝试解析错误响应中的message字段
-            try {
-              const errorData = await response.json()
-              if (errorData.message) {
-                throw new Error(errorData.message)
-              } else if (errorData.error) {
-                throw new Error(errorData.error)
-              } else {
-                throw new Error(`HTTP error! status: ${response.status}`)
-              }
-            } catch {
-              // 如果解析失败，使用默认错误信息
-              throw new Error(`HTTP error! status: ${response.status}`)
-            }
+            const errorData = await response.json().catch(() => ({}))
+            throw new Error(errorData.message || errorData.error || `HTTP error: ${response.status}`)
           }
 
           const ocrResult = await response.json()
+          window.dispatchEvent(new Event('billing:refresh'))
           const processingTime = Date.now() - Date.now()
           
           if (ocrResult.success) {
@@ -162,12 +158,13 @@ export function ChineseOCR() {
 
   return (
     <div className="w-full max-w-6xl mx-auto" id="chinese-ocr-section">
-      <Card className="border-2 border-dashed border-red-300 dark:border-red-600">
+      <Balance />
+      <Card className="border-2 border-dashed border-border ">
         <CardContent className="p-8">
           {viewMode === 'multi-upload' && selectedImages.length === 0 && (
             <div className="text-center">
               <div className="mb-8">
-                <FileImage className="h-16 w-16 text-red-500 mx-auto mb-4" />
+                <FileImage className="h-16 w-16 text-destructive mx-auto mb-4" />
                 <h3 className="text-2xl font-semibold mb-2">Upload Images with Chinese Text</h3>
                 <p className="text-muted-foreground mb-6">
                   Select images containing Chinese characters. Maximum 10MB per file, up to 50 files.
@@ -208,7 +205,7 @@ export function ChineseOCR() {
                   <Button 
                     onClick={handleProcessImages}
                     disabled={isProcessing || selectedImages.length === 0}
-                    className="bg-red-600 hover:bg-red-700"
+                    className="bg-primary hover:bg-primary"
                   >
                     {isProcessing ? (
                       <>
@@ -234,18 +231,18 @@ export function ChineseOCR() {
               
               {isProcessing && (
                 <div className="mt-6">
-                  <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                  <div className="bg-secondary  border border-border  rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-red-700 dark:text-red-300">
+                      <span className="text-sm font-medium text-destructive ">
                         Processing Chinese Text Images...
                       </span>
-                      <span className="text-sm text-red-600 dark:text-red-400">
+                      <span className="text-sm text-destructive ">
                         {Math.round(processingProgress)}%
                       </span>
                     </div>
-                    <div className="w-full bg-red-200 dark:bg-red-800 rounded-full h-2">
+                    <div className="w-full bg-secondary  rounded-full h-2">
                       <div 
-                        className="bg-red-600 h-2 rounded-full transition-all duration-300" 
+                        className="bg-primary h-2 rounded-full transition-all duration-300" 
                         style={{ width: `${processingProgress}%` }}
                       ></div>
                     </div>

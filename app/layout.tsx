@@ -1,4 +1,3 @@
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/hooks/useAuth'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
@@ -7,7 +6,6 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import { PageTrackingProvider } from '@/hooks/usePageTracking'
 import { Clarity } from '@/components/analytics/Clarity'
 
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Free Online Image to Text OCR Converter & Batch Transcribe Image to Text - ImageOCRAI',
@@ -85,6 +83,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" />
         {/* Google AdSense */}
         <script
           async
@@ -108,7 +109,7 @@ export default function RootLayout({
           </>
         )}
       </head>
-      <body className={inter.className}>
+      <body className="font-sans antialiased">
         <ThemeProvider
           defaultTheme="system"
           storageKey="imageocrai-ui-theme"

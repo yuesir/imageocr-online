@@ -164,7 +164,7 @@ export function OCRResult({
           </div>
           <div className="text-center">
             <p className="text-sm font-medium text-muted-foreground">Status</p>
-            <p className="text-lg font-semibold text-green-600 capitalize">
+            <p className="text-lg font-semibold text-sage capitalize">
               {result.status}
             </p>
           </div>

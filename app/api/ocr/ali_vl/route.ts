@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
-import { getClientIP, checkIPDailyLimit, updateIPUsage, checkUserDailyLimit, updateUserUsage } from '@/lib/ip-usage'
+import { billingDB } from '@/lib/billing/server'
+import { meteredOCR } from '@/lib/billing/ocr'
 import { Buffer } from 'buffer'
 import OpenAI from 'openai'
 
 // 阿里云视觉API配置
 const aliVLClient = new OpenAI({
-  apiKey: process.env.ALI_VL_API_KEY || 'sk-04d1c56672e94809be1009cfe7345126',
+  timeout: 90000,
+  maxRetries: 0,
+  apiKey: process.env.ALI_VL_API_KEY || 'unconfigured',
   baseURL: "https://llm-rr2wkq7dbif1x2pb.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
 })
 
@@ -150,8 +152,9 @@ function formatOCRResult(aliResult: AliVLOCRResult) {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function processOCR(request: NextRequest) {
   try {
+    const supabase = billingDB()
     // 检查环境变量配置
     if (!process.env.ALI_VL_API_KEY) {
       return NextResponse.json(
@@ -160,9 +163,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 获取客户端IP
-    const clientIP = getClientIP(request)
-    
     // 检查用户认证（从请求头获取token）
     const authHeader = request.headers.get('authorization')
     let user = null
@@ -181,49 +181,9 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // 检查使用限制：已登录用户检查邮箱限制，未登录用户检查IP限制
-    if (isAuthenticated && user?.email) {
-      const userLimitCheck = await checkUserDailyLimit(user.email)
-      
-      if (!userLimitCheck.allowed) {
-        return NextResponse.json(
-          { 
-            error: 'Daily usage limit exceeded',
-            message: 'You have reached the upper limit for today\'s usage. Please try again tomorrow or purchase a package.',
-            currentCount: userLimitCheck.currentCount,
-            limit: userLimitCheck.limit
-          }, 
-          { status: 429 }
-        )
-      }
-    } else if (!isAuthenticated) {
-      const ipLimitCheck = await checkIPDailyLimit(clientIP)
-      
-      if (!ipLimitCheck.allowed) {
-        return NextResponse.json(
-          { 
-            error: 'Daily usage limit exceeded', 
-            message: `You have reached the daily limit of ${ipLimitCheck.limit} free OCR requests. Please try again tomorrow or sign up for unlimited access.`,
-            currentCount: ipLimitCheck.currentCount,
-            limit: ipLimitCheck.limit
-          }, 
-          { status: 429 }
-        )
-      }
-    }
-
     const body = await request.json()
     const { fileId, imageUrl, imageBase64 } = body
     
-    console.log('Ali VL OCR Request received:', {
-      hasFileId: !!fileId,
-      hasImageUrl: !!imageUrl,
-      hasImageBase64: !!imageBase64,
-      imageBase64Length: imageBase64?.length,
-      imageBase64Prefix: imageBase64?.substring(0, 100),
-      imageBase64Type: typeof imageBase64,
-      isValidDataUrl: imageBase64 ? /^data:image\/(jpeg|jpg|png|bmp|gif|webp|tiff|heic);base64,/.test(imageBase64) : false
-    })
 
     // 参数校验
     if (!fileId && !imageUrl && !imageBase64) {
@@ -314,12 +274,6 @@ export async function POST(request: NextRequest) {
 
     const startTime = Date.now()
 
-    console.log('About to call Ali VL API with:', {
-      imageDataUrlLength: imageDataUrl.length,
-      imageDataUrlPrefix: imageDataUrl.substring(0, 100),
-      isDataUrl: imageDataUrl.startsWith('data:'),
-      hasBase64Comma: imageDataUrl.includes(';base64,')
-    })
 
     // 调用阿里云视觉API
     const response = await aliVLClient.chat.completions.create({
@@ -347,17 +301,11 @@ export async function POST(request: NextRequest) {
     })
     
     const processingTime = Date.now() - startTime
+    console.info('ocr_cost_sample', JSON.stringify({ requestId: request.headers.get('idempotency-key'), provider: 'ali_vl', model: response.model, durationMs: processingTime, usage: response.usage }))
 
     // 格式化结果
     const formattedResult = formatOCRResult(response)
     
-    // 更新使用次数：已登录用户更新邮箱使用次数，未登录用户更新IP使用次数
-    if (isAuthenticated && user?.email) {
-      await updateUserUsage(user.email)
-    } else if (!isAuthenticated) {
-      await updateIPUsage(clientIP)
-    }
-
     // 如果有fileId且用户已登录，保存OCR结果到数据库
     if (fileId && file && isAuthenticated && user) {
       const { data: savedResult, error: saveError } = await supabase
@@ -416,3 +364,4 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+export const POST = meteredOCR(processOCR)

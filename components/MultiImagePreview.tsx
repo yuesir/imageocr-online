@@ -155,7 +155,7 @@ export function MultiImagePreview({
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <FileImage className="h-5 w-5 text-blue-600" />
+              <FileImage className="h-5 w-5 text-primary" />
               <Badge variant="secondary" className="text-sm">
                 {images.length}
               </Badge>
@@ -166,7 +166,7 @@ export function MultiImagePreview({
                 size="sm"
                 onClick={handleAddClick}
                 disabled={isProcessing}
-                className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                className="text-primary border-border hover:bg-secondary"
               >
                 <Plus className="h-4 w-4 mr-1" />
                 Add
@@ -176,7 +176,7 @@ export function MultiImagePreview({
                 size="sm"
                 onClick={handleDeleteSelected}
                 disabled={isProcessing || selectedCount === 0}
-                className="text-red-600 border-red-600 hover:bg-red-50"
+                className="text-destructive border-border hover:bg-secondary"
               >
                 <Trash2 className="h-4 w-4 mr-1" />
                 Delete
@@ -189,14 +189,14 @@ export function MultiImagePreview({
       {/* Images Grid */}
       {images.length === 0 ? (
         <Card
-          className={`cursor-pointer transition-all duration-200 hover:border-blue-400 ${isDragOver ? 'border-blue-400 bg-blue-50 dark:bg-blue-950/20' : ''} ${isProcessing ? 'cursor-not-allowed opacity-50' : ''}`}
+          className={`cursor-pointer transition-all duration-200 hover:border-border ${isDragOver ? 'border-border bg-secondary ' : ''} ${isProcessing ? 'cursor-not-allowed opacity-50' : ''}`}
           onClick={handleAddClick}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
         >
           <CardContent className="p-12 text-center">
-            <Upload className={`mx-auto h-12 w-12 mb-4 ${isDragOver ? 'text-blue-500' : 'text-muted-foreground'}`} />
+            <Upload className={`mx-auto h-12 w-12 mb-4 ${isDragOver ? 'text-primary' : 'text-muted-foreground'}`} />
             <h3 className="text-lg font-medium text-muted-foreground mb-2">
               {isDragOver ? 'Drop your images here' : 'No images selected'}
             </h3>
@@ -219,7 +219,7 @@ export function MultiImagePreview({
             <Card 
               key={imageFile.id} 
               className={`relative cursor-pointer transition-all duration-200 ${
-                imageFile.selected ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-950/20' : 'hover:shadow-md'
+                imageFile.selected ? 'ring-2 ring-blue-500 bg-secondary ' : 'hover:shadow-md'
               }`}
               onClick={() => handleToggleSelection(imageFile.id)}
             >
@@ -228,8 +228,8 @@ export function MultiImagePreview({
                 <div className="absolute top-2 left-2 z-10">
                   <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                     imageFile.selected 
-                      ? 'bg-blue-500 border-blue-500' 
-                      : 'bg-white border-gray-300 hover:border-blue-400'
+                      ? 'bg-primary border-border' 
+                      : 'bg-card border-border hover:border-border'
                   }`}>
                     {imageFile.selected && (
                       <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -243,7 +243,7 @@ export function MultiImagePreview({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute top-2 right-2 z-10 h-6 w-6 p-0 bg-red-500 hover:bg-red-600 text-white"
+                  className="absolute top-2 right-2 z-10 h-6 w-6 p-0 bg-primary hover:bg-primary text-white"
                   onClick={(e) => {
                     e.stopPropagation()
                     handleRemoveFile(imageFile.id)
@@ -288,7 +288,7 @@ export function MultiImagePreview({
           onClick={handleConvert}
           disabled={images.length === 0 || isProcessing}
           size="lg"
-          className="bg-blue-600 hover:bg-blue-700 px-8 py-3"
+          className="bg-primary hover:bg-primary px-8 py-3"
         >
           <Zap className="h-5 w-5 mr-2" />
           {isProcessing ? 'Converting...' : 'Convert'}
@@ -300,7 +300,7 @@ export function MultiImagePreview({
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-center space-x-2">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-border"></div>
               <span className="text-sm font-medium">Processing images...</span>
             </div>
           </CardContent>
