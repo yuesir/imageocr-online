@@ -1,5 +1,4 @@
 import { createBrowserClient } from '@supabase/ssr'
-import { createClient } from '@supabase/supabase-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 // Get environment variables with fallback values
@@ -32,6 +31,7 @@ function getSupabaseClient() {
         getUser: () => Promise.resolve({ data: { user: null }, error: null }),
         onAuthStateChange: () => ({ data: { subscription: null } }),
         signUp: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
+        signInWithOAuth: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
         signInWithPassword: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
         signOut: () => Promise.resolve({ error: null }),
         resetPasswordForEmail: () => Promise.resolve({ error: new Error('Supabase not configured') }),
@@ -67,53 +67,6 @@ function getSupabaseClient() {
 }
 
 export const supabase = getSupabaseClient()
-
-// Server-side client with service role key (only used on server)
-let supabaseAdminInstance: SupabaseClient | null = null
-
-function getSupabaseAdminClient() {
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxiYmpmZW9nZ2RzbWJqZWV4cHNvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjE5ODgzMiwiZXhwIjoyMDcxNzc0ODMyfQ.yQD3lXAV0VYIq6XAanxjzceBIpy28Kfxf6qjri_5v8Q'
-  
-  if (!hasValidConfig || serviceRoleKey === 'your_supabase_service_role_key') {
-    console.warn('Supabase admin configuration is invalid. Please check your environment variables.')
-    // Return a mock admin client
-    return {
-      auth: {
-        getUser: () => Promise.resolve({ data: { user: null }, error: new Error('Supabase not configured') })
-      },
-      from: () => ({
-        select: () => Promise.resolve({ data: [], error: null }),
-        insert: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
-        update: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
-        delete: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') })
-      }),
-      storage: {
-        from: () => ({
-          upload: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
-          getPublicUrl: () => ({ data: { publicUrl: '' } }),
-          remove: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') })
-        })
-      }
-    } as unknown as SupabaseClient
-  }
-
-  if (!supabaseAdminInstance) {
-    supabaseAdminInstance = createClient(
-      supabaseUrl,
-      serviceRoleKey,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
-    )
-  }
-  
-  return supabaseAdminInstance
-}
-
-export const supabaseAdmin = getSupabaseAdminClient()
 
 // Database types
 export interface Database {

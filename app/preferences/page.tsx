@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/components/providers/ThemeProvider'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { ArrowLeft, Save, User, Palette, Globe } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -116,7 +115,7 @@ export default function PreferencesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background ">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex items-center justify-between">
           <Link
@@ -126,15 +125,14 @@ export default function PreferencesPage() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to home
           </Link>
-          <ThemeToggle />
         </div>
 
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-3xl font-bold text-foreground  mb-2">
               User Preferences
             </h1>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-muted-foreground ">
               Customize your ImageOCRAI experience
             </p>
           </div>

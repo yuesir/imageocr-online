@@ -28,8 +28,9 @@ interface OCRResult {
   confidence: number
   language: string
   processingTime: number
-  status: 'success' | 'error' | 'processing'
+  status: 'success' | 'error' | 'processing' | 'queued'
   error?: string
+  errorCode?: string
 }
 
 interface ImageFile {
@@ -118,7 +119,7 @@ export function MultiImageResult({
           <div className="flex items-center space-x-2">
             <FileText className="h-5 w-5 text-muted-foreground" />
             <h2 className="text-xl font-semibold">OCR Results</h2>
-            <Badge variant="secondary">{results.length} processed</Badge>
+            <Badge variant="secondary">{results.filter(result => result.status === 'success' || result.status === 'error').length} / {images.length} processed</Badge>
           </div>
         </div>
       </div>
@@ -255,7 +256,7 @@ export function MultiImageResult({
                       ) : result.status === 'error' ? (
                         <div className="flex items-center justify-center h-[200px] text-center">
                           <div>
-                            <div className="text-red-500 mb-2">Processing failed</div>
+                            <div className="text-destructive mb-2">{result.errorCode === 'IMAGE_ALLOWANCE_EXHAUSTED' ? 'Image allowance used' : result.errorCode?.startsWith('ALLOWANCE_') ? 'Image allowance unavailable' : 'Processing failed'}</div>
                             <p className="text-sm text-muted-foreground mb-4">
                               {result.error || 'An error occurred during processing'}
                             </p>
@@ -272,8 +273,8 @@ export function MultiImageResult({
                       ) : (
                         <div className="flex items-center justify-center h-[200px] text-center">
                           <div>
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                            <p className="text-sm text-muted-foreground">Processing...</p>
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-border mx-auto mb-2"></div>
+                            <p className="text-sm text-muted-foreground">{result.status === 'queued' ? 'Queued — waiting for an available slot' : 'Processing...'}</p>
                           </div>
                         </div>
                       )

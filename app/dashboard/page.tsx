@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { 
   ArrowLeft, 
   FileText, 
@@ -146,7 +145,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background ">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex items-center justify-between">
           <Link
@@ -156,15 +155,14 @@ export default function DashboardPage() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to home
           </Link>
-          <ThemeToggle />
         </div>
 
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-3xl font-bold text-foreground  mb-2">
               OCR Dashboard
             </h1>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-muted-foreground ">
               View and manage your OCR processing history
             </p>
           </div>
@@ -172,7 +170,7 @@ export default function DashboardPage() {
           {/* Search and Filter */}
           <div className="mb-6">
             <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Search results..."
                 value={searchTerm}
@@ -184,16 +182,16 @@ export default function DashboardPage() {
 
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-4 border-border border-t-transparent rounded-full animate-spin" />
             </div>
           ) : filteredResults.length === 0 ? (
             <Card>
               <CardContent className="text-center py-12">
-                <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium text-foreground  mb-2">
                   {searchTerm ? 'No matching results found' : 'No OCR results yet'}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                <p className="text-muted-foreground  mb-4">
                   {searchTerm 
                     ? 'Try adjusting your search terms'
                     : 'Start by processing your first image'
@@ -262,7 +260,7 @@ export default function DashboardPage() {
                               deleteResult(result.id)
                             }}
                             title="Delete"
-                            className="text-red-600 hover:text-red-700"
+                            className="text-destructive hover:text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -272,24 +270,24 @@ export default function DashboardPage() {
                     <CardContent>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div className="flex items-center gap-2">
-                          <Languages className="h-4 w-4 text-gray-400" />
+                          <Languages className="h-4 w-4 text-muted-foreground" />
                           <span className="capitalize">{result.language_detected}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Percent className="h-4 w-4 text-gray-400" />
+                          <Percent className="h-4 w-4 text-muted-foreground" />
                           <span>{Math.round(result.confidence_score)}%</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-gray-400" />
+                          <Clock className="h-4 w-4 text-muted-foreground" />
                           <span>{result.processing_time}ms</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-gray-400" />
+                          <FileText className="h-4 w-4 text-muted-foreground" />
                           <span>{result.word_count} words</span>
                         </div>
                       </div>
                       <div className="mt-3">
-                        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                        <p className="text-sm text-muted-foreground  line-clamp-2">
                           {result.extracted_text.substring(0, 150)}...
                         </p>
                       </div>
@@ -331,7 +329,7 @@ export default function DashboardPage() {
 
                       <div>
                         <h4 className="font-medium mb-2">Extracted Text</h4>
-                        <div className="max-h-64 overflow-y-auto p-3 bg-gray-50 dark:bg-gray-800 rounded-md text-sm">
+                        <div className="max-h-64 overflow-y-auto p-3 bg-background  rounded-md text-sm">
                           <pre className="whitespace-pre-wrap font-mono">
                             {selectedResult.extracted_text}
                           </pre>
@@ -363,8 +361,8 @@ export default function DashboardPage() {
                 ) : (
                   <Card>
                     <CardContent className="text-center py-12">
-                      <Eye className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                      <p className="text-gray-600 dark:text-gray-300">
+                      <Eye className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground ">
                         Select a result to view details
                       </p>
                     </CardContent>

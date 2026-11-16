@@ -21,9 +21,9 @@ export default function RelatedPosts({ posts, className = "" }: RelatedPostsProp
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`bg-card  rounded-lg border border-border  ${className}`}>
       <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        <h3 className="text-xl font-bold text-foreground  mb-4">
           Related Articles
         </h3>
         
@@ -31,7 +31,7 @@ export default function RelatedPosts({ posts, className = "" }: RelatedPostsProp
           {posts.map((post) => (
             <article key={post.slug} className="group">
               <Link href={`/blog/${post.slug}`} className="block">
-                <div className="flex gap-4 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div className="flex gap-4 p-4 rounded-lg hover:bg-background  transition-colors">
                   {/* Article Image */}
                   {post.image && (
                     <div className="flex-shrink-0">
@@ -45,16 +45,16 @@ export default function RelatedPosts({ posts, className = "" }: RelatedPostsProp
                   
                   {/* Article Information */}
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 mb-2">
+                    <h4 className="font-semibold text-foreground  group-hover:text-primary  transition-colors line-clamp-2 mb-2">
                       {post.title}
                     </h4>
                     
-                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
+                    <p className="text-sm text-muted-foreground  line-clamp-2 mb-3">
                       {post.description}
                     </p>
                     
-                    <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                      <span className="inline-flex items-center px-2 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground ">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full bg-secondary text-primary  ">
                         {post.category}
                       </span>
                       
@@ -76,10 +76,10 @@ export default function RelatedPosts({ posts, className = "" }: RelatedPostsProp
         </div>
         
         {/* View More */}
-        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="mt-6 pt-4 border-t border-border ">
           <Link
             href="/blog"
-            className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm transition-colors"
+            className="inline-flex items-center text-primary  hover:text-primary  font-medium text-sm transition-colors"
           >
             View More Articles
             <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

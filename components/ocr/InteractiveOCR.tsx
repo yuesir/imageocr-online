@@ -6,6 +6,9 @@ import { MultiImagePreview } from '@/components/MultiImagePreview'
 import { MultiImageResult } from '@/components/MultiImageResult'
 import { Images } from 'lucide-react'
 import { toast } from 'sonner'
+import Link from 'next/link'
+import { runImageBatch, fetchQueuedOCR } from '@/lib/ocr/batch'
+import { Balance } from '@/components/billing/Balance'
 import { useAuth } from '@/hooks/useAuth'
 
 // Removed OCRResultData interface - unified to use MultiOCRResult
@@ -24,8 +27,13 @@ interface MultiOCRResult {
   confidence: number
   language: string
   processingTime: number
-  status: 'success' | 'error' | 'processing'
+  status: 'success' | 'error' | 'processing' | 'queued'
   error?: string
+  errorCode?: string
+}
+
+class OCRRequestError extends Error {
+  constructor(message: string, readonly errorCode?: string) { super(message) }
 }
 
 type ViewMode = 'multi-upload' | 'multi-preview' | 'multi-result'
@@ -39,6 +47,9 @@ export function InteractiveOCR() {
   const [multiImages, setMultiImages] = useState<ImageFile[]>([])
   const [multiResults, setMultiResults] = useState<MultiOCRResult[]>([])
   const [isMultiProcessing, setIsMultiProcessing] = useState(false)
+  const [allowanceExhausted, setAllowanceExhausted] = useState(false)
+
+  useEffect(() => { setAllowanceExhausted(false) }, [session?.user.id])
 
   // Removed single image mode handlers - unified to multi-image approach
 
@@ -76,6 +87,8 @@ export function InteractiveOCR() {
       return
     }
 
+    if (multiResults.some(result => result.status === 'success') && !window.confirm('Recognizing these images again uses another image allowance for each successful image. Continue?')) return
+    setAllowanceExhausted(false)
     setIsMultiProcessing(true)
     setMultiResults([])
     setViewMode('multi-result')
@@ -83,28 +96,28 @@ export function InteractiveOCR() {
     try {
       toast.info('Initializing OCR engine...')
       
-      const results: MultiOCRResult[] = []
-      
-      for (let i = 0; i < multiImages.length; i++) {
-        const image = multiImages[i]
+      const balanceResponse = await fetch('/api/billing/balance', {
+        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {},
+        cache: 'no-store',
+      })
+      const allowance = await balanceResponse.json().catch(() => ({}))
+      if (!balanceResponse.ok) throw new Error(allowance.message || 'Image allowance is temporarily unavailable.')
+      const concurrency = allowance.concurrencyLimit === 3 ? 3 : 1
+      const results: MultiOCRResult[] = multiImages.map(image => ({
+        id: crypto.randomUUID(), imageId: image.id, text: '', confidence: 0,
+        language: 'zh', processingTime: 0, status: 'queued',
+      }))
+      setMultiResults([...results])
+      await runImageBatch(multiImages, concurrency, async (image, i) => {
         const startTime = Date.now()
         
         try {
           toast.info(`Processing image ${i + 1} of ${multiImages.length}...`)
           
-          // Add processing result
-          const processingResult: MultiOCRResult = {
-            id: Date.now().toString() + i,
-            imageId: image.id,
-            text: '',
-            confidence: 0,
-            language: 'zh',
-            processingTime: 0,
-            status: 'processing'
-          }
-          results.push(processingResult)
+          const processingResult: MultiOCRResult = { ...results[i], status: 'processing' }
+          results[i] = processingResult
           setMultiResults([...results])
-          
+
           // Convert image to base64
           const base64Image = await fileToBase64(image.file)
           
@@ -127,6 +140,7 @@ export function InteractiveOCR() {
           // Call Ali Cloud Vision OCR API
           const headers: Record<string, string> = {
             'Content-Type': 'application/json',
+            'Idempotency-Key': crypto.randomUUID(),
           }
           
           // Add Authorization header if user is authenticated
@@ -134,7 +148,7 @@ export function InteractiveOCR() {
             headers['Authorization'] = `Bearer ${session.access_token}`
           }
           
-          const response = await fetch('/api/ocr/ali_vl', {
+          const response = await fetchQueuedOCR('/api/ocr/ali_vl', {
             method: 'POST',
             headers,
             body: JSON.stringify({
@@ -143,23 +157,12 @@ export function InteractiveOCR() {
           })
           
           if (!response.ok) {
-            // 尝试解析错误响应中的message字段
-            try {
-              const errorData = await response.json()
-              if (errorData.message) {
-                throw new Error(errorData.message)
-              } else if (errorData.error) {
-                throw new Error(errorData.error)
-              } else {
-                throw new Error(`HTTP error! status: ${response.status}`)
-              }
-            } catch {
-              // 如果解析失败，使用默认错误信息
-              throw new Error(`HTTP error! status: ${response.status}`)
-            }
+            const errorData = await response.json().catch(() => ({}))
+            if (response.status === 402 && errorData.errorCode === 'IMAGE_ALLOWANCE_EXHAUSTED') setAllowanceExhausted(true)
+            throw new OCRRequestError(errorData.message || errorData.error || `HTTP error: ${response.status}`, errorData.errorCode)
           }
-          
           const ocrResult = await response.json()
+          window.dispatchEvent(new Event('billing:refresh'))
           const processingTime = Date.now() - startTime
           
           if (ocrResult.success) {
@@ -183,33 +186,46 @@ export function InteractiveOCR() {
           results[i] = {
             ...results[i],
             status: 'error',
-            error: error instanceof Error ? error.message : 'Processing failed'
+            error: error instanceof Error ? error.message : 'Processing failed',
+            errorCode: error instanceof OCRRequestError ? error.errorCode : undefined
           }
           setMultiResults([...results])
         }
-      }
+      })
       
-      toast.success(`Completed processing ${multiImages.length} images`)
+      const succeeded = results.filter(r => r.status === 'success').length
+      toast.info(`${succeeded} of ${multiImages.length} images processed successfully.`)
       
     } catch (error) {
       console.error('Multi OCR processing failed:', error)
-      toast.error('OCR processing failed, please try again')
+      toast.error(error instanceof Error ? error.message : 'OCR processing failed, please try again')
+      setViewMode('multi-preview')
     } finally {
       setIsMultiProcessing(false)
+      window.dispatchEvent(new Event('billing:refresh'))
     }
-  }, [multiImages, session?.access_token])
+  }, [multiImages, multiResults, session?.access_token])
 
   // Removed handleModeSwitch - unified to multi-image mode only
 
   return (
-    <div className="space-y-6">
+    <div className="optical-workbench space-y-6">
+      <Balance />
+      {allowanceExhausted && <div role="alert" className="rounded-xl border p-4 text-sm">
+        <p>{session ? 'Buy an image pack to continue, or wait for your daily free images to reset.' : 'Your 2 guest images for today have been used. Sign in to use the rest of your 4-image daily free allowance, or buy an image pack.'}</p>
+        <div className="mt-3 flex flex-wrap gap-4">
+          {!session && <Link href="/login?redirectTo=%2Focr" target="_blank" rel="noopener noreferrer" className="font-medium text-primary underline">Sign in ↗</Link>}
+          <Link href="/pricing" target="_blank" rel="noopener noreferrer" className="font-medium text-primary underline">Buy image packs ↗</Link>
+        </div>
+        <p className="mt-2 text-muted-foreground">Your selected images stay in this tab.</p>
+      </div>}
       {/* Removed single image mode - unified to multi-image mode only */}
 
       {/* Multi Image Upload Mode */}
       {viewMode === 'multi-upload' && (
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
-            <Images className="h-5 w-5 text-blue-600" />
+            <Images className="h-5 w-5 text-primary" />
             <h3 className="text-lg font-semibold">Select Multiple Images</h3>
           </div>
           <MultiImageUpload

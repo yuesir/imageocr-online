@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { GoogleSignInButton } from './GoogleSignInButton'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
@@ -56,6 +57,7 @@ export function SignUpForm() {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
+          <GoogleSignInButton disabled={loading} />
           <div className="space-y-2">
             <Label htmlFor="fullName">Full Name</Label>
             <div className="relative">

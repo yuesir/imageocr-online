@@ -67,3 +67,13 @@ export default tseslint.config({
   },
 })
 ```
+
+## One-time image packs
+
+Starter: $5.99 / 100 images; Plus (Recommended): $9.99 / 300; Max: $19.99 / 800. Purchased images never expire. Guests receive 2 free images/day and signed-in accounts 4/day total, resetting at 00:00 UTC.
+
+Apply the billing migration before deploying the new OCR handlers. Purchases remain disabled until `BILLING_ENABLED=true`. See [billing setup, tests and cost gate](docs/billing.md) for Waffo configuration and launch requirements. Run `npm run test:billing` for isolated PostgreSQL and API contract tests.
+
+## Google 账号登录
+
+登录页和注册页支持通过 Supabase Auth 使用 Google 账号登录（PKCE）。部署前按 [配置指南](docs/google-login.md) 设置 Google Cloud 和 Supabase 回调地址及凭据。

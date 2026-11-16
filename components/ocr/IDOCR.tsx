@@ -1,5 +1,7 @@
 'use client'
 
+import { Balance } from '@/components/billing/Balance'
+
 import React, { useState, useCallback } from 'react'
 import { Upload, FileText, Loader2, Download, Copy, Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
@@ -81,6 +83,7 @@ export default function IDOCR() {
       return
     }
 
+    if (!window.confirm('Each successfully processed image uses 1 image allowance, including images with no text. Running images again uses another allowance. Continue?')) return
     setIsProcessing(true)
     const results: OCRResult[] = []
 
@@ -88,10 +91,11 @@ export default function IDOCR() {
       for (const image of selectedImages) {
         const base64 = await convertToBase64(image.file)
         
-        const response = await fetch('/api/ocr', {
+        const response = await fetch('/api/ocr/ali_vl', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Idempotency-Key': crypto.randomUUID(),
+          'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             image: base64,
@@ -104,9 +108,10 @@ export default function IDOCR() {
         }
 
         const data = await response.json()
+      window.dispatchEvent(new Event('billing:refresh'))
         results.push({
-          text: data.text || 'No text detected in this ID document',
-          confidence: data.confidence || 0
+          text: data.result.text || 'No text detected in this ID document',
+          confidence: data.result.confidence || 0
         })
       }
 
@@ -149,31 +154,32 @@ export default function IDOCR() {
   if (viewMode === 'upload') {
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+      <Balance />
+        <div className="bg-card rounded-2xl shadow-tactile p-8">
           <div className="text-center mb-8">
-            <FileText className="w-16 h-16 text-purple-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            <FileText className="w-16 h-16 text-primary mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               Upload Your ID Document
             </h2>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Drag and drop your ID document images here, or click to browse
             </p>
           </div>
 
           <div
-            className="border-2 border-dashed border-purple-300 rounded-xl p-12 text-center hover:border-purple-400 transition-colors cursor-pointer"
+            className="border-2 border-dashed border-border rounded-xl p-12 text-center hover:border-border transition-colors cursor-pointer"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onClick={() => document.getElementById('file-input')?.click()}
           >
-            <Upload className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-            <p className="text-lg text-gray-600 mb-2">
+            <Upload className="w-12 h-12 text-primary mx-auto mb-4" />
+            <p className="text-lg text-muted-foreground mb-2">
               Drop your ID document images here
             </p>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Supports JPG, PNG, PDF • Max 10MB per file
             </p>
-            <button className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+            <button className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary transition-colors">
               Choose Files
             </button>
           </div>
@@ -187,7 +193,7 @@ export default function IDOCR() {
             className="hidden"
           />
 
-          <div className="mt-6 text-center text-sm text-gray-500">
+          <div className="mt-6 text-center text-sm text-muted-foreground">
             <p>✓ Secure processing • ✓ No data stored • ✓ Free to use</p>
           </div>
         </div>
@@ -198,22 +204,23 @@ export default function IDOCR() {
   if (viewMode === 'preview') {
     return (
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <Balance />
+        <div className="bg-card rounded-2xl shadow-tactile p-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-2xl font-bold text-foreground">
               Preview Your ID Document Images
             </h2>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowPreview(!showPreview)}
-                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 {showPreview ? 'Hide' : 'Show'} Preview
               </button>
               <button
                 onClick={resetUpload}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 Upload Different Images
               </button>
@@ -230,10 +237,10 @@ export default function IDOCR() {
                     className="w-full h-48 object-cover"
                   />
                   <div className="p-3">
-                    <p className="text-sm text-gray-600 truncate">
+                    <p className="text-sm text-muted-foreground truncate">
                       {image.file.name}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {(image.file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
@@ -246,7 +253,7 @@ export default function IDOCR() {
             <button
               onClick={handleConvert}
               disabled={isProcessing}
-              className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 mx-auto"
+              className="bg-primary text-white px-8 py-3 rounded-lg hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 mx-auto"
             >
               {isProcessing ? (
                 <>
@@ -269,14 +276,15 @@ export default function IDOCR() {
   if (viewMode === 'result') {
     return (
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <Balance />
+        <div className="bg-card rounded-2xl shadow-tactile p-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-2xl font-bold text-foreground">
               Extracted ID Document Text
             </h2>
             <button
               onClick={resetUpload}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               Process New Document
             </button>
@@ -286,20 +294,20 @@ export default function IDOCR() {
             {ocrResults.map((result, index) => (
               <div key={index} className="border rounded-lg p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-lg font-semibold text-foreground">
                     Document {index + 1} - {selectedImages[index]?.file.name}
                   </h3>
                   <div className="flex gap-2">
                     <button
                       onClick={() => copyToClipboard(result.text)}
-                      className="flex items-center gap-2 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+                      className="flex items-center gap-2 px-3 py-1 text-sm bg-secondary hover:bg-secondary rounded transition-colors"
                     >
                       <Copy className="w-4 h-4" />
                       Copy
                     </button>
                     <button
                       onClick={() => downloadText(result.text, index)}
-                      className="flex items-center gap-2 px-3 py-1 text-sm bg-purple-100 hover:bg-purple-200 text-purple-700 rounded transition-colors"
+                      className="flex items-center gap-2 px-3 py-1 text-sm bg-secondary hover:bg-secondary text-primary rounded transition-colors"
                     >
                       <Download className="w-4 h-4" />
                       Download
@@ -307,14 +315,14 @@ export default function IDOCR() {
                   </div>
                 </div>
                 
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <pre className="whitespace-pre-wrap text-sm text-gray-800 font-mono">
+                <div className="bg-background rounded-lg p-4">
+                  <pre className="whitespace-pre-wrap text-sm text-foreground font-mono">
                     {result.text}
                   </pre>
                 </div>
                 
                 {result.confidence > 0 && (
-                  <div className="mt-3 text-sm text-gray-600">
+                  <div className="mt-3 text-sm text-muted-foreground">
                     Confidence: {(result.confidence * 100).toFixed(1)}%
                   </div>
                 )}

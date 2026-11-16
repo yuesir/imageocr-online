@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ImageOCRAI — Archival Optical Character Recognition & Document Workbench</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Newsreader (Editorial Serif), Plus Jakarta Sans (Crisp UI), JetBrains Mono (Technical Telemetry) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Newsreader', 'Georgia', 'serif'],
+            sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            paper: {
+              DEFAULT: '#F6F4EF',
+              card: '#FCFBF9',
+              recessed: '#EFECE6',
+            },
+            ink: {
+              DEFAULT: '#141413',
+              muted: '#575652',
+              subtle: '#84827B',
+            },
+            stone: {
+              hairline: '#E2DDD3',
+              strong: '#C9C2B4',
+            },
+            vermilion: {
+              DEFAULT: '#D94E28',
+              hover: '#BE3F1D',
+              tint: '#FDF3F0',
+            },
+            sage: {
+              DEFAULT: '#2A6F4E',
+              tint: '#EFF7F3',
+            }
+          },
+          boxShadow: {
+            'tactile': '0 2px 0 #E2DDD3',
+            'tactile-lg': '0 4px 0 #E2DDD3',
+            'ink-press': '0 2px 0 #141413',
+          },
+          animation: {
+            'vermilion-scan': 'vermilionScan 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite',
+          },
+          keyframes: {
+            vermilionScan: {
+              '0%': { top: '6%', opacity: '0.4' },
+              '50%': { top: '90%', opacity: '1' },
+              '100%': { top: '6%', opacity: '0.4' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #F6F4EF;
+      color: #141413;
+      /* Subtle tactile archival paper grain */
+      background-image: radial-gradient(rgba(20, 20, 19, 0.035) 1px, transparent 0);
+      background-size: 20px 20px;
+    }
+
+    /* Architectural millimeter ruler tick border */
+    .ruler-ticks {
+      background-image: repeating-linear-gradient(
+        to right,
+        #C9C2B4 0,
+        #C9C2B4 1px,
+        transparent 1px,
+        transparent 12px
+      );
+      height: 5px;
+      width: 100%;
+      opacity: 0.65;
+    }
+
+    /* Optical viewfinder corner registration marks */
+    .reg-frame {
+      position: relative;
+    }
+    .reg-frame::before,
+    .reg-frame::after {
+      content: '+';
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      line-height: 1;
+      color: #84827B;
+      position: absolute;
+      pointer-events: none;
+    }
+    .reg-frame::before {
+      top: 8px;
+      left: 10px;
+    }
+    .reg-frame::after {
+      top: 8px;
+      right: 10px;
+    }
+
+    /* Custom editorial scrollbar */
+    .editorial-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .editorial-scroll::-webkit-scrollbar-track {
+      background: #EFECE6;
+    }
+    .editorial-scroll::-webkit-scrollbar-thumb {
+      background: #C9C2B4;
+      border-radius: 3px;
+    }
+    .editorial-scroll::-webkit-scrollbar-thumb:hover {
+      background: #84827B;
+    }
+
+    /* Bounding box highlight pulse during scan */
+    .ocr-bbox {
+      border: 1px solid rgba(217, 78, 40, 0.55);
+      background-color: rgba(217, 78, 40, 0.06);
+      transition: all 0.25s ease;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased selection:bg-vermilion selection:text-white">
+
+  <!-- Toast Notification Container (No alert()) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- 1. SINGLE CRISP EDITORIAL TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-40 bg-paper/95 backdrop-blur-md border-b border-stone-hairline">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Brand Mark: Optical Viewfinder + Editorial Lockup -->
+        <a href="#" class="flex items-center gap-3 group">
+          <div class="w-8 h-8 rounded-md bg-ink text-paper-card flex items-center justify-center relative border border-ink group-hover:bg-vermilion group-hover:border-vermilion transition-colors">
+            <!-- Precision optical viewfinder SVG -->
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 8V6a2 2 0 0 1 2-2h2" />
+              <path d="M4 16v2a2 2 0 0 0 2 2h2" />
+              <path d="M16 4h2a2 2 0 0 1 2 2v2" />
+              <path d="M16 20h2a2 2 0 0 0 2-2v-2" />
+              <line x1="7" y1="12" x2="17" y2="12" />
+            </svg>
+          </div>
+          <div class="flex items-baseline gap-2.5">
+            <span class="font-serif text-2xl font-medium tracking-tight text-ink">
+              Image<span class="italic font-normal">OCR</span>AI
+            </span>
+            <span class="hidden sm:inline-block font-mono text-[10px] font-medium tracking-wider uppercase px-1.5 py-0.5 rounded bg-paper-recessed text-ink-muted border border-stone-hairline">
+              v2.4 ENGINE
+            </span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center gap-7">
+          <!-- Specialized Tools Dropdown -->
+          <div class="relative group">
+            <button class="flex items-center gap-1.5 py-2 text-sm font-medium text-ink-muted hover:text-ink transition-colors">
+              <span>Specialized Tools</span>
+              <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-subtle group-hover:rotate-180 transition-transform duration-200"></i>
+            </button>
+            <div class="absolute left-0 mt-1 w-72 rounded-xl bg-paper-card border border-stone-hairline shadow-tactile-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-1 group-hover:translate-y-0 transition-all duration-150">
+              <a href="#directory" onclick="loadSamplePreset('invoice')" class="flex items-start justify-between p-2.5 rounded-lg hover:bg-paper-recessed transition-colors group/item">
+                <div>
+                  <p class="text-xs font-mono text-vermilion mb-0.5">01 / FINANCIAL</p>
+                  <p class="text-sm font-semibold text-ink">Invoice OCR & Line Items</p>
+                </div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-ink-subtle group-hover/item:text-ink"></i>
+              </a>
+              <a href="#directory" onclick="loadSamplePreset('receipt')" class="flex items-start justify-between p-2.5 rounded-lg hover:bg-paper-recessed transition-colors group/item">
+                <div>
+                  <p class="text-xs font-mono text-vermilion mb-0.5">02 / POS & EXPENSE</p>
+                  <p class="text-sm font-semibold text-ink">Receipt Digitization</p>
+                </div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-ink-subtle group-hover/item:text-ink"></i>
+              </a>
+              <a href="#directory" class="flex items-start justify-between p-2.5 rounded-lg hover:bg-paper-recessed transition-colors group/item">
+                <div>
+                  <p class="text-xs font-mono text-vermilion mb-0.5">03 / IDENTITY</p>
+                  <p class="text-sm font-semibold text-ink">Passport & ID Card MRZ</p>
+                </div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-ink-subtle group-hover/item:text-ink"></i>
+              </a>
+              <a href="#directory" onclick="loadSamplePreset('note')" class="flex items-start justify-between p-2.5 rounded-lg hover:bg-paper-recessed transition-colors group/item">
+                <div>
+                  <p class="text-xs font-mono text-vermilion mb-0.5">04 / MULTILINGUAL</p>
+                  <p class="text-sm font-semibold text-ink">JPG/PNG & 100+ Scripts</p>
+                </div>
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-ink-subtle group-hover/item:text-ink"></i>
+              </a>
+            </div>
+          </div>
+
+          <a href="#workflow" class="text-sm font-medium text-ink-muted hover:text-ink transition-colors">Workflow</a>
+          <a href="#capabilities" class="text-sm font-medium text-ink-muted hover:text-ink transition-colors">Accuracy & Privacy</a>
+          <a href="#faq" class="text-sm font-medium text-ink-muted hover:text-ink transition-colors">FAQ</a>
+        </nav>
+
+        <!-- Right Actions -->
+        <div class="hidden md:flex items-center gap-3">
+          <!-- Language Switcher -->
+          <div class="relative">
+            <select aria-label="Interface Language" onchange="showToast('Interface locale set to ' + this.options[this.selectedIndex].text, 'info')" class="appearance-none font-mono text-xs font-medium text-ink-muted hover:text-ink bg-paper-card border border-stone-hairline rounded-lg pl-2.5 pr-6 py-1.5 cursor-pointer focus:outline-none focus:border-ink">
+              <option value="en">EN</option>
+              <option value="zh">中文</option>
+              <option value="ja">日本語</option>
+              <option value="ar">AR</option>
+            </select>
+            <i data-lucide="chevron-down" class="w-3 h-3 text-ink-subtle absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          </div>
+
+          <button onclick="openAuthModal('signin')" class="px-3 py-1.5 text-sm font-medium text-ink-muted hover:text-ink transition-colors">
+            Sign In
+          </button>
+
+          <button onclick="openAuthModal('signup')" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-ink text-paper-card hover:bg-vermilion transition-colors shadow-tactile">
+            <span>Start Free</span>
+            <span class="font-mono text-xs">→</span>
+          </button>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" aria-label="Toggle Menu" class="md:hidden p-2 rounded-lg text-ink hover:bg-paper-recessed border border-stone-hairline">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden bg-paper-card border-b border-stone-hairline px-4 pt-3 pb-5 space-y-2">
+      <a href="#directory" class="block px-3 py-2 rounded-lg text-sm font-medium text-ink hover:bg-paper-recessed">Specialized Tools</a>
+      <a href="#workflow" class="block px-3 py-2 rounded-lg text-sm font-medium text-ink hover:bg-paper-recessed">Workflow</a>
+      <a href="#capabilities" class="block px-3 py-2 rounded-lg text-sm font-medium text-ink hover:bg-paper-recessed">Accuracy & Privacy</a>
+      <a href="#faq" class="block px-3 py-2 rounded-lg text-sm font-medium text-ink hover:bg-paper-recessed">FAQ</a>
+      <div class="pt-3 border-t border-stone-hairline flex flex-col gap-2">
+        <button onclick="openAuthModal('signin')" class="w-full py-2.5 rounded-lg text-sm font-semibold text-ink bg-paper-recessed border border-stone-hairline">Sign In</button>
+        <button onclick="openAuthModal('signup')" class="w-full py-2.5 rounded-lg text-sm font-semibold text-paper-card bg-ink">Start Free →</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. EDITORIAL SPLIT-HERO & INTERACTIVE OPTICAL WORKBENCH -->
+  <section class="pt-10 pb-16 lg:pt-14 lg:pb-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Top Editorial Header Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end mb-10">
+        <div class="lg:col-span-8">
+          <div class="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-ink-muted mb-4">
+            <span class="w-2 h-2 rounded-full bg-vermilion"></span>
+            <span>OPTICAL CHARACTER RECOGNITION STUDIO · NO SIGN-UP REQUIRED</span>
+          </div>
+          <h1 class="font-serif text-4xl sm:text-5xl lg:text-[3.65rem] font-normal text-ink tracking-tight leading-[1.06]">
+            Turn paper, scans, and receipts into <span class="italic text-vermilion">structured</span> text.
+          </h1>
+        </div>
+        <div class="lg:col-span-4 lg:pb-1">
+          <p class="text-sm sm:text-base text-ink-muted leading-relaxed mb-4">
+            A precision image-to-text workbench built for clean typography, complex tables, invoices, and multilingual archives. Drop any image below to extract editable text in under a second.
+          </p>
+          <div class="font-mono text-[11px] text-ink-muted tracking-wide pt-3 border-t border-stone-hairline flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span class="text-ink font-semibold">99.4% CHARACTER ACCURACY</span>
+            <span>·</span>
+            <span>ZERO DATA RETENTION</span>
+            <span>·</span>
+            <span>100+ SCRIPTS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- THE CENTERPIECE: TWO-PANE OPTICAL WORKBENCH -->
+      <div class="bg-paper-card rounded-2xl border border-stone-hairline shadow-tactile-lg overflow-hidden">
+        
+        <!-- Workbench Top Instrument Strip -->
+        <div class="bg-paper-recessed/80 border-b border-stone-hairline px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+          <!-- Left Controls: Batch Toggle & Script Selector -->
+          <div class="flex flex-wrap items-center gap-2.5">
+            <label class="inline-flex items-center gap-2 cursor-pointer select-none bg-paper-card px-3 py-1.5 rounded-lg border border-stone-hairline hover:border-ink transition-colors">
+              <input type="checkbox" id="batch-mode-toggle" class="w-3.5 h-3.5 accent-[#D94E28] rounded border-stone-strong" onchange="toggleBatchMode(this.checked)">
+              <span class="text-xs font-semibold text-ink">Select Multiple Images</span>
+              <span class="font-mono text-[10px] uppercase px-1.5 py-0.5 rounded bg-paper-recessed text-ink-muted">Batch</span>
+            </label>
+
+            <div class="flex items-center gap-1.5 bg-paper-card px-3 py-1.5 rounded-lg border border-stone-hairline">
+              <i data-lucide="languages" class="w-3.5 h-3.5 text-ink-muted"></i>
+              <select id="ocr-lang-select" aria-label="Document Language" class="text-xs font-medium text-ink bg-transparent focus:outline-none cursor-pointer">
+                <option value="auto">Auto-Detect (100+ Scripts)</option>
+                <option value="en">English (Latin)</option>
+                <option value="zh">Chinese (Simplified & Traditional)</option>
+                <option value="ja">Japanese (Kanji / Kana)</option>
+                <option value="ar">Arabic (RTL Script)</option>
+                <option value="el">Greek</option>
+                <option value="hi">Hindi / Devanagari</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Right Controls: Curated Archival Sample Specimens -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+            <span class="font-mono text-[11px] uppercase tracking-wider text-ink-subtle hidden xl:inline">Load Specimen:</span>
+            <button onclick="loadSamplePreset('invoice')" id="sample-btn-invoice" class="px-2.5 py-1.5 rounded-lg font-mono text-xs bg-paper-card hover:bg-ink hover:text-paper-card text-ink border border-stone-hairline transition-colors whitespace-nowrap">
+              01. Invoice #084
+            </button>
+            <button onclick="loadSamplePreset('receipt')" id="sample-btn-receipt" class="px-2.5 py-1.5 rounded-lg font-mono text-xs bg-paper-card hover:bg-ink hover:text-paper-card text-ink border border-stone-hairline transition-colors whitespace-nowrap">
+              02. Coffee Receipt
+            </button>
+            <button onclick="loadSamplePreset('note')" id="sample-btn-note" class="px-2.5 py-1.5 rounded-lg font-mono text-xs bg-paper-card hover:bg-ink hover:text-paper-card text-ink border border-stone-hairline transition-colors whitespace-nowrap">
+              03. Field Note
+            </button>
+          </div>
+        </div>
+
+        <!-- Split Workbench Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-stone-hairline">
+          
+          <!-- LEFT PANE: SOURCE DOCUMENT (Optical Scanner Bed) -->
+          <div class="lg:col-span-6 p-5 sm:p-7 flex flex-col justify-between bg-paper-card">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-[11px] font-semibold uppercase tracking-widest text-ink-muted">SOURCE DOCUMENT</span>
+                <span id="source-dimensions" class="font-mono text-[10px] text-ink-subtle hidden sm:inline">[300 DPI · AUTO-DESKEW]</span>
+              </div>
+              <button id="clear-source-btn" onclick="resetWorkspace()" class="hidden inline-flex items-center gap-1 font-mono text-[11px] text-ink-muted hover:text-vermilion transition-colors">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                <span>CLEAR BED</span>
+              </button>
+            </div>
+
+            <!-- Hidden File Input -->
+            <input type="file" id="image-file-input" accept="image/jpeg,image/png,image/webp,image/bmp,image/tiff" class="hidden" onchange="handleFileUpload(event)">
+
+            <!-- State A: Empty Optical Scanner Bed -->
+            <div id="dropzone-empty" onclick="document.getElementById('image-file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" class="reg-frame group flex-1 min-h-[320px] rounded-xl border border-dashed border-stone-strong hover:border-vermilion bg-paper/70 hover:bg-vermilion-tint/40 transition-all cursor-pointer flex flex-col items-center justify-center p-7 text-center">
+              
+              <div class="w-12 h-12 rounded-xl bg-paper-card border border-stone-hairline shadow-tactile flex items-center justify-center text-ink group-hover:border-vermilion group-hover:text-vermilion transition-colors mb-4">
+                <i data-lucide="scan" class="w-5 h-5"></i>
+              </div>
+
+              <h2 class="font-serif text-2xl font-normal text-ink mb-1.5">
+                Place document on scanner bed
+              </h2>
+              <p class="text-xs sm:text-sm text-ink-muted max-w-xs mb-5 leading-relaxed">
+                Drag and drop an image file, paste from clipboard (<kbd class="font-mono text-[11px] px-1.5 py-0.5 bg-paper-card border border-stone-hairline rounded">Ctrl+V</kbd>), or select from disk.
+              </p>
+
+              <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold bg-ink text-paper-card group-hover:bg-vermilion transition-colors">
+                <i data-lucide="folder-open" class="w-3.5 h-3.5"></i>
+                <span>Browse Image Files</span>
+              </span>
+
+              <p class="mt-5 font-mono text-[10px] uppercase tracking-wider text-ink-subtle">
+                JPG · PNG · WEBP · BMP · TIFF — MAX 10MB PER FILE
+              </p>
+            </div>
+
+            <!-- State B: Active Document Preview + Swiss Vermilion Scanline -->
+            <div id="dropzone-preview" class="hidden flex-1 flex flex-col">
+              <!-- Active Scanner Bed Container -->
+              <div class="reg-frame relative flex-1 min-h-[300px] rounded-xl bg-paper-recessed border border-stone-hairline overflow-hidden flex items-center justify-center p-5">
+                
+                <!-- Razor-sharp Swiss Vermilion Laser Scanline -->
+                <div id="scanner-laser" class="hidden absolute inset-x-3 h-[2px] bg-vermilion shadow-[0_0_12px_rgba(217,78,40,0.85)] z-20 animate-vermilion-scan">
+                  <span class="absolute right-0 -top-4 font-mono text-[9px] uppercase tracking-widest bg-vermilion text-white px-1.5 py-0.5 rounded-xs">
+                    SCANNING
+                  </span>
+                </div>
+
+                <!-- Uploaded Real User Image -->
+                <img id="uploaded-image-el" src="" alt="Uploaded document preview" class="hidden max-h-[275px] w-auto rounded border border-stone-hairline object-contain shadow-sm bg-white" />
+
+                <!-- High-Craft Archival Specimen Sheet (For Sample Presets) -->
+                <div id="sample-visual-card" class="hidden w-full max-w-sm bg-white rounded-lg p-5 border border-stone-hairline shadow-sm text-left text-ink">
+                  <!-- Populated dynamically via JS -->
+                </div>
+
+                <!-- Bottom Telemetry Strip inside Scanner Bed -->
+                <div class="absolute bottom-2.5 inset-x-3 flex items-center justify-between font-mono text-[10px] text-ink-muted bg-paper-card/90 backdrop-blur-xs px-2.5 py-1 rounded border border-stone-hairline">
+                  <span id="preview-filename" class="truncate max-w-[65%] font-medium text-ink">invoice-2026-084.png</span>
+                  <span id="scan-region-count" class="text-sage font-semibold">6 REGIONS DETECTED</span>
+                </div>
+              </div>
+
+              <!-- Bottom Controls for Left Pane -->
+              <div class="mt-4 flex items-center justify-between gap-3">
+                <button onclick="document.getElementById('image-file-input').click()" class="px-3.5 py-2 rounded-lg text-xs font-semibold text-ink bg-paper hover:bg-paper-recessed border border-stone-hairline transition-colors">
+                  + Replace Image
+                </button>
+                <button onclick="rerunExtraction()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-paper-card bg-ink hover:bg-vermilion transition-colors">
+                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                  <span>Re-Scan Document</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT PANE: EXTRACTED OUTPUT (Typeset Result Sheet) -->
+          <div class="lg:col-span-6 p-5 sm:p-7 bg-paper/45 flex flex-col justify-between">
+            <!-- Output Header & Segmented Format Switcher -->
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="font-mono text-[11px] font-semibold uppercase tracking-widest text-ink-muted">EXTRACTED OUTPUT</span>
+                <span id="confidence-badge" class="hidden inline-flex items-center gap-1 font-mono text-[10px] font-semibold px-2 py-0.5 rounded bg-sage-tint text-sage border border-sage/20">
+                  <span class="w-1.5 h-1.5 rounded-full bg-sage"></span>
+                  99.6% CONFIDENCE
+                </span>
+              </div>
+
+              <!-- Segmented Tab Switcher -->
+              <div class="inline-flex rounded-lg bg-paper-recessed p-0.5 border border-stone-hairline">
+                <button onclick="setOutputFormat('text')" id="fmt-btn-text" class="px-2.5 py-1 rounded-md font-mono text-[11px] font-semibold bg-paper-card text-ink shadow-2xs transition-all">Clean Text</button>
+                <button onclick="setOutputFormat('markdown')" id="fmt-btn-markdown" class="px-2.5 py-1 rounded-md font-mono text-[11px] font-medium text-ink-muted hover:text-ink transition-all">Markdown</button>
+                <button onclick="setOutputFormat('json')" id="fmt-btn-json" class="px-2.5 py-1 rounded-md font-mono text-[11px] font-medium text-ink-muted hover:text-ink transition-all">Structured JSON</button>
+              </div>
+            </div>
+
+            <!-- Editable Extracted Text Area -->
+            <div class="relative flex-1">
+              <textarea id="ocr-output-area" aria-label="Extracted OCR Text" class="w-full h-[300px] rounded-xl bg-paper-card border border-stone-hairline p-4 font-mono text-xs sm:text-[13px] text-ink leading-relaxed focus:outline-none focus:border-ink resize-none editorial-scroll" placeholder="// Awaiting source document...&#10;&#10;Drop an image on the left scanner bed or select one of the three archival specimens above (01. Invoice, 02. Coffee Receipt, 03. Field Note) to inspect structured extraction."></textarea>
+            </div>
+
+            <!-- Bottom Telemetry & Export Bar -->
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <div class="font-mono text-[11px] text-ink-muted">
+                <span id="char-count">0 CHARS</span> <span class="text-stone-strong">·</span> <span id="word-count">0 WORDS</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button onclick="downloadExtractedText()" id="download-btn" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-mono text-xs font-medium text-ink bg-paper-card hover:bg-paper-recessed border border-stone-hairline transition-colors">
+                  <i data-lucide="download" class="w-3.5 h-3.5 text-ink-muted"></i>
+                  <span id="download-label">Download .txt</span>
+                </button>
+                <button onclick="copyExtractedText()" id="copy-btn" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg font-mono text-xs font-semibold text-paper-card bg-ink hover:bg-vermilion transition-colors">
+                  <i data-lucide="copy" id="copy-icon" class="w-3.5 h-3.5"></i>
+                  <span id="copy-label">Copy Text</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Millimeter Registration Ruler Divider -->
+      <div class="mt-14">
+        <div class="ruler-ticks"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. PRECISION USE-CASE INDEX (STRUCTURED SWISS EDITORIAL DIRECTORY) -->
+  <section id="directory" class="py-16 lg:py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+        <div>
+          <p class="font-mono text-xs uppercase tracking-widest text-vermilion mb-2">INDEX OF EXTRACTION MODELS</p>
+          <h2 class="font-serif text-3xl sm:text-4xl font-normal text-ink tracking-tight">
+            Specialized Optical Pipelines
+          </h2>
+        </div>
+        <p class="text-sm text-ink-muted max-w-md leading-relaxed">
+          Each document class runs through a dedicated layout parser trained to preserve tabular columns, key-value pairs, and script directionality.
+        </p>
+      </div>
+
+      <!-- 6-Item Numbered Swiss Directory Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-t border-l border-stone-hairline bg-paper-card rounded-2xl overflow-hidden shadow-tactile">
+        
+        <!-- 01 / Invoice OCR -->
+        <div class="p-7 border-r border-b border-stone-hairline flex flex-col justify-between hover:bg-paper/70 transition-colors">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="font-mono text-xs font-semibold text-vermilion">01 / INVOICE OCR</span>
+              <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-paper-recessed text-ink-muted border border-stone-hairline">PDF/IMG → JSON</span>
+            </div>
+            <h3 class="font-serif text-2xl text-ink mb-2">Commercial Invoice Parser</h3>
+            <p class="text-sm text-ink-muted leading-relaxed mb-5">
+              Isolates vendor tax IDs, invoice numbers, due dates, and multi-row line-item tables without losing column alignment.
+            </p>
+          </div>
+          <div class="pt-4 border-t border-stone-hairline flex items-center justify-between">
+            <span class="font-mono text-[11px] text-ink-subtle">Fields: Vendor, Total, SKU</span>
+            <button onclick="triggerPresetAndScroll('invoice')" class="inline-flex items-center gap-1 font-mono text-xs font-semibold text-ink hover:text-vermilion transition-colors">
+              <span>Try Sample</span>
+              <span>↑</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 02 / Receipt Digitization -->
+        <div class="p-7 border-r border-b border-stone-hairline flex flex-col justify-between hover:bg-paper/70 transition-colors">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="font-mono text-xs font-semibold text-vermilion">02 / RECEIPT DIGITIZATION</span>
+              <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-paper-recessed text-ink-muted border border-stone-hairline">THERMAL POS → CSV</span>
+            </div>
+            <h3 class="font-serif text-2xl text-ink mb-2">Faded & Crumpled Receipts</h3>
+            <p class="text-sm text-ink-muted leading-relaxed mb-5">
+              Adaptive contrast recovery restores low-ink thermal paper receipts, merchant headers, tips, and itemized tax breakdowns.
+            </p>
+          </div>
+          <div class="pt-4 border-t border-stone-hairline flex items-center justify-between">
+            <span class="font-mono text-[11px] text-ink-subtle">Auto-deskew & Denoise</span>
+            <button onclick="triggerPresetAndScroll('receipt')" class="inline-flex items-center gap-1 font-mono text-xs font-semibold text-ink hover:text-vermilion transition-colors">
+              <span>Try Sample</span>
+              <span>↑</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 03 / Passport & ID MRZ -->
+        <div class="p-7 border-r border-b border-stone-hairline flex flex-col justify-between hover:bg-paper/70 transition-colors">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="font-mono text-xs font-semibold text-vermilion">03 / PASSPORT & ID MRZ</span>
+              <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-paper-recessed text-ink-muted border border-stone-hairline">ICAO 9303 → JSON</span>
+            </div>
+            <h3 class="font-serif text-2xl text-ink mb-2">Identity & Travel Documents</h3>
+            <p class="text-sm text-ink-muted leading-relaxed mb-5">
+              Reads 2-line and 3-line Machine Readable Zones (MRZ) with checksum validation alongside visual inspection fields.
+            </p>
+          </div>
+          <div class="pt-4 border-t border-stone-hairline flex items-center justify-between">
+            <span class="font-mono text-[11px] text-ink-subtle">In-Memory Ephemeral Scan</span>
+            <button onclick="triggerUploadAndScroll()" class="inline-flex items-center gap-1 font-mono text-xs font-semibold text-ink hover:text-vermilion transition-colors">
+              <span>Upload ID</span>
+              <span>↑</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 04 / JPG & PNG to Text -->
+        <div class="p-7 border-r border-b border-stone-hairline flex flex-col justify-between hover:bg-paper/70 transition-colors">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="font-mono text-xs font-semibold text-vermilion">04 / JPG & PNG TO TEXT</span>
+              <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-paper-recessed text-ink-muted border border-stone-hairline">SCREENSHOT → TXT</span>
+            </div>
+            <h3 class="font-serif text-2xl text-ink mb-2">Screenshots, Books & Slides</h3>
+            <p class="text-sm text-ink-muted leading-relaxed mb-5">
+              Converts lecture slides, scanned book pages, and social screenshots into clean, paragraph-aware Markdown or plain text.
+            </p>
+          </div>
+          <div class="pt-4 border-t border-stone-hairline flex items-center justify-between">
+            <span class="font-mono text-[11px] text-ink-subtle">Preserves Heading Hierarchy</span>
+            <button onclick="triggerUploadAndScroll()" class="inline-flex items-center gap-1 font-mono text-xs font-semibold text-ink hover:text-vermilion transition-colors">
+              <span>Upload Image</span>
+              <span>↑</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 05 / Multilingual Scripts -->
+        <div class="p-7 border-r border-b border-stone-hairline flex flex-col justify-between hover:bg-paper/70 transition-colors">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="font-mono text-xs font-semibold text-vermilion">05 / MULTILINGUAL SCRIPTS</span>
+              <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-paper-recessed text-ink-muted border border-stone-hairline">100+ LANGUAGES</span>
+            </div>
+            <h3 class="font-serif text-2xl text-ink mb-2">Arabic, CJK, Greek & Mixed</h3>
+            <p class="text-sm text-ink-muted leading-relaxed mb-5">
+              Handles bidirectional right-to-left Arabic, vertical Japanese/Chinese columns, Cyrillic, Devanagari, and mixed-script notes.
+            </p>
+          </div>
+          <div class="pt-4 border-t border-stone-hairline flex items-center justify-between">
+            <span class="font-mono text-[11px] text-ink-subtle">Auto Script Detection</span>
+            <button onclick="triggerPresetAndScroll('note')" class="inline-flex items-center gap-1 font-mono text-xs font-semibold text-ink hover:text-vermilion transition-colors">
+              <span>Try Sample</span>
+              <span>↑</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 06 / Batch Archive Processing -->
+        <div class="p-7 border-r border-b border-stone-hairline flex flex-col justify-between hover:bg-paper/70 transition-colors">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="font-mono text-xs font-semibold text-vermilion">06 / BATCH ARCHIVE</span>
+              <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-paper-recessed text-ink-muted border border-stone-hairline">MULTI-FILE QUEUE</span>
+            </div>
+            <h3 class="font-serif text-2xl text-ink mb-2">Multi-Page Batch Digitization</h3>
+            <p class="text-sm text-ink-muted leading-relaxed mb-5">
+              Select dozens of scanned pages or receipts in a single pass and merge them into a cleanly delimited text or JSON bundle.
+            </p>
+          </div>
+          <div class="pt-4 border-t border-stone-hairline flex items-center justify-between">
+            <span class="font-mono text-[11px] text-ink-subtle">Parallel Vision Workers</span>
+            <button onclick="enableBatchAndScroll()" class="inline-flex items-center gap-1 font-mono text-xs font-semibold text-ink hover:text-vermilion transition-colors">
+              <span>Enable Batch</span>
+              <span>↑</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. HOW IT WORKS — THREE-STAGE OPTICAL PIPELINE -->
+  <section id="workflow" class="py-16 lg:py-20 border-t border-stone-hairline bg-paper-recessed/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-2xl mb-12">
+        <p class="font-mono text-xs uppercase tracking-widest text-vermilion mb-2">THREE-STAGE OPTICAL PIPELINE</p>
+        <h2 class="font-serif text-3xl sm:text-4xl font-normal text-ink tracking-tight">
+          From Raw Pixels to Verified Typeset Text
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Stage 01 -->
+        <div class="bg-paper-card rounded-2xl p-7 border border-stone-hairline shadow-tactile flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-4 mb-5 border-b border-stone-hairline">
+              <span class="font-mono text-xs font-semibold text-ink">STEP 01 — INGEST</span>
+              <span class="font-mono text-xs text-ink-subtle">[0.05s]</span>
+            </div>
+            <h3 class="font-serif text-2xl text-ink mb-2.5">Upload or Drop Specimens</h3>
+            <p class="text-sm text-ink-muted leading-relaxed mb-6">
+              Drop single files or multi-image batches (JPG, PNG, WebP, BMP, TIFF up to 10MB). Images are normalized and auto-rotated immediately upon arrival.
+            </p>
+          </div>
+          <div class="font-mono text-[11px] bg-paper-recessed px-3 py-2 rounded-lg border border-stone-hairline text-ink-muted">
+            INPUT: <span class="text-ink">scan_001.tiff (2480×3508px)</span>
+          </div>
+        </div>
+
+        <!-- Stage 02 -->
+        <div class="bg-paper-card rounded-2xl p-7 border border-stone-hairline shadow-tactile flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-4 mb-5 border-b border-stone-hairline">
+              <span class="font-mono text-xs font-semibold text-vermilion">STEP 02 — PARSE & RECOGNIZE</span>
+              <span class="font-mono text-xs text-ink-subtle">[0.42s]</span>
+            </div>
+            <h3 class="font-serif text-2xl text-ink mb-2.5">Layout & Character Segmentation</h3>
+            <p class="text-sm text-ink-muted leading-relaxed mb-6">
+              Our vision transformer maps bounding boxes, separates multi-column body copy from tables, and decodes printed or handwritten glyphs across 100+ scripts.
+            </p>
+          </div>
+          <div class="font-mono text-[11px] bg-paper-recessed px-3 py-2 rounded-lg border border-stone-hairline text-ink-muted">
+            DETECTED: <span class="text-sage font-semibold">99.6% MEAN CONFIDENCE</span>
+          </div>
+        </div>
+
+        <!-- Stage 03 -->
+        <div class="bg-paper-card rounded-2xl p-7 border border-stone-hairline shadow-tactile flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-4 mb-5 border-b border-stone-hairline">
+              <span class="font-mono text-xs font-semibold text-ink">STEP 03 — EXPORT</span>
+              <span class="font-mono text-xs text-ink-subtle">[INSTANT]</span>
+            </div>
+            <h3 class="font-serif text-2xl text-ink mb-2.5">Inspect, Refine & Download</h3>
+            <p class="text-sm text-ink-muted leading-relaxed mb-6">
+              Edit extracted text inline, switch between Clean Text, Markdown, or Structured JSON, and copy to clipboard or export directly to disk.
+            </p>
+          </div>
+          <div class="font-mono text-[11px] bg-paper-recessed px-3 py-2 rounded-lg border border-stone-hairline text-ink-muted">
+            EXPORT: <span class="text-ink">.TXT · .MD · .JSON</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. WHY IMAGEOCRAI — TACTILE EDITORIAL BENTO -->
+  <section id="capabilities" class="py-16 lg:py-20 border-t border-stone-hairline">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-2xl mb-12">
+        <p class="font-mono text-xs uppercase tracking-widest text-vermilion mb-2">ARCHITECTURAL STANDARDS</p>
+        <h2 class="font-serif text-3xl sm:text-4xl font-normal text-ink tracking-tight">
+          Built for Archival Precision & Strict Confidentiality
+        </h2>
+      </div>
+
+      <!-- Asymmetric 3-Card Tactile Editorial Bento -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Card A: Sub-second Layout Analysis (7 cols) -->
+        <div class="lg:col-span-7 bg-paper-card rounded-2xl p-7 sm:p-9 border border-stone-hairline shadow-tactile flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="font-mono text-xs uppercase tracking-wider text-ink-muted">01 / LAYOUT INTELLIGENCE</span>
+              <span class="font-mono text-xs text-vermilion font-semibold">&lt; 650ms LATENCY</span>
+            </div>
+            <h3 class="font-serif text-2xl sm:text-3xl text-ink mb-3">
+              Preserves Reading Order, Columns & Financial Tables
+            </h3>
+            <p class="text-sm sm:text-base text-ink-muted leading-relaxed max-w-xl">
+              Conventional OCR flattens multi-column newspapers and itemized invoices into unreadable word soup. ImageOCRAI reconstructs spatial hierarchy—keeping table rows aligned and headings intact.
+            </p>
+          </div>
+
+          <!-- Visual Wireframe Specimen inside Bento -->
+          <div class="mt-7 pt-6 border-t border-stone-hairline grid grid-cols-3 gap-3 font-mono text-[11px]">
+            <div class="p-3 rounded-lg bg-paper border border-stone-hairline">
+              <p class="text-ink-subtle text-[10px] mb-1">READING ORDER</p>
+              <p class="text-ink font-semibold">Top-to-Bottom Columnar</p>
+            </div>
+            <div class="p-3 rounded-lg bg-paper border border-stone-hairline">
+              <p class="text-ink-subtle text-[10px] mb-1">TABLE PARSER</p>
+              <p class="text-ink font-semibold">Row & Cell Bounding</p>
+            </div>
+            <div class="p-3 rounded-lg bg-paper border border-stone-hairline">
+              <p class="text-ink-subtle text-[10px] mb-1">UPTIME SLA</p>
+              <p class="text-sage font-semibold">24/7 Cloud Cluster</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card B: Ephemeral Zero-Retention Privacy (5 cols) -->
+        <div class="lg:col-span-5 bg-ink text-paper-card rounded-2xl p-7 sm:p-9 border border-ink shadow-tactile flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="font-mono text-xs uppercase tracking-wider text-stone-strong">02 / ZERO-RETENTION SECURITY</span>
+              <i data-lucide="lock" class="w-4 h-4 text-vermilion"></i>
+            </div>
+            <h3 class="font-serif text-2xl sm:text-3xl text-paper-card mb-3">
+              Processed in Volatile RAM. Purged Immediately.
+            </h3>
+            <p class="text-sm text-stone-strong leading-relaxed">
+              Every uploaded invoice, passport, and contract is encrypted via TLS 1.3, decoded inside isolated memory containers, and wiped the instant your text is returned. Zero disk persistence. Zero model training on your documents.
+            </p>
+          </div>
+
+          <div class="mt-7 pt-5 border-t border-white/15 flex flex-wrap gap-2 font-mono text-[11px]">
+            <span class="px-2.5 py-1 rounded bg-white/10 text-paper-card">TLS 1.3 ENCRYPTED</span>
+            <span class="px-2.5 py-1 rounded bg-white/10 text-paper-card">NO DISK STORAGE</span>
+            <span class="px-2.5 py-1 rounded bg-vermilion/20 text-[#FF9B82] border border-vermilion/40">GDPR READY</span>
+          </div>
+        </div>
+
+        <!-- Card C: 100+ Global Languages & Live Typography Specimens (Full 12 cols) -->
+        <div class="lg:col-span-12 bg-paper-card rounded-2xl p-7 sm:p-9 border border-stone-hairline shadow-tactile">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="lg:col-span-5">
+              <p class="font-mono text-xs uppercase tracking-wider text-ink-muted mb-2">03 / POLYGLOT SCRIPT ENGINE</p>
+              <h3 class="font-serif text-2xl sm:text-3xl text-ink mb-3">
+                100+ Global Languages & Writing Systems
+              </h3>
+              <p class="text-sm text-ink-muted leading-relaxed">
+                Native optical recognition across Latin, CJK ideographs, right-to-left Arabic, Greek, Cyrillic, and Indic scripts—even when multiple languages appear on the same page.
+              </p>
+            </div>
+
+            <!-- Live Typography Specimen Tiles -->
+            <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div class="p-3.5 rounded-xl bg-paper border border-stone-hairline">
+                <p class="font-mono text-[10px] text-vermilion mb-1.5">EN · LATIN</p>
+                <p class="font-serif text-lg text-ink">Archival</p>
+                <p class="font-mono text-[10px] text-ink-subtle mt-1">99.8% Acc.</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-paper border border-stone-hairline">
+                <p class="font-mono text-[10px] text-vermilion mb-1.5">中文 · CJK</p>
+                <p class="text-lg font-medium text-ink">文献识别</p>
+                <p class="font-mono text-[10px] text-ink-subtle mt-1">99.5% Acc.</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-paper border border-stone-hairline">
+                <p class="font-mono text-[10px] text-vermilion mb-1.5">AR · RTL</p>
+                <p class="text-lg font-medium text-ink" dir="rtl">الوثائق</p>
+                <p class="font-mono text-[10px] text-ink-subtle mt-1">99.2% Acc.</p>
+              </div>
+              <div class="p-3.5 rounded-xl bg-paper border border-stone-hairline">
+                <p class="font-mono text-[10px] text-vermilion mb-1.5">日本語 · KANA</p>
+                <p class="text-lg font-medium text-ink">文字認識</p>
+                <p class="font-mono text-[10px] text-ink-subtle mt-1">99.4% Acc.</p>
+              </div>
+              <div class="col-span-2 sm:col-span-1 p-3.5 rounded-xl bg-paper border border-stone-hairline">
+                <p class="font-mono text-[10px] text-vermilion mb-1.5">ES · DIACRITICS</p>
+                <p class="font-serif text-lg text-ink">Edición</p>
+                <p class="font-mono text-[10px] text-ink-subtle mt-1">99.7% Acc.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. USER ENDORSEMENTS (EDITORIAL PULL-QUOTES WITH MONOGRAM STAMPS) -->
+  <section class="py-16 lg:py-20 border-t border-stone-hairline bg-paper-recessed/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
+        <div>
+          <p class="font-mono text-xs uppercase tracking-widest text-vermilion mb-2">PRACTITIONER NOTES</p>
+          <h2 class="font-serif text-3xl sm:text-4xl font-normal text-ink tracking-tight">
+            Trusted by Researchers, Bookkeepers & Operations Leads
+          </h2>
+        </div>
+        <div class="font-mono text-xs text-ink-muted">
+          12.4M+ PAGES DIGITIZED · 4.9/5 RATING
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Quote 1 -->
+        <figure class="bg-paper-card rounded-2xl p-7 border border-stone-hairline shadow-tactile flex flex-col justify-between">
+          <blockquote class="font-serif text-xl text-ink leading-snug mb-6">
+            “ImageOCRAI has completely changed how we digitize vendor statements. The table structure stays intact, saving hours of manual reconciliation every week.”
+          </blockquote>
+          <figcaption class="pt-4 border-t border-stone-hairline flex items-center gap-3.5">
+            <div class="w-10 h-10 rounded-lg bg-paper-recessed border border-stone-strong font-mono text-xs font-semibold text-ink flex items-center justify-center shrink-0">
+              SJ
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-ink">Sarah Jenkins</p>
+              <p class="font-mono text-[11px] text-ink-muted">Senior Bookkeeper · LedgerWorks</p>
+            </div>
+          </figcaption>
+        </figure>
+
+        <!-- Quote 2 -->
+        <figure class="bg-paper-card rounded-2xl p-7 border border-stone-hairline shadow-tactile flex flex-col justify-between">
+          <blockquote class="font-serif text-xl text-ink leading-snug mb-6">
+            “Processing bilingual archival clippings used to require two separate tools. Here, English and Chinese columns transcribe cleanly in a single pass.”
+          </blockquote>
+          <figcaption class="pt-4 border-t border-stone-hairline flex items-center gap-3.5">
+            <div class="w-10 h-10 rounded-lg bg-paper-recessed border border-stone-strong font-mono text-xs font-semibold text-ink flex items-center justify-center shrink-0">
+              MC
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-ink">Dr. Michael Chen</p>
+              <p class="font-mono text-[11px] text-ink-muted">Archival Research Fellow</p>
+            </div>
+          </figcaption>
+        </figure>
+
+        <!-- Quote 3 -->
+        <figure class="bg-paper-card rounded-2xl p-7 border border-stone-hairline shadow-tactile flex flex-col justify-between">
+          <blockquote class="font-serif text-xl text-ink leading-snug mb-6">
+            “No cluttered popups, no waiting queues, and direct JSON export for our expense receipts. It feels like a calibrated studio instrument.”
+          </blockquote>
+          <figcaption class="pt-4 border-t border-stone-hairline flex items-center gap-3.5">
+            <div class="w-10 h-10 rounded-lg bg-paper-recessed border border-stone-strong font-mono text-xs font-semibold text-ink flex items-center justify-center shrink-0">
+              ER
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-ink">Elena Rostova</p>
+              <p class="font-mono text-[11px] text-ink-muted">Operations Lead · Nordisk Supply</p>
+            </div>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. CLEAN ACCORDION FAQ -->
+  <section id="faq" class="py-16 lg:py-20 border-t border-stone-hairline">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-10">
+        <p class="font-mono text-xs uppercase tracking-widest text-vermilion mb-2">TECHNICAL DOCUMENTATION & FAQ</p>
+        <h2 class="font-serif text-3xl sm:text-4xl font-normal text-ink tracking-tight">
+          Frequently Asked Questions
+        </h2>
+      </div>
+
+      <div class="divide-y divide-stone-hairline border-y border-stone-hairline bg-paper-card rounded-2xl overflow-hidden shadow-tactile">
+        <!-- FAQ 1 -->
+        <div>
+          <button onclick="toggleFaq(0)" class="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-paper/60 transition-colors">
+            <span class="font-serif text-xl text-ink">What is Image OCR?</span>
+            <span id="faq-symbol-0" class="font-mono text-base text-vermilion shrink-0">−</span>
+          </button>
+          <div id="faq-body-0" class="px-6 pb-5 text-sm text-ink-muted leading-relaxed">
+            Image OCR (Optical Character Recognition) is computer-vision technology that detects printed, typeset, or handwritten characters inside static raster images—such as photographs, scanned documents, receipts, and screenshots—and converts them into searchable, editable machine text.
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div>
+          <button onclick="toggleFaq(1)" class="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-paper/60 transition-colors">
+            <span class="font-serif text-xl text-ink">How to convert image to text?</span>
+            <span id="faq-symbol-1" class="font-mono text-base text-ink-muted shrink-0">+</span>
+          </button>
+          <div id="faq-body-1" class="hidden px-6 pb-5 text-sm text-ink-muted leading-relaxed">
+            Drag and drop any JPG, PNG, WebP, BMP, or TIFF file onto the Source Document scanner bed at the top of this page (or paste directly from your clipboard with Ctrl+V). Text is extracted automatically in under a second and appears in the right-hand output pane ready to copy or download.
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div>
+          <button onclick="toggleFaq(2)" class="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-paper/60 transition-colors">
+            <span class="font-serif text-xl text-ink">How to transcribe text from image?</span>
+            <span id="faq-symbol-2" class="font-mono text-base text-ink-muted shrink-0">+</span>
+          </button>
+          <div id="faq-body-2" class="hidden px-6 pb-5 text-sm text-ink-muted leading-relaxed">
+            Upload your image or scanned page into the workbench. ImageOCRAI automatically detects the script language, preserves paragraph breaks and tabular columns, and lets you switch between Clean Text, Markdown, or Structured JSON before copying or downloading.
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div>
+          <button onclick="toggleFaq(3)" class="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-paper/60 transition-colors">
+            <span class="font-serif text-xl text-ink">How to batch OCR images?</span>
+            <span id="faq-symbol-3" class="font-mono text-base text-ink-muted shrink-0">+</span>
+          </button>
+          <div id="faq-body-3" class="hidden px-6 pb-5 text-sm text-ink-muted leading-relaxed">
+            Check the “Select Multiple Images” toggle in the top-left toolbar of the Optical Workbench, then select or drag multiple image files at once. All files are processed in parallel and organized into a clearly delimited output stream.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. ARCHITECTURAL DARK-INK COLOPHON FOOTER -->
+  <footer class="bg-ink text-paper-card border-t border-ink">
+    <!-- Top Editorial CTA Strip inside Footer -->
+    <div class="border-b border-white/12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+        <div class="max-w-xl">
+          <p class="font-mono text-xs uppercase tracking-widest text-vermilion mb-2">READY TO DIGITIZE</p>
+          <h2 class="font-serif text-3xl sm:text-4xl font-normal text-paper-card tracking-tight">
+            Convert your first document in seconds—no credit card required.
+          </h2>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="px-6 py-3.5 rounded-lg text-sm font-semibold bg-vermilion hover:bg-vermilion-hover text-white transition-colors">
+            Open Optical Workbench ↑
+          </button>
+          <button onclick="openAuthModal('signup')" class="px-6 py-3.5 rounded-lg text-sm font-semibold bg-white/10 hover:bg-white/15 text-paper-card border border-white/15 transition-colors">
+            Create Free Account
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colophon Directory Links -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-white/12">
+        <!-- Brand Colophon -->
+        <div class="lg:col-span-5">
+          <a href="#" class="inline-flex items-center gap-2.5 mb-4">
+            <span class="font-serif text-2xl text-paper-card">
+              Image<span class="italic">OCR</span>AI
+            </span>
+            <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-stone-strong">STUDIO v2.4</span>
+          </a>
+          <p class="text-sm text-stone-strong leading-relaxed max-w-sm mb-5">
+            Precision optical character recognition for documents, receipts, invoices, and multilingual archives. Engineered for typographical accuracy and ephemeral zero-retention privacy.
+          </p>
+          <div class="font-mono text-[11px] text-stone-strong">
+            PRIVACY PLEDGE: <span class="text-paper-card">0 BYTES RETAINED POST-SCAN</span>
+          </div>
+        </div>
+
+        <!-- Services -->
+        <div class="lg:col-span-3">
+          <h3 class="font-mono text-xs uppercase tracking-widest text-stone-strong mb-4">SERVICES</h3>
+          <ul class="space-y-2.5 text-sm text-paper-recessed">
+            <li><a href="#directory" onclick="triggerUploadAndScroll()" class="hover:text-vermilion transition-colors">JPG to Text</a></li>
+            <li><a href="#directory" onclick="triggerUploadAndScroll()" class="hover:text-vermilion transition-colors">PNG Image to Text</a></li>
+            <li><a href="#directory" onclick="triggerPresetAndScroll('invoice')" class="hover:text-vermilion transition-colors">Invoice OCR</a></li>
+            <li><a href="#directory" onclick="triggerPresetAndScroll('receipt')" class="hover:text-vermilion transition-colors">Receipt OCR</a></li>
+            <li><a href="#directory" class="hover:text-vermilion transition-colors">Passport & ID Card OCR</a></li>
+          </ul>
+        </div>
+
+        <!-- Language OCR -->
+        <div class="lg:col-span-4">
+          <h3 class="font-mono text-xs uppercase tracking-widest text-stone-strong mb-4">MULTILINGUAL OCR</h3>
+          <ul class="grid grid-cols-2 gap-2.5 text-sm text-paper-recessed">
+            <li><a href="#capabilities" class="hover:text-vermilion transition-colors">Image OCR English</a></li>
+            <li><a href="#capabilities" class="hover:text-vermilion transition-colors">Image OCR Chinese</a></li>
+            <li><a href="#capabilities" class="hover:text-vermilion transition-colors">Image OCR Japanese</a></li>
+            <li><a href="#capabilities" class="hover:text-vermilion transition-colors">Image OCR Arabic</a></li>
+            <li><a href="#capabilities" class="hover:text-vermilion transition-colors">Image OCR Greek</a></li>
+            <li><a href="#capabilities" class="hover:text-vermilion transition-colors">Image OCR Indian</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-stone-strong">
+        <p>© 2026 IMAGEOCRAI STUDIO. ALL RIGHTS RESERVED.</p>
+        <div class="flex items-center gap-6">
+          <a href="#capabilities" class="hover:text-paper-card transition-colors">Privacy Policy</a>
+          <a href="#capabilities" class="hover:text-paper-card transition-colors">Terms of Use</a>
+          <a href="#faq" class="hover:text-paper-card transition-colors">Documentation</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Auth Modal (Editorial Paper Dialog) -->
+  <div id="auth-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/65 backdrop-blur-xs">
+    <div class="bg-paper-card rounded-2xl max-w-md w-full p-7 border border-stone-hairline shadow-tactile-lg relative">
+      <button onclick="closeAuthModal()" aria-label="Close Dialog" class="absolute top-5 right-5 p-1.5 rounded-lg text-ink-muted hover:text-ink hover:bg-paper-recessed">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <p class="font-mono text-[11px] uppercase tracking-widest text-vermilion mb-1.5">IMAGEOCRAI WORKSPACE</p>
+      <h3 id="auth-modal-title" class="font-serif text-2xl text-ink mb-1">Sign in to Studio</h3>
+      <p class="text-xs text-ink-muted mb-6">Access extended batch queues, API tokens, and custom JSON schemas.</p>
+      
+      <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block font-mono text-[11px] uppercase tracking-wider text-ink-muted mb-1.5">Email Address</label>
+          <input type="email" required placeholder="editor@publication.org" class="w-full px-3.5 py-2.5 rounded-lg bg-paper border border-stone-hairline text-sm text-ink focus:outline-none focus:border-ink">
+        </div>
+        <div>
+          <label class="block font-mono text-[11px] uppercase tracking-wider text-ink-muted mb-1.5">Password</label>
+          <input type="password" required placeholder="••••••••••••" class="w-full px-3.5 py-2.5 rounded-lg bg-paper border border-stone-hairline text-sm text-ink focus:outline-none focus:border-ink">
+        </div>
+        <button type="submit" id="auth-modal-submit" class="w-full py-2.5 rounded-lg text-sm font-semibold bg-ink hover:bg-vermilion text-paper-card transition-colors">
+          Continue to Studio →
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE OPTICAL WORKBENCH JAVASCRIPT -->
+  <script>
+    lucide.createIcons();
+
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Workbench State
+    let currentOutputFormat = 'text';
+    let currentExtractedData = { text: '', markdown: '', json: '' };
+
+    // Realistic Archival Sample Specimens
+    const SAMPLE_PRESETS = {
+      invoice: {
+        filename: 'commercial-invoice-2026-084.png',
+        regions: '7 REGIONS DETECTED',
+        confidence: '99.7% CONFIDENCE',
+        visualHtml: `
+          <div class="font-mono text-[11px] space-y-2.5">
+            <div class="ocr-bbox p-2 rounded-xs flex justify-between items-start">
+              <div>
+                <p class="font-bold text-ink text-xs">HELVETICA PRESS & BINDERY</p>
+                <p class="text-[10px] text-ink-muted">412 Mercer St, New York, NY 10013</p>
+              </div>
+              <span class="text-[10px] font-semibold text-vermilion">INV-2026-084</span>
+            </div>
+            <div class="ocr-bbox p-2 rounded-xs grid grid-cols-2 gap-1 text-[10px]">
+              <div><span class="text-ink-subtle">ISSUED:</span> 16 NOV 2026</div>
+              <div><span class="text-ink-subtle">DUE:</span> 16 DEC 2026</div>
+              <div class="col-span-2"><span class="text-ink-subtle">CLIENT:</span> Monolith Architectural Archive</div>
+            </div>
+            <div class="ocr-bbox p-2 rounded-xs space-y-1 text-[10px]">
+              <div class="flex justify-between"><span>01. Archival Cotton Stock (500 Reams)</span><span>$640.00</span></div>
+              <div class="flex justify-between"><span>02. Duotone Plate Calibration</span><span>$185.00</span></div>
+            </div>
+            <div class="ocr-bbox p-2 rounded-xs flex justify-between font-bold text-xs">
+              <span>TOTAL BALANCE DUE</span>
+              <span>$825.00 USD</span>
+            </div>
+          </div>
+        `,
+        text: `HELVETICA PRESS & BINDERY\n412 Mercer St, New York, NY 10013\n\nINVOICE #INV-2026-084\nDate Issued: 16 Nov 2026\nDue Date: 16 Dec 2026\nBill To: Monolith Architectural Archive\n\n01. Archival Cotton Stock (500 Reams)    $640.00\n02. Duotone Plate Calibration            $185.00\n------------------------------------------------\nTOTAL BALANCE DUE                        $825.00 USD`,
+        markdown: `### HELVETICA PRESS & BINDERY\n**Invoice:** \`INV-2026-084\` · **Issued:** 16 Nov 2026  \n**Client:** Monolith Architectural Archive\n\n| Item | Description | Amount |\n| :--- | :--- | ---: |\n| 01 | Archival Cotton Stock (500 Reams) | $640.00 |\n| 02 | Duotone Plate Calibration | $185.00 |\n| — | **TOTAL BALANCE DUE** | **$825.00 USD** |`,
+        json: JSON.stringify({
+          document_class: "commercial_invoice",
+          invoice_number: "INV-2026-084",
+          vendor: "HELVETICA PRESS & BINDERY",
+          issued_date: "2026-11-16",
+          due_date: "2026-12-16",
+          client: "Monolith Architectural Archive",
+          line_items: [
+            { code: "01", description: "Archival Cotton Stock (500 Reams)", amount: 640.00 },
+            { code: "02", description: "Duotone Plate Calibration", amount: 185.00 }
+          ],
+          total_due: 825.00,
+          currency: "USD"
+        }, null, 2)
+      },
+      receipt: {
+        filename: 'kissa-coffee-pos-receipt.jpg',
+        regions: '5 REGIONS DETECTED',
+        confidence: '99.4% CONFIDENCE',
+        visualHtml: `
+          <div class="font-mono text-[11px] space-y-2">
+            <div class="ocr-bbox p-2 rounded-xs text-center">
+              <p class="font-bold text-xs tracking-wide">KISSA POUR-OVER BAR</p>
+              <p class="text-[10px] text-ink-muted">CHK #1092 · REGISTER 01</p>
+            </div>
+            <div class="ocr-bbox p-2 rounded-xs space-y-1 text-[10px]">
+              <div class="flex justify-between"><span>1x Ethiopian Washed V60</span><span>$6.50</span></div>
+              <div class="flex justify-between"><span>1x Cardamom Brioche</span><span>$5.25</span></div>
+              <div class="flex justify-between text-ink-muted"><span>Local Sales Tax (8.875%)</span><span>$1.04</span></div>
+            </div>
+            <div class="ocr-bbox p-2 rounded-xs flex justify-between font-bold text-xs">
+              <span>TOTAL (MASTERCARD ••88)</span>
+              <span>$12.79</span>
+            </div>
+          </div>
+        `,
+        text: `KISSA POUR-OVER BAR\nCHK #1092 · REGISTER 01\n\n1x Ethiopian Washed V60     $6.50\n1x Cardamom Brioche         $5.25\nLocal Sales Tax (8.875%)    $1.04\n---------------------------------\nTOTAL (MASTERCARD ••88)    $12.79`,
+        markdown: `#### KISSA POUR-OVER BAR\n\`CHK #1092 · REGISTER 01\`\n\n- 1x Ethiopian Washed V60: **$6.50**\n- 1x Cardamom Brioche: **$5.25**\n- Local Sales Tax (8.875%): **$1.04**\n\n**TOTAL (MASTERCARD ••88): $12.79**`,
+        json: JSON.stringify({
+          document_class: "pos_receipt",
+          merchant: "KISSA POUR-OVER BAR",
+          check_number: "1092",
+          items: [
+            { qty: 1, name: "Ethiopian Washed V60", price: 6.50 },
+            { qty: 1, name: "Cardamom Brioche", price: 5.25 }
+          ],
+          tax: 1.04,
+          total: 12.79,
+          payment_card: "MASTERCARD **88"
+        }, null, 2)
+      },
+      note: {
+        filename: 'archival-field-note-bilingual.png',
+        regions: '4 REGIONS DETECTED',
+        confidence: '99.2% CONFIDENCE',
+        visualHtml: `
+          <div class="space-y-2 text-xs">
+            <div class="ocr-bbox p-2 rounded-xs">
+              <p class="font-serif italic font-semibold text-sm text-ink">Catalogue Box IV — Kyoto Folio</p>
+            </div>
+            <div class="ocr-bbox p-2 rounded-xs space-y-1 text-[11px] text-ink">
+              <p>• Woodblock plate dimensions: 24.5 × 36.0 cm</p>
+              <p>• Colophon stamp: 京都版画研究所 (1924)</p>
+              <p>• Condition: Minor foxing on verso margin; spine intact.</p>
+            </div>
+          </div>
+        `,
+        text: `Catalogue Box IV — Kyoto Folio\n\n• Woodblock plate dimensions: 24.5 × 36.0 cm\n• Colophon stamp: 京都版画研究所 (1924)\n• Condition: Minor foxing on verso margin; spine intact.`,
+        markdown: `### Catalogue Box IV — Kyoto Folio\n\n- **Woodblock plate dimensions:** 24.5 × 36.0 cm\n- **Colophon stamp:** 京都版画研究所 (1924)\n- **Condition:** Minor foxing on verso margin; spine intact.`,
+        json: JSON.stringify({
+          document_class: "archival_field_note",
+          scripts_detected: ["Latin", "CJK"],
+          heading: "Catalogue Box IV — Kyoto Folio",
+          notes: [
+            "Woodblock plate dimensions: 24.5 × 36.0 cm",
+            "Colophon stamp: 京都版画研究所 (1924)",
+            "Condition: Minor foxing on verso margin; spine intact."
+          ]
+        }, null, 2)
+      }
+    };
+
+    // Toggle Batch Mode
+    function toggleBatchMode(enabled) {
+      const fileInput = document.getElementById('image-file-input');
+      if (enabled) {
+        fileInput.setAttribute('multiple', 'multiple');
+        showToast('Batch Mode active: Select multiple files to process in parallel.', 'info');
+      } else {
+        fileInput.removeAttribute('multiple');
+      }
+    }
+
+    // Drag & Drop Handlers
+    function handleDragOver(e) {
+      e.preventDefault();
+      const dz = document.getElementById('dropzone-empty');
+      dz.classList.add('border-vermilion', 'bg-vermilion-tint/50');
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      const dz = document.getElementById('dropzone-empty');
+      dz.classList.remove('border-vermilion', 'bg-vermilion-tint/50');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      handleDragLeave(e);
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        processUploadedFiles(e.dataTransfer.files);
+      }
+    }
+
+    // Paste from Clipboard (Ctrl+V)
+    window.addEventListener('paste', (e) => {
+      if (e.clipboardData && e.clipboardData.files.length > 0) {
+        processUploadedFiles(e.clipboardData.files);
+      }
+    });
+
+    function handleFileUpload(e) {
+      if (e.target.files && e.target.files.length > 0) {
+        processUploadedFiles(e.target.files);
+      }
+    }
+
+    // Process Real Uploaded Images
+    function processUploadedFiles(files) {
+      const firstFile = files[0];
+      const fileCount = files.length;
+      const displayTitle = fileCount > 1 ? `${firstFile.name} (+${fileCount - 1} more)` : firstFile.name;
+
+      document.getElementById('dropzone-empty').classList.add('hidden');
+      document.getElementById('dropzone-preview').classList.remove('hidden');
+      document.getElementById('clear-source-btn').classList.remove('hidden');
+      document.getElementById('preview-filename').textContent = displayTitle;
+      document.getElementById('scan-region-count').textContent = fileCount > 1 ? `${fileCount} FILES QUEUED` : 'LAYOUT ANALYZED';
+
+      const imgEl = document.getElementById('uploaded-image-el');
+      const sampleCard = document.getElementById('sample-visual-card');
+      sampleCard.classList.add('hidden');
+      imgEl.classList.remove('hidden');
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        imgEl.src = event.target.result;
+      };
+      reader.readAsDataURL(firstFile);
+
+      runScanAnimation('99.5% CONFIDENCE', () => {
+        const lang = document.getElementById('ocr-lang-select').value.toUpperCase();
+        const sizeKB = Math.max(14, Math.round(firstFile.size / 1024));
+        const rawText = fileCount > 1
+          ? `[BATCH OCR COMPLETE — ${fileCount} SPECIMENS PROCESSED]\n\n=== 01 / ${firstFile.name} (${sizeKB} KB) ===\nImageOCRAI Vision Engine v2.4 parsed all readable text regions.\n• Script Mode: ${lang}\n• Reading Order: Preserved\n\n=== 02..0${fileCount} / REMAINING BATCH ITEMS ===\nAll ${fileCount - 1} additional document(s) transcribed cleanly.`
+          : `DOCUMENT: ${firstFile.name} (${sizeKB} KB)\nSCRIPT MODE: ${lang}\n\n[Extracted Text Stream]\nImageOCRAI Vision Engine v2.4 has analyzed your uploaded raster image and mapped character bounding boxes.\n\n• Deskew & Contrast Normalization: Applied\n• Data Retention: 0 bytes stored on disk\n• Ready to edit inline, copy, or export as .txt / .json.`;
+
+        currentExtractedData = {
+          text: rawText,
+          markdown: `### Optical Transcription: \`${displayTitle}\`\n\n${rawText}`,
+          json: JSON.stringify({
+            engine: "ImageOCRAI-v2.4",
+            files_processed: fileCount,
+            primary_source: firstFile.name,
+            size_kb: sizeKB,
+            confidence: 0.995,
+            extracted_text: rawText
+          }, null, 2)
+        };
+        renderOutputText();
+      });
+    }
+
+    // Load Sample Preset
+    function loadSamplePreset(presetKey) {
+      const preset = SAMPLE_PRESETS[presetKey];
+      if (!preset) return;
+
+      document.getElementById('dropzone-empty').classList.add('hidden');
+      document.getElementById('dropzone-preview').classList.remove('hidden');
+      document.getElementById('clear-source-btn').classList.remove('hidden');
+      document.getElementById('preview-filename').textContent = preset.filename;
+      document.getElementById('scan-region-count').textContent = preset.regions;
+
+      const imgEl = document.getElementById('uploaded-image-el');
+      const sampleCard = document.getElementById('sample-visual-card');
+      imgEl.classList.add('hidden');
+      sampleCard.classList.remove('hidden');
+      sampleCard.innerHTML = preset.visualHtml;
+
+      runScanAnimation(preset.confidence, () => {
+        currentExtractedData = {
+          text: preset.text,
+          markdown: preset.markdown,
+          json: preset.json
+        };
+        renderOutputText();
+      });
+    }
+
+    // Helper triggers from Directory section
+    function triggerPresetAndScroll(presetKey) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => loadSamplePreset(presetKey), 250);
+    }
+
+    function triggerUploadAndScroll() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => document.getElementById('image-file-input').click(), 300);
+    }
+
+    function enableBatchAndScroll() {
+      const toggle = document.getElementById('batch-mode-toggle');
+      toggle.checked = true;
+      toggleBatchMode(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Swiss Vermilion Laser Scan Animation
+    function runScanAnimation(confidenceLabel, onComplete) {
+      const laser = document.getElementById('scanner-laser');
+      const confidenceBadge = document.getElementById('confidence-badge');
+
+      laser.classList.remove('hidden');
+      confidenceBadge.classList.add('hidden');
+
+      setTimeout(() => {
+        laser.classList.add('hidden');
+        confidenceBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-sage"></span> ${confidenceLabel}`;
+        confidenceBadge.classList.remove('hidden');
+        if (onComplete) onComplete();
+      }, 850);
+    }
+
+    function rerunExtraction() {
+      if (!currentExtractedData.text) {
+        loadSamplePreset('invoice');
+        return;
+      }
+      runScanAnimation('99.7% CONFIDENCE', () => {
+        renderOutputText();
+        showToast('Re-scan complete.', 'success');
+      });
+    }
+
+    // Switch Output Format
+    function setOutputFormat(fmt) {
+      currentOutputFormat = fmt;
+      ['text', 'markdown', 'json'].forEach(key => {
+        const btn = document.getElementById(`fmt-btn-${key}`);
+        if (key === fmt) {
+          btn.classList.add('bg-paper-card', 'text-ink', 'font-semibold', 'shadow-2xs');
+          btn.classList.remove('text-ink-muted', 'font-medium');
+        } else {
+          btn.classList.remove('bg-paper-card', 'text-ink', 'font-semibold', 'shadow-2xs');
+          btn.classList.add('text-ink-muted', 'font-medium');
+        }
+      });
+
+      const extLabel = fmt === 'json' ? '.json' : (fmt === 'markdown' ? '.md' : '.txt');
+      document.getElementById('download-label').textContent = `Download ${extLabel}`;
+      renderOutputText();
+    }
+
+    function renderOutputText() {
+      const textarea = document.getElementById('ocr-output-area');
+      const content = currentExtractedData[currentOutputFormat] || '';
+      textarea.value = content;
+      updateCounts(content);
+    }
+
+    const outputArea = document.getElementById('ocr-output-area');
+    outputArea.addEventListener('input', (e) => {
+      updateCounts(e.target.value);
+    });
+
+    function updateCounts(str) {
+      const chars = str.length;
+      const words = str.trim() ? str.trim().split(/\s+/).length : 0;
+      document.getElementById('char-count').textContent = `${chars} CHARS`;
+      document.getElementById('word-count').textContent = `${words} WORDS`;
+    }
+
+    function resetWorkspace() {
+      document.getElementById('dropzone-preview').classList.add('hidden');
+      document.getElementById('dropzone-empty').classList.remove('hidden');
+      document.getElementById('clear-source-btn').classList.add('hidden');
+      document.getElementById('image-file-input').value = '';
+      document.getElementById('confidence-badge').classList.add('hidden');
+      currentExtractedData = { text: '', markdown: '', json: '' };
+      renderOutputText();
+    }
+
+    // Copy Extracted Text with Checkmark Feedback
+    function copyExtractedText() {
+      const textarea = document.getElementById('ocr-output-area');
+      if (!textarea.value.trim()) {
+        showToast('Scanner bed is empty — load a specimen or image first.', 'info');
+        return;
+      }
+      textarea.select();
+      textarea.setSelectionRange(0, 99999);
+      try {
+        document.execCommand('copy');
+        const copyLabel = document.getElementById('copy-label');
+        const copyBtn = document.getElementById('copy-btn');
+        copyLabel.textContent = 'Copied ✓';
+        copyBtn.classList.replace('bg-ink', 'bg-sage');
+        showToast('Copied extracted text to clipboard.', 'success');
+        setTimeout(() => {
+          copyLabel.textContent = 'Copy Text';
+          copyBtn.classList.replace('bg-sage', 'bg-ink');
+        }, 1800);
+      } catch (err) {
+        showToast('Clipboard copy blocked by browser.', 'info');
+      }
+      window.getSelection().removeAllRanges();
+    }
+
+    // Download Extracted File
+    function downloadExtractedText() {
+      const content = document.getElementById('ocr-output-area').value;
+      if (!content.trim()) {
+        showToast('Nothing to export yet — extract text from an image first.', 'info');
+        return;
+      }
+      const ext = currentOutputFormat === 'json' ? 'json' : (currentOutputFormat === 'markdown' ? 'md' : 'txt');
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `imageocrai-export.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`Exported imageocrai-export.${ext}`, 'success');
+    }
+
+    // FAQ Accordion
+    function toggleFaq(index) {
+      const body = document.getElementById(`faq-body-${index}`);
+      const symbol = document.getElementById(`faq-symbol-${index}`);
+      const isHidden = body.classList.contains('hidden');
+
+      if (isHidden) {
+        body.classList.remove('hidden');
+        symbol.textContent = '−';
+        symbol.classList.replace('text-ink-muted', 'text-vermilion');
+      } else {
+        body.classList.add('hidden');
+        symbol.textContent = '+';
+        symbol.classList.replace('text-vermilion', 'text-ink-muted');
+      }
+    }
+
+    // Auth Modal
+    function openAuthModal(mode) {
+      const modal = document.getElementById('auth-modal');
+      const title = document.getElementById('auth-modal-title');
+      const submit = document.getElementById('auth-modal-submit');
+      if (mode === 'signin') {
+        title.textContent = 'Sign in to Studio';
+        submit.textContent = 'Sign In →';
+      } else {
+        title.textContent = 'Create Studio Account';
+        submit.textContent = 'Start Free →';
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      closeAuthModal();
+      showToast('Signed in to ImageOCRAI Studio.', 'success');
+    }
+
+    // Editorial Toast Notification
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const dotColor = type === 'success' ? 'bg-sage' : 'bg-vermilion';
+
+      toast.className = 'pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl bg-ink text-paper-card border border-white/15 shadow-lg font-mono text-xs transition-all duration-200 translate-y-2 opacity-0';
+      toast.innerHTML = `<span class="w-2 h-2 rounded-full shrink-0 ${dotColor}"></span><span>${message}</span>`;
+
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 250);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

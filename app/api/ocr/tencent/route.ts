@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
-import { getClientIP, checkIPDailyLimit, updateIPUsage, checkUserDailyLimit, updateUserUsage } from '@/lib/ip-usage'
+import { billingDB } from '@/lib/billing/server'
+import { meteredOCR } from '@/lib/billing/ocr'
 import { Buffer } from 'buffer'
 
 // 腾讯云OCR SDK
@@ -161,8 +161,9 @@ function formatOCRResult(tencentResult: TencentOCRResult) {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function processOCR(request: NextRequest) {
   try {
+    const supabase = billingDB()
     // 检查环境变量配置
     if (!process.env.TENCENT_SECRET_ID || !process.env.TENCENT_SECRET_KEY) {
       return NextResponse.json(
@@ -171,9 +172,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 获取客户端IP
-    const clientIP = getClientIP(request)
-    
     // 检查用户认证（从请求头获取token）
     const authHeader = request.headers.get('authorization')
     let user = null
@@ -192,37 +190,6 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // 检查使用限制：已登录用户检查邮箱限制，未登录用户检查IP限制
-    if (isAuthenticated && user?.email) {
-      const userLimitCheck = await checkUserDailyLimit(user.email)
-      
-      if (!userLimitCheck.allowed) {
-        return NextResponse.json(
-          { 
-            error: 'Daily usage limit exceeded', 
-            message: 'You have reached the upper limit for today\'s usage. Please try again tomorrow or purchase a package.',
-            currentCount: userLimitCheck.currentCount,
-            limit: userLimitCheck.limit
-          }, 
-          { status: 429 }
-        )
-      }
-    } else if (!isAuthenticated) {
-      const ipLimitCheck = await checkIPDailyLimit(clientIP)
-      
-      if (!ipLimitCheck.allowed) {
-        return NextResponse.json(
-          { 
-            error: 'Daily usage limit exceeded', 
-            message: `You have reached the daily limit of ${ipLimitCheck.limit} free OCR requests. Please try again tomorrow or sign up for unlimited access.`,
-            currentCount: ipLimitCheck.currentCount,
-            limit: ipLimitCheck.limit
-          }, 
-          { status: 429 }
-        )
-      }
-    }
-
     const body = await request.json()
     const { fileId, imageUrl, imageBase64 } = body
     
@@ -341,13 +308,6 @@ export async function POST(request: NextRequest) {
     // 格式化结果
     const formattedResult = formatOCRResult(ocrResult)
     
-    // 更新使用次数：已登录用户更新邮箱使用次数，未登录用户更新IP使用次数
-    if (isAuthenticated && user?.email) {
-      await updateUserUsage(user.email)
-    } else if (!isAuthenticated) {
-      await updateIPUsage(clientIP)
-    }
-
     // 如果有fileId且用户已登录，保存OCR结果到数据库
     if (fileId && file && isAuthenticated && user) {
       const { data: savedResult, error: saveError } = await supabase
@@ -406,3 +366,4 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+export const POST = meteredOCR(processOCR)

@@ -93,7 +93,7 @@ export function ImageUpload({
           <CardContent className="p-6">
             <div className="flex items-center space-x-4">
               <div className="flex-shrink-0">
-                <FileImage className="h-12 w-12 text-blue-500" />
+                <FileImage className="h-12 w-12 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">
@@ -121,8 +121,8 @@ export function ImageUpload({
         </Card>
       ) : (
         <Card
-          className={`cursor-pointer transition-all duration-200 hover:border-blue-400 ${
-            isDragOver ? 'border-blue-400 bg-blue-50 dark:bg-blue-950/20' : ''
+          className={`cursor-pointer transition-all duration-200 hover:border-border ${
+            isDragOver ? 'border-border bg-secondary ' : ''
           } ${isProcessing ? 'cursor-not-allowed opacity-50' : ''}`}
           onClick={handleClick}
           onDrop={handleDrop}
@@ -132,7 +132,7 @@ export function ImageUpload({
           <CardContent className="p-12">
             <div className="text-center">
               <Upload className={`mx-auto h-12 w-12 mb-4 ${
-                isDragOver ? 'text-blue-500' : 'text-muted-foreground'
+                isDragOver ? 'text-primary' : 'text-muted-foreground'
               }`} />
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 {isDragOver ? 'Drop your image here' : 'Upload an image'}

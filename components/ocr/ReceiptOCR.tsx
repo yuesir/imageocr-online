@@ -1,5 +1,7 @@
 'use client'
 
+import { Balance } from '@/components/billing/Balance'
+
 import React, { useState, useCallback } from 'react'
 import { Upload, FileText, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -63,6 +65,7 @@ const ReceiptOCR: React.FC = () => {
   const processOCR = async () => {
     if (selectedImages.length === 0) return
     
+    if (!window.confirm('Each successfully processed image uses 1 image allowance, including images with no text. Running images again uses another allowance. Continue?')) return
     setIsProcessing(true)
     setError(null)
     
@@ -73,6 +76,7 @@ const ReceiptOCR: React.FC = () => {
         const base64Image = await convertToBase64(image)
         
         const headers: Record<string, string> = {
+          'Idempotency-Key': crypto.randomUUID(),
           'Content-Type': 'application/json',
         }
         
@@ -81,23 +85,25 @@ const ReceiptOCR: React.FC = () => {
           headers['Authorization'] = `Bearer ${session.access_token}`
         }
         
-        const response = await fetch('/api/ocr', {
+        const response = await fetch('/api/ocr/ali_vl', {
           method: 'POST',
           headers,
           body: JSON.stringify({
-            image: base64Image,
+            imageBase64: base64Image,
             imageType: image.type
           })
         })
         
         if (!response.ok) {
-          throw new Error(`OCR processing failed: ${response.statusText}`)
+          const failure = await response.json().catch(() => ({}))
+          throw new Error(failure.message || failure.error || `OCR processing failed: ${response.statusText}`)
         }
         
         const data = await response.json()
+      window.dispatchEvent(new Event('billing:refresh'))
         results.push({
-          text: data.text || 'No text detected in this receipt.',
-          confidence: data.confidence || 0
+          text: data.result.text || 'No text detected in this receipt.',
+          confidence: data.result.confidence || 0
         })
       }
       
@@ -130,20 +136,21 @@ const ReceiptOCR: React.FC = () => {
   if (viewMode === 'upload') {
     return (
       <div className="max-w-4xl mx-auto">
+      <Balance />
         <div 
-          className="border-2 border-dashed border-green-300 rounded-lg p-12 text-center bg-white hover:bg-green-50 transition-colors cursor-pointer"
+          className="border-2 border-dashed border-border rounded-lg p-12 text-center bg-card hover:bg-secondary transition-colors cursor-pointer"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onClick={() => document.getElementById('receipt-file-input')?.click()}
         >
-          <Upload className="mx-auto h-16 w-16 text-green-400 mb-4" />
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
+          <Upload className="mx-auto h-16 w-16 text-sage mb-4" />
+          <h3 className="text-xl font-semibold text-muted-foreground mb-2">
             Upload Your Receipt Images
           </h3>
-          <p className="text-gray-500 mb-4">
+          <p className="text-muted-foreground mb-4">
             Drag and drop your receipt files here, or click to browse
           </p>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-muted-foreground">
             Supports: JPG, PNG, PDF • Max file size: 10MB
           </p>
           <input
@@ -156,8 +163,8 @@ const ReceiptOCR: React.FC = () => {
           />
         </div>
         {error && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600">{error}</p>
+          <div className="mt-4 p-4 bg-secondary border border-border rounded-lg">
+            <p className="text-destructive">{error}</p>
           </div>
         )}
       </div>
@@ -167,14 +174,15 @@ const ReceiptOCR: React.FC = () => {
   if (viewMode === 'preview') {
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <Balance />
+        <div className="bg-card rounded-lg shadow-tactile p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-gray-800">
+            <h3 className="text-xl font-semibold text-foreground">
               Receipt Preview ({selectedImages.length} file{selectedImages.length > 1 ? 's' : ''})
             </h3>
             <button
               onClick={resetToUpload}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
+              className="text-muted-foreground hover:text-muted-foreground transition-colors"
             >
               ← Back to Upload
             </button>
@@ -182,14 +190,14 @@ const ReceiptOCR: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             {selectedImages.map((file, index) => (
-              <div key={index} className="border rounded-lg p-4 bg-gray-50">
+              <div key={index} className="border rounded-lg p-4 bg-background">
                 <div className="flex items-center space-x-3">
-                  <FileText className="h-8 w-8 text-green-500" />
+                  <FileText className="h-8 w-8 text-sage" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {file.name}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       {(file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
@@ -202,7 +210,7 @@ const ReceiptOCR: React.FC = () => {
             <button
               onClick={processOCR}
               disabled={isProcessing}
-              className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2"
+              className="bg-primary hover:bg-primary disabled:bg-primary text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2"
             >
               {isProcessing ? (
                 <>
@@ -216,8 +224,8 @@ const ReceiptOCR: React.FC = () => {
           </div>
           
           {error && (
-            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-600">{error}</p>
+            <div className="mt-4 p-4 bg-secondary border border-border rounded-lg">
+              <p className="text-destructive">{error}</p>
             </div>
           )}
         </div>
@@ -228,14 +236,15 @@ const ReceiptOCR: React.FC = () => {
   if (viewMode === 'result') {
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <Balance />
+        <div className="bg-card rounded-lg shadow-tactile p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-gray-800">
+            <h3 className="text-xl font-semibold text-foreground">
               Receipt OCR Results
             </h3>
             <button
               onClick={resetToUpload}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+              className="bg-primary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors"
             >
               Process New Receipt
             </button>
@@ -245,27 +254,27 @@ const ReceiptOCR: React.FC = () => {
             {ocrResults.map((result, index) => (
               <div key={index} className="border rounded-lg p-4">
                 <div className="flex justify-between items-center mb-3">
-                  <h4 className="font-medium text-gray-800">
+                  <h4 className="font-medium text-foreground">
                     Receipt {index + 1} - {selectedImages[index]?.name}
                   </h4>
                   <div className="flex space-x-2">
                     <button
                       onClick={() => copyToClipboard(result.text)}
-                      className="text-green-600 hover:text-green-800 text-sm font-medium transition-colors"
+                      className="text-sage hover:text-sage text-sm font-medium transition-colors"
                     >
                       Copy Text
                     </button>
                   </div>
                 </div>
                 
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono">
+                <div className="bg-background rounded-lg p-4">
+                  <pre className="whitespace-pre-wrap text-sm text-muted-foreground font-mono">
                     {result.text}
                   </pre>
                 </div>
                 
                 {result.confidence > 0 && (
-                  <div className="mt-2 text-sm text-gray-500">
+                  <div className="mt-2 text-sm text-muted-foreground">
                     Confidence: {(result.confidence * 100).toFixed(1)}%
                   </div>
                 )}

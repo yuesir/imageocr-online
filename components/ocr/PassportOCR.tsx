@@ -1,5 +1,7 @@
 "use client";
 
+import { Balance } from '@/components/billing/Balance'
+
 import { useState, useCallback } from "react";
 import { Upload, FileText, Download, Copy, RotateCcw, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -70,6 +72,7 @@ export function PassportOCR() {
   const processOCR = async () => {
     if (selectedImages.length === 0) return;
 
+    if (!window.confirm('Each successfully processed image uses 1 image allowance, including images with no text. Running images again uses another allowance. Continue?')) return
     setIsProcessing(true);
     const results: OCRResult[] = [];
 
@@ -79,6 +82,7 @@ export function PassportOCR() {
         
         const headers: Record<string, string> = {
           "Content-Type": "application/json",
+          "Idempotency-Key": crypto.randomUUID(),
         };
         
         // Add Authorization header if user is authenticated
@@ -86,25 +90,27 @@ export function PassportOCR() {
           headers['Authorization'] = `Bearer ${session.access_token}`;
         }
         
-        const response = await fetch("/api/ocr", {
+        const response = await fetch("/api/ocr/ali_vl", {
           method: "POST",
           headers,
           body: JSON.stringify({
-            image: base64Image,
+            imageBase64: base64Image,
             imageType: image.type,
           }),
         });
 
         if (!response.ok) {
-          throw new Error(`OCR processing failed: ${response.statusText}`);
+          const failure = await response.json().catch(() => ({}))
+          throw new Error(failure.message || failure.error || `OCR processing failed: ${response.statusText}`);
         }
 
-        const data = await response.json();
+        const data = await response.json()
+      window.dispatchEvent(new Event('billing:refresh'));
         
-        if (data.success && data.text) {
+        if (data.success) {
           results.push({
-            text: data.text,
-            confidence: data.confidence || 0,
+            text: data.result.text,
+            confidence: data.result.confidence || 0,
           });
         } else {
           throw new Error(data.error || "Failed to extract text from passport");
@@ -156,12 +162,12 @@ export function PassportOCR() {
 
   const renderUploadView = () => (
     <div className="text-center py-12">
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-blue-400 transition-colors">
-        <Upload className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+      <div className="border-2 border-dashed border-border rounded-lg p-8 hover:border-border transition-colors">
+        <Upload className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+        <h3 className="text-xl font-semibold text-muted-foreground mb-2">
           Upload Passport Images
         </h3>
-        <p className="text-gray-500 mb-6">
+        <p className="text-muted-foreground mb-6">
           Select passport images to extract text information
         </p>
         
@@ -176,13 +182,13 @@ export function PassportOCR() {
         
         <label
           htmlFor="passport-upload"
-          className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
+          className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary cursor-pointer transition-colors"
         >
           <Upload className="w-5 h-5 mr-2" />
           Choose Passport Images
         </label>
         
-        <div className="mt-4 text-sm text-gray-500">
+        <div className="mt-4 text-sm text-muted-foreground">
           <p>Supported formats: JPG, PNG, WEBP</p>
           <p>Maximum file size: 10MB per image</p>
         </div>
@@ -193,10 +199,10 @@ export function PassportOCR() {
   const renderPreviewView = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+        <h3 className="text-xl font-semibold text-muted-foreground mb-2">
           Passport Images Preview
         </h3>
-        <p className="text-gray-500">
+        <p className="text-muted-foreground">
           Review your passport images before processing
         </p>
       </div>
@@ -209,8 +215,8 @@ export function PassportOCR() {
               alt={`Passport ${index + 1}`}
               className="w-full h-48 object-cover rounded-lg mb-2"
             />
-            <p className="text-sm text-gray-600 truncate">{file.name}</p>
-            <p className="text-xs text-gray-500">
+            <p className="text-sm text-muted-foreground truncate">{file.name}</p>
+            <p className="text-xs text-muted-foreground">
               {(file.size / 1024 / 1024).toFixed(2)} MB
             </p>
           </div>
@@ -220,14 +226,14 @@ export function PassportOCR() {
       <div className="flex justify-center space-x-4">
         <button
           onClick={resetTool}
-          className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          className="px-6 py-2 border border-border text-muted-foreground rounded-lg hover:bg-background transition-colors"
         >
           Choose Different Images
         </button>
         <button
           onClick={processOCR}
           disabled={isProcessing}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+          className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
         >
           {isProcessing ? (
             <>
@@ -248,10 +254,10 @@ export function PassportOCR() {
   const renderResultView = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">
+        <h3 className="text-xl font-semibold text-muted-foreground mb-2">
           Passport OCR Results
         </h3>
-        <p className="text-gray-500">
+        <p className="text-muted-foreground">
           Extracted text from your passport images
         </p>
       </div>
@@ -259,20 +265,20 @@ export function PassportOCR() {
       {ocrResults.map((result, index) => (
         <div key={index} className="border rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
-            <h4 className="text-lg font-medium text-gray-700">
+            <h4 className="text-lg font-medium text-muted-foreground">
               Passport {index + 1}
             </h4>
             <div className="flex items-center space-x-2">
               {result.confidence > 0 && (
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-muted-foreground">
                   Confidence: {(result.confidence * 100).toFixed(1)}%
                 </span>
               )}
             </div>
           </div>
           
-          <div className="bg-gray-50 rounded-lg p-4 mb-4">
-            <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono">
+          <div className="bg-background rounded-lg p-4 mb-4">
+            <pre className="whitespace-pre-wrap text-sm text-muted-foreground font-mono">
               {result.text}
             </pre>
           </div>
@@ -280,14 +286,14 @@ export function PassportOCR() {
           <div className="flex space-x-2">
             <button
               onClick={() => copyToClipboard(result.text)}
-              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary transition-colors"
             >
               <Copy className="w-4 h-4 mr-2" />
               Copy Text
             </button>
             <button
               onClick={() => downloadText(result.text, index)}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary transition-colors"
             >
               <Download className="w-4 h-4 mr-2" />
               Download
@@ -299,7 +305,7 @@ export function PassportOCR() {
       <div className="text-center">
         <button
           onClick={resetTool}
-          className="flex items-center px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors mx-auto"
+          className="flex items-center px-6 py-2 bg-foreground text-white rounded-lg hover:bg-foreground transition-colors mx-auto"
         >
           <RotateCcw className="w-4 h-4 mr-2" />
           Process New Passports
@@ -310,10 +316,11 @@ export function PassportOCR() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <Balance />
+      <div className="bg-secondary border border-border rounded-lg p-4 mb-6">
         <div className="flex items-start">
-          <AlertCircle className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-blue-800">
+          <AlertCircle className="w-5 h-5 text-primary mr-3 mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-primary">
             <p className="font-medium mb-1">Privacy Notice</p>
             <p>
               Your passport images are processed securely and are not stored on our servers. 

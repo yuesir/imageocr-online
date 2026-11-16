@@ -51,23 +51,23 @@ export default function Pagination({ currentPage, totalPages, baseUrl, searchPar
   const visiblePages = getVisiblePages()
 
   const buttonBaseClass = "relative inline-flex items-center px-4 py-2 text-sm font-medium transition-colors focus:z-20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-  const activeButtonClass = "z-10 bg-blue-600 text-white border-blue-600"
-  const inactiveButtonClass = "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-  const disabledButtonClass = "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-300 dark:border-gray-600 cursor-not-allowed"
+  const activeButtonClass = "z-10 bg-primary text-white border-border"
+  const inactiveButtonClass = "bg-card  text-muted-foreground  border-border  hover:bg-background "
+  const disabledButtonClass = "bg-secondary  text-muted-foreground  border-border  cursor-not-allowed"
 
   return (
-    <nav className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-4 py-3 sm:px-6" aria-label="Pagination Navigation">
+    <nav className="flex items-center justify-between border-t border-border  px-4 py-3 sm:px-6" aria-label="Pagination Navigation">
       {/* Mobile simplified version */}
       <div className="flex flex-1 justify-between sm:hidden">
         {currentPage > 1 ? (
           <Link
             href={createPageUrl(currentPage - 1)}
-            className="relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            className="relative inline-flex items-center rounded-md border border-border  bg-card  px-4 py-2 text-sm font-medium text-muted-foreground  hover:bg-background "
           >
             Previous
           </Link>
         ) : (
-          <span className="relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-400 dark:text-gray-500 cursor-not-allowed">
+          <span className="relative inline-flex items-center rounded-md border border-border  bg-secondary  px-4 py-2 text-sm font-medium text-muted-foreground  cursor-not-allowed">
             Previous
           </span>
         )}
@@ -75,12 +75,12 @@ export default function Pagination({ currentPage, totalPages, baseUrl, searchPar
         {currentPage < totalPages ? (
           <Link
             href={createPageUrl(currentPage + 1)}
-            className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            className="relative ml-3 inline-flex items-center rounded-md border border-border  bg-card  px-4 py-2 text-sm font-medium text-muted-foreground  hover:bg-background "
           >
             Next
           </Link>
         ) : (
-          <span className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-400 dark:text-gray-500 cursor-not-allowed">
+          <span className="relative ml-3 inline-flex items-center rounded-md border border-border  bg-secondary  px-4 py-2 text-sm font-medium text-muted-foreground  cursor-not-allowed">
             Next
           </span>
         )}
@@ -89,14 +89,14 @@ export default function Pagination({ currentPage, totalPages, baseUrl, searchPar
       {/* Desktop full version */}
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm text-gray-700 dark:text-gray-300">
+          <p className="text-sm text-muted-foreground ">
             Showing page <span className="font-medium">{currentPage}</span> of{' '}
             <span className="font-medium">{totalPages}</span> pages
           </p>
         </div>
         
         <div>
-          <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+          <nav className="isolate inline-flex -space-x-px rounded-md shadow-tactile" aria-label="Pagination">
             {/* Previous page button */}
             {currentPage > 1 ? (
               <Link

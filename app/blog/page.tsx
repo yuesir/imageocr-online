@@ -28,15 +28,15 @@ function BlogListSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {[...Array(6)].map((_, i) => (
-        <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden animate-pulse">
-          <div className="h-48 bg-gray-200 dark:bg-gray-700" />
+        <div key={i} className="bg-card  rounded-xl shadow-tactile border border-border  overflow-hidden animate-pulse">
+          <div className="h-48 bg-secondary " />
           <div className="p-6">
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-3" />
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-3" />
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
+            <div className="h-4 bg-secondary  rounded mb-3" />
+            <div className="h-6 bg-secondary  rounded mb-3" />
+            <div className="h-4 bg-secondary  rounded mb-4" />
             <div className="flex gap-2">
-              <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
-              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+              <div className="h-4 w-16 bg-secondary  rounded" />
+              <div className="h-4 w-20 bg-secondary  rounded" />
             </div>
           </div>
         </div>
@@ -76,13 +76,13 @@ async function BlogContent({ searchParams }: { searchParams: { page?: string } }
       {/* Empty state */}
       {posts.length === 0 && (
         <div className="text-center py-12">
-          <div className="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
-            <BookOpen className="w-12 h-12 text-gray-400" />
+          <div className="mx-auto w-24 h-24 bg-secondary  rounded-full flex items-center justify-center mb-4">
+            <BookOpen className="w-12 h-12 text-muted-foreground" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          <h3 className="text-lg font-medium text-foreground  mb-2">
             No articles found
           </h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
+          <p className="text-muted-foreground  mb-6">
             No articles published yet
           </p>
         </div>
@@ -97,20 +97,20 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <main className="min-h-screen bg-background ">
         {/* Page header */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="bg-card  border-b border-border ">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="text-center">
               <div className="flex justify-center mb-4">
-                <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
-                  <BookOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                <div className="p-3 bg-secondary  rounded-full">
+                  <BookOpen className="h-8 w-8 text-primary " />
                 </div>
               </div>
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              <h1 className="text-4xl font-bold text-foreground  mb-4">
                 OCR Technology Blog
               </h1>
-              <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+              <p className="text-xl text-muted-foreground  max-w-3xl mx-auto">
                 Image OCR Recognition: Best Practices for Specific Scenarios
               </p>
             </div>

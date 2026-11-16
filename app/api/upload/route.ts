@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { billingDB } from '@/lib/billing/server'
 import { validateImageFile, generateId } from '@/lib/utils'
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = billingDB()
     // Get user from session (optional for anonymous users)
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await supabase.auth.getUser(request.headers.get('authorization')?.replace(/^Bearer /, ''))
     
     // Allow both authenticated and anonymous users
     const isAuthenticated = !authError && user

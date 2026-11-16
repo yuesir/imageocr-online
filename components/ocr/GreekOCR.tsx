@@ -1,5 +1,8 @@
 'use client'
 
+import { supabase } from '@/lib/supabase'
+import { Balance } from '@/components/billing/Balance'
+
 import { useState, useEffect } from 'react'
 import { MultiImageUpload } from '@/components/upload/MultiImageUpload'
 import { MultiImagePreview } from '@/components/MultiImagePreview'
@@ -63,6 +66,7 @@ export function GreekOCR() {
       return
     }
 
+    if (!window.confirm('Each successfully processed image uses 1 image allowance, including images with no text. Running images again uses another allowance. Continue?')) return
     setIsProcessing(true)
     setProcessingProgress(0)
     const results: OCRResult[] = []
@@ -77,9 +81,12 @@ export function GreekOCR() {
           const base64Image = await convertToBase64(image.file)
           
           // Call OCR API with Greek language specification
+          const { data: { session } } = await supabase.auth.getSession()
           const response = await fetch('/api/ocr/tencent', {
             method: 'POST',
             headers: {
+              ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
+              'Idempotency-Key': crypto.randomUUID(),
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
@@ -90,23 +97,12 @@ export function GreekOCR() {
           })
 
           if (!response.ok) {
-            // 尝试解析错误响应中的message字段
-            try {
-              const errorData = await response.json()
-              if (errorData.message) {
-                throw new Error(errorData.message)
-              } else if (errorData.error) {
-                throw new Error(errorData.error)
-              } else {
-                throw new Error(`HTTP error! status: ${response.status}`)
-              }
-            } catch {
-              // 如果解析失败，使用默认错误信息
-              throw new Error(`HTTP error! status: ${response.status}`)
-            }
+            const errorData = await response.json().catch(() => ({}))
+            throw new Error(errorData.message || errorData.error || `HTTP error: ${response.status}`)
           }
 
           const data = await response.json()
+      window.dispatchEvent(new Event('billing:refresh'))
           const processingTime = Date.now() - startTime
 
           if (data.success && data.text) {
@@ -169,6 +165,7 @@ export function GreekOCR() {
 
   return (
     <div className="w-full" id="greek-ocr-section">
+      <Balance />
       {viewMode === 'multi-upload' && (
         <MultiImageUpload
           selectedFiles={selectedImages}

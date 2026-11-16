@@ -6,15 +6,15 @@ export default function BlogList({ posts, currentPage, totalPages, totalPosts, c
     return (
       <div className="text-center py-12">
         <div className="max-w-md mx-auto">
-          <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-24 h-24 mx-auto mb-4 bg-secondary  rounded-full flex items-center justify-center">
+            <svg className="w-12 h-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-xl font-semibold text-foreground  mb-2">
             No Articles Found
           </h3>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-muted-foreground ">
             {searchQuery ? `No articles found containing "${searchQuery}"` : 
              category ? `No articles in "${category}" category yet` : 
              'No articles have been published yet'}
@@ -36,7 +36,7 @@ export default function BlogList({ posts, currentPage, totalPages, totalPosts, c
       </section>
 
       {/* Article Statistics */}
-      <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between text-sm text-muted-foreground  pt-4 border-t border-border ">
         <div>
           Showing {((currentPage - 1) * 6) + 1} - {Math.min(currentPage * 6, totalPosts)} of {totalPosts} articles
         </div>

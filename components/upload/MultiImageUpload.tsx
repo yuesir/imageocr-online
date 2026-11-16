@@ -153,8 +153,8 @@ export function MultiImageUpload({
       
       {/* Upload Area */}
       <Card
-        className={`cursor-pointer transition-all duration-200 hover:border-blue-400 mb-4 ${
-          isDragOver ? 'border-blue-400 bg-blue-50 dark:bg-blue-950/20' : ''
+        className={`cursor-pointer transition-all duration-200 hover:border-border mb-4 ${
+          isDragOver ? 'border-border bg-secondary ' : ''
         } ${isProcessing ? 'cursor-not-allowed opacity-50' : ''}`}
         onClick={handleClick}
         onDrop={handleDrop}
@@ -164,13 +164,24 @@ export function MultiImageUpload({
         <CardContent className="p-8">
           <div className="text-center">
             <Upload className={`mx-auto h-10 w-10 mb-3 ${
-              isDragOver ? 'text-blue-500' : 'text-muted-foreground'
+              isDragOver ? 'text-primary' : 'text-muted-foreground'
             }`} />
             <h3 className="text-lg font-semibold text-foreground mb-2">
               {isDragOver ? 'Drop your images here' : 'Upload Images'}
             </h3>
             <p className="text-sm text-muted-foreground mb-3">
-              Drag and drop your images here, or click to browse
+              Drag and drop your images here, or{' '}
+              <button
+                type="button"
+                className="text-primary underline underline-offset-4 hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring disabled:cursor-not-allowed"
+                disabled={isProcessing}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  handleClick()
+                }}
+              >
+                click to browse
+              </button>
             </p>
             <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
               <AlertCircle className="h-3 w-3" />
@@ -212,7 +223,7 @@ export function MultiImageUpload({
                   size="sm"
                   onClick={handleDeleteSelected}
                   disabled={isProcessing}
-                  className="text-red-600 hover:text-red-700"
+                  className="text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4 mr-1" />
                   Delete ({selectedCount})
@@ -236,7 +247,7 @@ export function MultiImageUpload({
               <Card 
                 key={imageFile.id} 
                 className={`relative cursor-pointer transition-all duration-200 ${
-                  imageFile.selected ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-950/20' : 'hover:shadow-md'
+                  imageFile.selected ? 'ring-2 ring-blue-500 bg-secondary ' : 'hover:shadow-md'
                 }`}
                 onClick={() => handleToggleSelection(imageFile.id)}
               >
@@ -245,8 +256,8 @@ export function MultiImageUpload({
                   <div className="absolute top-2 left-2 z-10">
                     <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                       imageFile.selected 
-                        ? 'bg-blue-500 border-blue-500' 
-                        : 'bg-white border-gray-300 hover:border-blue-400'
+                        ? 'bg-primary border-border' 
+                        : 'bg-card border-border hover:border-border'
                     }`}>
                       {imageFile.selected && (
                         <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -260,7 +271,7 @@ export function MultiImageUpload({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="absolute top-2 right-2 z-10 h-6 w-6 p-0 bg-red-500 hover:bg-red-600 text-white"
+                    className="absolute top-2 right-2 z-10 h-6 w-6 p-0 bg-primary hover:bg-primary text-white"
                     onClick={(e) => {
                       e.stopPropagation()
                       handleRemoveFile(imageFile.id)
