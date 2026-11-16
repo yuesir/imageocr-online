@@ -7,6 +7,12 @@ test('OAuth destinations preserve local paths and query strings', () => {
   assert.equal(safeAuthRedirect('/ocr#upload'), '/ocr#upload')
 })
 
+test('OAuth destinations reject every ASCII control character and space', () => {
+  for (let code = 0; code <= 0x20; code++) {
+    assert.equal(safeAuthRedirect(`/path${String.fromCharCode(code)}suffix`), '/ocr')
+  }
+})
+
 test('OAuth destinations reject external URLs, browser normalization tricks, and login loops', () => {
   for (const value of [null, '', 'https://evil.example', '//evil.example', '/\\evil.example', '/\nevil.example', '/auth/callback?code=x', '/login', '/signup', '/a/../auth/callback']) {
     assert.equal(safeAuthRedirect(value), '/ocr', String(value))
