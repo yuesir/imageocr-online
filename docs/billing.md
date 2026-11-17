@@ -26,6 +26,20 @@ One-time USD image packs: Starter $5.99 / 100 images, Plus $9.99 / 300, Max $19.
 7. Set a random `CRON_SECRET` and schedule a GET to `/api/billing/reconcile` every five minutes with `Authorization: Bearer <CRON_SECRET>`. A local secret was generated if absent. The endpoint processes three pending events per call; schedule extra calls if the inbox grows. `npm run billing:reconcile` also drains pending events from a trusted server CLI. Scheduling is intentionally not tied to a specific hosting plan.
 8. Once sandbox payment/refund tests and the cost gate pass, set `BILLING_ENABLED=true` **in the test environment** to enable checkout. This switch stops new sales when false; already verified callbacks, purchased credit usage and refunds continue.
 
+## Sandbox verification status (2026-11-17)
+
+The specified merchant/store now has these active test products, created through the SDK and saved in ignored `.env.local`:
+
+| Package | Test product | USD | Images |
+| --- | --- | --- | --- |
+| Starter | `PROD_5uQgXL2A57Nccxk0qtCYyK` | 5.99 | 100 |
+| Plus | `PROD_7ABWVfbj3wgtT5cBQPR6gs` | 9.99 | 300 |
+| Max | `PROD_2n5tCiobKDeGIqeyHXPuUg` | 19.99 | 800 |
+
+The remote Supabase read-only allowance check passed. Direct terminal DNS fails on this machine; its system HTTP proxy is `http://127.0.0.1:7890`. Node 20 does not automatically inherit the macOS system proxy; use a proxy-aware runtime when running the application and setup commands here. No proxy is hardcoded into application source.
+
+Run `npm run billing:verify` for read-only checks of the test catalog, registered payment/refund events and database reads. This does not prove webhook delivery or payment settlement. The test callback is registered at `https://voltage-open-bluff.ngrok-free.dev/api/billing/webhook` for `order.completed` and `refund.succeeded`. The local app origin is set to that ngrok host and `BILLING_ENABLED=true` for sandbox testing. The development server was restarted with a temporary proxy preload so it can reach Waffo and Supabase. The tunnel and proxy must remain running during testing; update the callback and app origin if the tunnel hostname changes. Starter sandbox payment verified at 2026-11-17 19:52:58 Asia/Shanghai: Waffo order `ORD_3nYNRGxHtGMtvREvuWgnOW` is completed in test mode for USD 5.99 (tax 0.00). Its callback was processed with zero retries and no error; exactly one purchase ledger entry granted 100 images, and the wallet balance was 100 at verification. No products were published to production. Plus/Max actual payments, declines and actual refunds remain unverified.
+
 ## Checkout and callback flow
 
 - `POST /api/billing/checkout`: Supabase Bearer token required; JSON `{ "packageId": "starter" | "plus" | "max" }`. Browser-supplied prices, quantities and user IDs are ignored. The server queries the store's one-time catalog and verifies the configured SKU's USD price/status.
@@ -64,7 +78,7 @@ Run `npm run check`, `npm run test:billing`, `npm run build`. Tests apply both S
 
 SDK installation was blocked by terminal DNS in the implementation environment. For local verification only, the unmodified official SDK source was retrieved through GitHub at commit `69c8878094344fceb1edaed0290a4462b0671b6a` (package version 0.28.0) and compiled into ignored node_modules. The tracked dependency still targets the official npm release. Run `npm ci` with registry access before deployment; this local source build is not a substitute for the published-package deployment check.
 
-Before live rollout, test actual Waffo sandbox checkout and raw signed deliveries: all three prices, login requirement, pending/confirmed return UI, payment success/decline, duplicate events, store/mode mismatches, partial/full/multiple refunds, refunded-before-completed events and repeat purchases. Waffo's documented test cards are `4576750000000110` (success) and `4576750000000220` (decline), with any future expiry and CVC. No real payment or product publishing has been performed locally.
+Before live rollout, test actual Waffo sandbox checkout and raw signed deliveries: all three prices, login requirement, pending/confirmed return UI, payment success/decline, duplicate events, store/mode mismatches, partial/full/multiple refunds, refunded-before-completed events and repeat purchases. Waffo's documented test cards are `4576750000000110` (success) and `4576750000000220` (decline), with any future expiry and CVC. No production payment or product publishing has been performed locally; the successful Starter sandbox payment is recorded above.
 
 Measure Qwen input/output tokens and billed cost for clear screenshots, dense text, handwriting, large images, empty images and failures. Successful calls log `ocr_cost_sample` without images/text. Include storage, platform, retries and **your Waffo merchant fee schedule**; do not reuse Creem fee assumptions. For an 80% contribution target on Max, average direct cost per image must be at most `(0.20 × $19.99 − payment fees) / 800`. Verify actual tax/refund treatment. Change pack quantities consistently before live sales if the cost gate fails; never rewrite historical orders.
 

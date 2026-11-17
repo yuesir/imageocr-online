@@ -14,7 +14,8 @@
     "test:billing": "node --import tsx --test tests/billing.test.ts",
     "billing:setup": "node --import tsx scripts/setup-waffo.ts",
     "billing:reconcile": "node --import tsx scripts/reconcile-waffo.ts",
-    "billing:check": "node --import tsx scripts/check-billing.ts"
+    "billing:check": "node --import tsx scripts/check-billing.ts",
+    "billing:verify": "node --import tsx scripts/verify-waffo.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

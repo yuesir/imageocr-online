@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { safeAuthRedirect } from '@/lib/auth/redirect'
 import { GoogleSignInButton } from './GoogleSignInButton'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
@@ -26,7 +27,7 @@ export function LoginForm() {
     const { error } = await signIn(email, password)
     
     if (!error) {
-      router.push('/dashboard')
+      router.push(safeAuthRedirect(new URLSearchParams(window.location.search).get('next')))
     }
     
     setLoading(false)
