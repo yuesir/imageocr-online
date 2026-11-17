@@ -1,6 +1,6 @@
 'use client'
 
-import { User, FileText, Settings, LogOut, ChevronDown } from 'lucide-react'
+import { User, FileText, ReceiptText, Settings, LogOut, ChevronDown } from 'lucide-react'
 import { DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from './dropdown-menu'
 import { Button } from './button'
 import Link from 'next/link'
@@ -35,6 +35,13 @@ export function UserMenu({ userEmail, onSignOut }: UserMenuProps) {
         </DropdownMenuItem>
       </Link>
       
+      <Link href="/orders">
+        <DropdownMenuItem className="cursor-pointer">
+          <ReceiptText className="mr-2 h-4 w-4" />
+          <span>My Orders</span>
+        </DropdownMenuItem>
+      </Link>
+
       <Link href="/preferences">
         <DropdownMenuItem className="cursor-pointer">
           <Settings className="mr-2 h-4 w-4" />

@@ -22,11 +22,22 @@
 
 配置 `NEXT_PUBLIC_SUPABASE_URL` 和 `NEXT_PUBLIC_SUPABASE_ANON_KEY`，二者必须属于上面同一个项目；重新构建部署。无需安装 NextAuth，无需在网站配置 Google Client Secret。
 
-入口：`/login` 和 `/signup`。默认登录后进入 `/ocr`；`/login?next=/pricing` 可返回本站指定页面。回调在服务端交换 code，并在同一 redirect response 写入会话 cookies。外部 next URL 和登录循环会回退到 `/ocr`；失败只显示固定提示，不暴露 token 或提供方错误。
+入口：`/login` 和 `/signup`。默认登录后进入首页 `/`；`/login?next=/pricing` 可返回本站指定页面。回调在服务端交换 code，并在同一 redirect response 写入会话 cookies。外部 next URL 和登录循环会回退到首页 `/`；失败只显示固定提示，不暴露 token 或提供方错误。
 
 ## 验收
 
-- 无痕窗口点击 Continue with Google，选择测试账号后返回 `/ocr`；刷新后仍登录，退出后会话清除。
+### 登录失败排查
+
+Supabase Users 中存在 Google 身份只表示身份已创建或关联，不代表网站完成了 code 换取会话。查看 Vercel 服务端 `[auth/callback]` 日志（不记录 code、token 或 Cookie 值）：
+
+- `missing_supabase_configuration`：在 Production 配置上述两个环境变量并重新构建部署。浏览器客户端目前有备用配置，能发起授权不代表服务端环境变量齐全。
+- `missing_authorization_code` / `provider_returned_error`：检查 Supabase Auth 日志和 Redirect URLs 配置。
+- `session_exchange_failed`：根据 `errorCode` 和 `status` 排查；`hasCodeVerifier: false` 表示回调没有收到 PKCE 校验 Cookie，应检查浏览器是否允许 Cookie，以及入口和回调是否跨越了 www / 非 www 域名。
+- `unexpected_exchange_failure`：检查服务端访问 Supabase 的网络和 URL 配置。
+
+登录入口与回调应使用同一 origin；如配置了域名跳转，应在发起登录前完成统一，避免在 `/auth/callback` 上跳转到另一个域名丢失校验 Cookie。
+
+- 无痕窗口点击 Continue with Google，选择测试账号后返回首页 `/`；刷新后仍登录，退出后会话清除。
 - `/login?next=/pricing` 成功后进入套餐页；首次登录用户资料正常创建。
 - 已有相同已验证邮箱用户登录后检查用户 ID、已有余额和历史记录保持一致。
 - 取消授权、过期/重复回调 code、换浏览器打开回调：回到登录页显示可重试提示。

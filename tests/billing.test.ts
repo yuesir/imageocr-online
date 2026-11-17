@@ -364,3 +364,32 @@ test('batch pool keeps 3 active workers and preserves original result indexes',a
  const upstream=await fetchQueuedOCR('/api/ocr/ali_vl',init,{wait:async()=>{},fetch:async()=>{attempts++;return new Response('{"error":"Provider rate limit"}',{status:429})}})
  assert.equal(upstream.status,429);assert.equal(attempts,1)
 })
+
+test('order history paginates only the signed-in account and preserves the recent-orders contract', async () => {
+ const {NextRequest}=await import('next/server')
+ const {GET}=await import('../app/api/billing/orders/route')
+ const restore=testEnvironment(), originalFetch=globalThis.fetch
+ let reads=0
+ globalThis.fetch=async(input,init)=>{
+  const req=input instanceof Request?input:new Request(input,init),url=new URL(req.url)
+  const json=(v:unknown)=>new Response(JSON.stringify(v),{headers:{'Content-Type':'application/json'}})
+  if(url.pathname==='/auth/v1/user')return json({id:TEST_USER})
+  assert.equal(url.pathname,'/rest/v1/billing_orders')
+  assert.equal(url.searchParams.get('user_id'),`eq.${TEST_USER}`)
+  assert.equal(url.searchParams.get('order'),'created_at.desc,id.desc')
+  reads++
+  const offset=Number(url.searchParams.get('offset')||0),limit=Number(url.searchParams.get('limit'))
+  return json(Array.from({length:Math.min(limit,55-offset)},(_,i)=>({id:`order-${offset+i}`})))
+ }
+ const request=(query='',auth=true)=>new NextRequest('https://site.test/api/billing/orders'+query,{headers:auth?{Authorization:'Bearer test-token'}:{}})
+ try {
+  assert.equal((await GET(request('',false))).status,401);assert.equal(reads,0)
+  for(const page of ['0','-1','1.5','abc','100001'])assert.equal((await GET(request('?page='+page))).status,400)
+  assert.equal(reads,0)
+  const first=await GET(request('?page=1&user_id=attacker'))
+  assert.equal(first.headers.get('cache-control'),'no-store')
+  const a=await first.json();assert.equal(a.orders.length,20);assert.equal(a.orders[0].id,'order-0');assert.equal(a.hasMore,true)
+  const b=await (await GET(request('?page=3'))).json();assert.equal(b.orders.length,15);assert.equal(b.orders[0].id,'order-40');assert.equal(b.hasMore,false)
+  const recent=await (await GET(request())).json();assert.equal(recent.orders.length,50);assert.equal(recent.hasMore,true)
+ } finally {globalThis.fetch=originalFetch;restore()}
+})

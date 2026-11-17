@@ -11,6 +11,20 @@ export async function GET(request: NextRequest) {
   const code = url.searchParams.get('code')
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  // Record only diagnostic metadata, never callback URLs, codes, tokens, or cookie values.
+  const diagnostic = {
+    hasCode: Boolean(code),
+    hasSupabaseUrl: Boolean(supabaseUrl),
+    hasSupabaseKey: Boolean(key),
+    hasCodeVerifier: request.cookies.getAll().some(({ name, value }) => /-code-verifier(?:\.\d+)?$/.test(name) && Boolean(value)),
+  }
+  if (url.searchParams.has('error')) {
+    console.error('[auth/callback] provider_returned_error', diagnostic)
+  } else if (!supabaseUrl || !key) {
+    console.error('[auth/callback] missing_supabase_configuration', diagnostic)
+  } else if (!code) {
+    console.error('[auth/callback] missing_authorization_code', diagnostic)
+  }
   if (!url.searchParams.has('error') && code && supabaseUrl && key) {
     try {
       const supabase = createServerClient(supabaseUrl, key, {
@@ -23,8 +37,13 @@ export async function GET(request: NextRequest) {
       })
       const { error } = await supabase.auth.exchangeCodeForSession(code)
       if (!error) return response
+      console.error('[auth/callback] session_exchange_failed', {
+        ...diagnostic,
+        status: error.status,
+        errorCode: error.code && /^[a-z0-9_]+$/.test(error.code) ? error.code : 'unknown',
+      })
     } catch {
-      // Never expose provider errors, authorization codes, or tokens to the browser.
+      console.error('[auth/callback] unexpected_exchange_failure', diagnostic)
     }
   }
   response.headers.set('Location', failure.toString())
