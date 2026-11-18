@@ -82,18 +82,18 @@ export default function PrivacyPolicy() {
               </ul>
             </section>
 
-            <section className="mb-8">
+            <section id="ocr-data" className="mb-8">
               <h2 className="text-2xl font-semibold text-foreground  mb-4">4. Data Processing and Storage</h2>
               
               <h3 className="text-xl font-medium text-foreground  mb-3">4.1 Image Processing</h3>
               <p className="text-muted-foreground  leading-relaxed mb-4">
-                Images uploaded for OCR processing are temporarily stored on our secure servers during processing. We use both our proprietary OCR technology and third-party services (including Tencent Cloud OCR and Tesseract.js) to extract text from your images.
+                Tools such as passport and driver’s license OCR submit images directly for recognition. We send images to cloud OCR providers, including Alibaba Cloud and Tencent Cloud, to extract text. The file upload workflow on the OCR Processing page saves original images in Supabase Storage when you upload while signed in. OCR results from saved files can also be stored in your account history.
               </p>
 
               <h3 className="text-xl font-medium text-foreground  mb-3">4.2 Data Retention</h3>
               <ul className="list-disc pl-6 text-muted-foreground  mb-4">
-                <li>Uploaded images are automatically deleted within 24 hours of processing</li>
-                <li>Extracted text results are stored for up to 30 days for registered users</li>
+                <li>We retain successful OCR responses, including extracted text, for both guests and signed-in users so a retry of the same request can return the original result.</li>
+                <li>Images saved through the file upload workflow and retained OCR results have no fixed automatic deletion period. You can delete entries from your account history in the dashboard. To request deletion of stored images or other OCR data, contact privacy@imageocrai.com.</li>
                 <li>Account information is retained until account deletion</li>
                 <li>Log data is retained for up to 12 months for security and analytics purposes</li>
               </ul>
@@ -112,8 +112,8 @@ export default function PrivacyPolicy() {
               <ul className="list-disc pl-6 text-muted-foreground  mb-4">
                 <li><strong>Google Analytics:</strong> For website analytics and usage tracking</li>
                 <li><strong>Tencent Cloud OCR:</strong> For advanced OCR processing capabilities</li>
-                <li><strong>Supabase:</strong> For database and authentication services</li>
-                <li><strong>Cloud Storage Providers:</strong> For optional file storage integration</li>
+                <li><strong>Alibaba Cloud:</strong> For cloud OCR processing</li>
+                <li><strong>Supabase:</strong> For database, file storage, and authentication services</li>
               </ul>
               <p className="text-muted-foreground  leading-relaxed">
                 These third parties have their own privacy policies governing their use of your information. We encourage you to review their privacy policies.

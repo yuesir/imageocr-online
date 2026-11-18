@@ -1,5 +1,6 @@
 'use client'
 
+import { OCRDataNotice, OCRPricingInfo, OCRPrivacyLink } from '@/components/ocr/OCRServiceInfo'
 import { FAQSection } from '@/components/faq/FAQSection'
 
 import { InteractiveOCR } from '@/components/ocr/InteractiveOCR'
@@ -86,8 +87,8 @@ export default function PassportOCRClient() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <h3 className="font-semibold mb-2 ">Secure & Private</h3>
-              <p className="text-sm text-muted-foreground ">Your passport images are processed securely and not stored</p>
+              <h3 className="font-semibold mb-2 ">Data Handling</h3>
+              <p className="text-sm text-muted-foreground "><OCRPrivacyLink /></p>
             </div>
             <div className="text-center">
               <div className="bg-secondary  rounded-lg p-4 mb-4">
@@ -104,8 +105,8 @@ export default function PassportOCRClient() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
               </div>
-              <h3 className="font-semibold mb-2 ">Completely Free</h3>
-              <p className="text-sm text-muted-foreground ">No registration or payment required</p>
+              <h3 className="font-semibold mb-2 ">Daily Free Allowance</h3>
+              <p className="text-sm text-muted-foreground "><OCRPricingInfo /></p>
             </div>
           </div>
         </div>
@@ -121,10 +122,9 @@ export default function PassportOCRClient() {
                   ensure your passport image is clear and well-lit.
                 </p>
           ) },
-          { question: <> Is my passport information secure? </>, answer: (
+          { question: <> How are my images and results handled? </>, answer: (
 <p className="text-muted-foreground  mt-2">
-                  Yes, your privacy is our priority. Passport images are processed in real-time 
-                  and are not stored on our servers. All data is handled securely.
+                  <OCRDataNotice />
                 </p>
           ) },
           { question: <> What information can be extracted from passports? </>, answer: (

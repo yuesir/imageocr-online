@@ -1,5 +1,6 @@
 'use client'
 
+import { OCRDataNotice } from '@/components/ocr/OCRServiceInfo'
 import { FAQSection } from '@/components/faq/FAQSection'
 
 import { ToolHero } from '@/components/ocr/ToolHero'
@@ -125,11 +126,11 @@ export default function IndianOCRClient() {
 
 </>
           ) },
-          { question: <> Is my Indian text data secure and private? </>, answer: (
+          { question: <> How are my images and results handled? </>, answer: (
 <>
 
 <p className="text-muted-foreground">
-                    Yes, we take data security seriously. All images and extracted Indian text are processed securely and are not stored on our servers after processing. Your data is encrypted during transmission and processing, ensuring complete privacy and confidentiality of your Indian language content.
+                    <OCRDataNotice />
                   </p>
 
 </>

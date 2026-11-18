@@ -1,5 +1,6 @@
 "use client";
 
+import { OCRDataNotice } from '@/components/ocr/OCRServiceInfo'
 import { Balance } from '@/components/billing/Balance'
 
 import { useState, useCallback } from "react";
@@ -323,8 +324,7 @@ export function PassportOCR() {
           <div className="text-sm text-primary">
             <p className="font-medium mb-1">Privacy Notice</p>
             <p>
-              Your passport images are processed securely and are not stored on our servers. 
-              All processing happens in real-time and your data remains private.
+              <OCRDataNotice />
             </p>
           </div>
         </div>

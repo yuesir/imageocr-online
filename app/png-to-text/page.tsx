@@ -4,7 +4,7 @@ import { PNGToTextClient } from './PNGToTextClient'
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'PNG to Text Converter - Extract Text from PNG Images | ImageOCRAI',
-    description: 'Convert PNG images to text instantly with our AI-powered OCR technology. Extract text from PNG files with high accuracy and speed. Free online PNG to text converter.',
+    description: 'Convert PNG images to text instantly with our AI-powered OCR technology. Extract text from PNG files with high accuracy and speed. Daily free allowance and optional one-time image packs.',
     keywords: 'PNG to text, PNG OCR, image to text, extract text from PNG, PNG text converter, optical character recognition',
     openGraph: {
       title: 'PNG to Text Converter - AI-Powered OCR | ImageOCRAI',

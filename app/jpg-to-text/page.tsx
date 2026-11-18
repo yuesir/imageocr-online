@@ -4,7 +4,7 @@ import { JPGToTextClient } from './JPGToTextClient'
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'JPG to Text Converter - Extract Text from JPG Images | ImageOCRAI',
-    description: 'Convert JPG images to text instantly with our AI-powered OCR technology. Extract text from JPG files with high accuracy and speed. Free online JPG to text converter.',
+    description: 'Convert JPG images to text instantly with our AI-powered OCR technology. Extract text from JPG files with high accuracy and speed. Daily free allowance and optional one-time image packs.',
     keywords: 'JPG to text, JPG OCR, image to text, extract text from JPG, JPG text converter, optical character recognition',
     openGraph: {
       title: 'JPG to Text Converter - AI-Powered OCR | ImageOCRAI',

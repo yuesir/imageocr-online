@@ -4,7 +4,7 @@ import { HandwritingToTextClient } from './HandwritingToTextClient'
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Handwriting to Text Converter - Extract Text from Handwritten Images | ImageOCRAI',
-    description: 'Convert handwriting images to text instantly with our AI-powered OCR technology. Extract text from handwritten documents with high accuracy and speed. Free online handwriting to text converter.',
+    description: 'Convert handwriting images to text instantly with our AI-powered OCR technology. Extract text from handwritten documents with high accuracy and speed. Daily free allowance and optional one-time image packs.',
     keywords: 'handwriting to text, handwriting OCR, image to text, extract text from handwriting, handwriting text converter, optical character recognition',
     openGraph: {
       title: 'Handwriting to Text Converter - AI-Powered OCR | ImageOCRAI',

@@ -1,5 +1,6 @@
 'use client'
 
+import { OCRPricingInfo } from '@/components/ocr/OCRServiceInfo'
 import { useState } from 'react'
 import { ArrowDown, ArrowRight, Check, Copy, FileText } from 'lucide-react'
 
@@ -33,7 +34,7 @@ export function HomeHero() {
             Optical character recognition
           </p>
           <h1 id="home-hero-title" className="text-4xl text-foreground sm:text-5xl lg:text-6xl">
-            Free Image to Text Converter (OCR) — Extract &amp; Transcribe Text <em className="text-primary">Instantly</em>
+            Image to Text Converter (OCR) — Extract &amp; Transcribe Text <em className="text-primary">Instantly</em>
           </h1>
           <p className="mt-6 max-w-lg text-base leading-relaxed text-muted-foreground">
             Upload images, photos and get accurate text extract results instantly.{' '}
@@ -41,6 +42,7 @@ export function HomeHero() {
               Extract text now <ArrowDown className="h-4 w-4" aria-hidden="true" />
             </a>
           </p>
+          <p className="mt-3 max-w-lg text-sm text-muted-foreground"><OCRPricingInfo /></p>
         </div>
 
         <figure className="home-hero-demo min-w-0" aria-label="Illustrative example of a receipt converted into editable text">

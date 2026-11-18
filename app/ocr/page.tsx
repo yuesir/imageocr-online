@@ -1,5 +1,6 @@
 'use client'
 
+import { OCRPrivacyLink } from '@/components/ocr/OCRServiceInfo'
 import { Balance } from '@/components/billing/Balance'
 
 import { useState } from 'react'
@@ -264,6 +265,9 @@ export default function OCRPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                <p className="text-sm text-muted-foreground">
+                  Images uploaded while signed in are saved for this workflow, and extracted text can appear in your account history. See <OCRPrivacyLink />.
+                </p>
                 <ImageUpload
                   onFileSelect={handleFileSelect}
                   onFileRemove={handleFileRemove}
@@ -354,9 +358,9 @@ export default function OCRPage() {
               <div className="w-12 h-12 bg-secondary  rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-6 w-6 text-sage" />
               </div>
-              <h3 className="font-semibold mb-2">Secure & Private</h3>
+              <h3 className="font-semibold mb-2">Data Handling</h3>
               <p className="text-sm text-muted-foreground">
-                Your files are processed securely and deleted after processing
+                <OCRPrivacyLink />
               </p>
             </div>
             

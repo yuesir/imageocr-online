@@ -1,5 +1,6 @@
 'use client'
 
+import { OCRDataNotice } from '@/components/ocr/OCRServiceInfo'
 import { FAQSection } from '@/components/faq/FAQSection'
 
 import { Database } from 'lucide-react'
@@ -129,12 +130,11 @@ export default function DataEntryOCRClient() {
 
 </>
           ) },
-          { question: <> Is my data secure during processing? </>, answer: (
+          { question: <> How are my images and results handled? </>, answer: (
 <>
 
 <p className="text-muted-foreground">
-                    Yes, your data security is our top priority. All documents are processed securely and are automatically deleted after processing. 
-                    We do not store or share your data entry documents or extracted text.
+                    <OCRDataNotice />
                   </p>
 
 </>

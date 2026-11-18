@@ -1,5 +1,6 @@
 "use client";
 
+import { OCRDataNotice, OCRPricingInfo, OCRPrivacyLink } from '@/components/ocr/OCRServiceInfo'
 import { FAQSection } from '@/components/faq/FAQSection'
 
 import { InteractiveOCR } from "@/components/ocr/InteractiveOCR";
@@ -102,9 +103,9 @@ export default function IDOCRClient() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2 ">Secure & Private</h3>
+              <h3 className="text-lg font-semibold mb-2 ">Data Handling</h3>
               <p className="text-muted-foreground  text-sm">
-                Your ID data is processed securely and not stored on our servers
+                <OCRPrivacyLink />
               </p>
             </div>
             <div className="text-center">
@@ -113,9 +114,9 @@ export default function IDOCRClient() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold mb-2 ">Free to Use</h3>
+              <h3 className="text-lg font-semibold mb-2 ">Daily Free Allowance</h3>
               <p className="text-muted-foreground  text-sm">
-                No registration required, completely free ID document OCR service
+                <OCRPricingInfo />
               </p>
             </div>
           </div>
@@ -146,12 +147,12 @@ export default function IDOCRClient() {
 
 </>
           ) },
-          { question: <> Is my ID document data secure? </>, answer: (
+          { question: <> How are my images and results handled? </>, answer: (
 <>
 
 
 <p className="text-muted-foreground ">
-                Yes, your privacy is our priority. ID document images are processed securely and are not stored on our servers after processing is complete.
+                <OCRDataNotice />
               </p>
 
 </>
