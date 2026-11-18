@@ -3,8 +3,8 @@ import IDOCRClient from './IDOCRClient';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "ID Document OCR: Extract Text from ID Images | Free Online Tool",
-    description: "Convert your ID document images to editable text instantly. Our advanced OCR technology accurately extracts text from identity documents in JPG, PNG, and PDF formats. Free, secure, and fast processing.",
+    title: "ID Document OCR: Extract Text from ID Images | Online OCR Tool",
+    description: "Convert your ID document images to editable text instantly. Our advanced OCR technology accurately extracts text from identity documents in JPG, PNG, and PDF formats. Daily free allowance and optional one-time image packs.",
     keywords: "ID document OCR, identity document text extraction, OCR tool, image to text, ID scanner, document processing, text recognition, ID data extraction",
     openGraph: {
       title: "ID Document OCR: Extract Text from ID Images",

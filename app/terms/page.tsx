@@ -1,3 +1,4 @@
+import { OCRPricingInfo, OCRPrivacyLink } from '@/components/ocr/OCRServiceInfo'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 
@@ -28,6 +29,9 @@ export default function TermsOfService() {
               <p className="text-muted-foreground  mb-4">
                 ImageOCR Online provides optical character recognition (OCR) services that allow users to extract text from images. The service supports multiple languages and document types including business cards, IDs, invoices, and general text recognition.
               </p>
+              <p className="text-muted-foreground mb-4">
+                <OCRPricingInfo /> Purchased image allowances do not expire. Purchases are one-time payments.
+              </p>
             </section>
             
             <section className="mb-8">
@@ -47,7 +51,7 @@ export default function TermsOfService() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-foreground  mb-4">4. Privacy and Data Protection</h2>
               <p className="text-muted-foreground  mb-4">
-                We take your privacy seriously. Images uploaded to our service are processed for OCR purposes only. We do not store your images permanently on our servers, and they are automatically deleted after processing. For detailed information about how we handle your data, please refer to our Privacy Policy.
+                We send images to cloud OCR providers to extract text. The file upload workflow stores original images, and we keep successful OCR responses to support retries. Results from processing saved files while signed in can also appear in your account history. See the Privacy Policy for <OCRPrivacyLink /> and how to request deletion.
               </p>
             </section>
             

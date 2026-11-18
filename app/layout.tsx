@@ -8,8 +8,8 @@ import { Clarity } from '@/components/analytics/Clarity'
 
 
 export const metadata = {
-  title: 'Free Online Image to Text OCR Converter & Batch Transcribe Image to Text - ImageOCRAI',
-  description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Batch OCR multiple files, extract text on any device—no software needed.',
+  title: 'Online Image to Text OCR Converter & Batch Transcribe Image to Text - ImageOCRAI',
+  description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Includes a free daily image allowance and optional one-time image packs.',
   keywords: '',
   authors: [{ name: 'ImageOCRAI Team' }],
   creator: 'ImageOCRAI',
@@ -24,8 +24,8 @@ export const metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'ImageOCRAI - Free Online Image to Text OCR Converter & Batch Photo Scanner',
-    description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Batch OCR multiple files, extract text on any device—no software needed.',
+    title: 'ImageOCRAI - Online Image to Text OCR Converter & Batch Photo Scanner',
+    description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Includes a free daily image allowance and optional one-time image packs.',
     url: 'https://imageocrai.com',
     siteName: 'ImageOCRAI',
     images: [
@@ -33,7 +33,7 @@ export const metadata = {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'ImageOCRAI - Free Online Image to Text OCR Converter & Batch Photo Scanner',
+        alt: 'ImageOCRAI - Online Image to Text OCR Converter & Batch Photo Scanner',
       },
     ],
     locale: 'en_US',
@@ -41,8 +41,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ImageOCRAI - Free Online Image to Text OCR Converter & Batch Photo Scanner',
-    description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Batch OCR multiple files, extract text on any device—no software needed.',
+    title: 'ImageOCRAI - Online Image to Text OCR Converter & Batch Photo Scanner',
+    description: 'Accurate online OCR tool to instantly convert image, photo to editable text. Includes a free daily image allowance and optional one-time image packs.',
     images: ['/og-image.jpg'],
   },
   robots: {

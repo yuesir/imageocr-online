@@ -1,5 +1,6 @@
 'use client'
 
+import { OCRPrivacyLink } from '@/components/ocr/OCRServiceInfo'
 import { Balance } from '@/components/billing/Balance'
 
 import { useState, useEffect } from 'react'
@@ -188,7 +189,7 @@ export function CreditCardOCR() {
               <div className="mt-6 text-sm text-muted-foreground">
                 <p className="mb-2"><strong>Supported:</strong> JPG, JPEG, PNG, BMP files</p>
                 <p className="mb-2"><strong>File Size:</strong> Up to 10MB per image</p>
-                <p className="mb-2"><strong>Security:</strong> Images are processed securely and never stored</p>
+                <p className="mb-2"><OCRPrivacyLink /></p>
                 <p><strong>Batch Processing:</strong> Up to 50 credit card images at once</p>
               </div>
             </div>

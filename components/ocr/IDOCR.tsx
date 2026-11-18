@@ -1,5 +1,6 @@
 'use client'
 
+import { OCRPrivacyLink } from '@/components/ocr/OCRServiceInfo'
 import { Balance } from '@/components/billing/Balance'
 
 import React, { useState, useCallback } from 'react'
@@ -194,7 +195,7 @@ export default function IDOCR() {
           />
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p>✓ Secure processing • ✓ No data stored • ✓ Free to use</p>
+            <p><OCRPrivacyLink /></p>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { OCRDataNotice, OCRPricingInfo, OCRPrivacyLink } from '@/components/ocr/OCRServiceInfo'
 import { FAQSection } from '@/components/faq/FAQSection'
 
 import { InteractiveOCR } from "@/components/ocr/InteractiveOCR";
@@ -25,7 +26,7 @@ export default function CreditCardOCRClient() {
           </h1>
           <p className="text-xl text-muted-foreground  max-w-3xl mx-auto">
             Securely extract text and information from credit card images with our advanced OCR technology. 
-            Fast, accurate, and completely free to use.
+            <OCRPricingInfo />
           </p>
         </div>
       </div>
@@ -66,7 +67,7 @@ export default function CreditCardOCRClient() {
               </div>
               <h3 className="text-xl font-semibold mb-2 text-foreground ">Get Results</h3>
               <p className="text-muted-foreground ">
-                View, copy, or download the extracted text. Results are processed securely and privately.
+                View, copy, or download the extracted text.
               </p>
             </div>
           </div>
@@ -82,9 +83,9 @@ export default function CreditCardOCRClient() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <Shield className="h-12 w-12 text-primary  mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2 text-foreground ">Secure & Private</h3>
+              <h3 className="text-xl font-semibold mb-2 text-foreground ">Data Handling</h3>
               <p className="text-muted-foreground ">
-                Your credit card images are processed securely and never stored on our servers.
+                <OCRPrivacyLink />
               </p>
             </div>
             <div className="text-center">
@@ -114,7 +115,7 @@ export default function CreditCardOCRClient() {
 
 
 <p className="text-muted-foreground ">
-                Yes, your images are processed securely and are never stored on our servers. We recommend removing sensitive information before processing.
+                <OCRDataNotice />
               </p>
 
 </>

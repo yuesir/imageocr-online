@@ -1,5 +1,6 @@
 "use client";
 
+import { OCRPricingInfo } from '@/components/ocr/OCRServiceInfo'
 import { FAQSection } from '@/components/faq/FAQSection'
 
 import { InteractiveOCR } from "@/components/ocr/InteractiveOCR";
@@ -25,7 +26,7 @@ export default function BusinessCardOCRClient() {
           </h1>
           <p className="text-xl text-muted-foreground  max-w-3xl mx-auto">
             Instantly extract contact information from business card images with our advanced OCR technology. 
-            Fast, accurate, and completely free to use.
+            <OCRPricingInfo />
           </p>
         </div>
       </div>

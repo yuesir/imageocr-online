@@ -1,5 +1,6 @@
 'use client'
 
+import { OCRDataNotice } from '@/components/ocr/OCRServiceInfo'
 import { FAQSection } from '@/components/faq/FAQSection'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -141,24 +142,10 @@ export default function ArabicOCRClient() {
 
 </>
           ) },
-          { question: <> Is my Arabic text data secure during processing? </>, answer: (
+          { question: <> How are my images and results handled? </>, answer: (
 <>
 
-<p className="text-muted-foreground leading-relaxed mb-4">
-                    Yes, we prioritize the security and privacy of your Arabic text and images:
-                  </p>
-
-<ul className="list-disc list-inside text-muted-foreground space-y-2 mb-4">
-                    <li><strong>Encrypted Transfer:</strong> All uploads use HTTPS encryption</li>
-                    <li><strong>Temporary Processing:</strong> Images are processed in memory and not permanently stored</li>
-                    <li><strong>Auto-Deletion:</strong> Uploaded files are automatically deleted after processing</li>
-                    <li><strong>No Data Retention:</strong> We don't store your images or extracted Arabic text</li>
-                    <li><strong>Privacy Compliance:</strong> Full compliance with GDPR and privacy regulations</li>
-                  </ul>
-
-<p className="text-muted-foreground">
-                    Your Arabic content remains completely private and is never shared with third parties.
-                  </p>
+<p className="text-muted-foreground"><OCRDataNotice /></p>
 
 </>
           ) },

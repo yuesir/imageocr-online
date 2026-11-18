@@ -1,5 +1,6 @@
 'use client'
 
+import { OCRDataNotice } from '@/components/ocr/OCRServiceInfo'
 import { FAQSection } from '@/components/faq/FAQSection'
 
 import { Button } from '@/components/ui/button'
@@ -134,24 +135,10 @@ export function JPGToTextClient() {
 
 </>
           ) },
-          { question: <> Is my JPG data secure during processing? </>, answer: (
+          { question: <> How are my images and results handled? </>, answer: (
 <>
 
-<p className="text-muted-foreground leading-relaxed mb-4">
-                    Yes, we prioritize the security and privacy of your JPG files and extracted text data:
-                  </p>
-
-<ul className="list-disc list-inside text-muted-foreground space-y-2 mb-4">
-                    <li><strong>Encrypted Transfer:</strong> All JPG uploads use HTTPS encryption</li>
-                    <li><strong>Temporary Processing:</strong> Files are processed in memory and not permanently stored</li>
-                    <li><strong>Auto-Deletion:</strong> Uploaded JPG files are automatically deleted after processing</li>
-                    <li><strong>No Data Retention:</strong> We don't store your images or extracted text content</li>
-                    <li><strong>Privacy Compliance:</strong> Full compliance with GDPR and privacy regulations</li>
-                  </ul>
-
-<p className="text-muted-foreground">
-                    Your JPG files and extracted text remain completely private and are never shared with third parties.
-                  </p>
+<p className="text-muted-foreground"><OCRDataNotice /></p>
 
 </>
           ) },
