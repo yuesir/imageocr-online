@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useState } from 'react'
 import Link from 'next/link'
 import { Info } from 'lucide-react'
+import { GUEST_DAILY_LIMIT, USER_DAILY_LIMIT } from '@/lib/billing/catalog'
 import { useAuth } from '@/hooks/useAuth'
 
 interface ImageBalance {
@@ -52,12 +53,12 @@ export function Balance() {
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-4">
-          {exhausted && !session && <Link href="/login?redirectTo=%2Focr" target="_blank" rel="noopener noreferrer" className="font-medium text-accent-foreground underline-offset-4 hover:underline">Sign in ↗</Link>}
+          {exhausted && !session && <Link href="/login?next=%2Focr" target="_blank" rel="noopener noreferrer" className="font-medium text-accent-foreground underline-offset-4 hover:underline">Sign in ↗</Link>}
           <Link href="/pricing" target="_blank" rel="noopener noreferrer" className="font-medium text-accent-foreground underline-offset-4 hover:underline">Buy image packs ↗</Link>
         </div>
       </div>
       <div id={rulesId} hidden={!showRules} className="mt-3 space-y-2 border-t border-border pt-3 text-sm leading-relaxed">
-        <p>Guests get 2 free images per day; signed-in accounts get 4 in total. Free images are used first and reset at 00:00 UTC. Purchased images never expire.</p>
+        <p>Guests get {GUEST_DAILY_LIMIT} free image per day. Signed-in accounts get {USER_DAILY_LIMIT} per day total, including guest use. Free images are used first and reset at 00:00 UTC. Purchased images never expire.</p>
         <p>Each successful recognition uses 1 image, including images with no text. Failed processing is free. Starting recognition again uses another image allowance.</p>
         <p>Free accounts process 1 image at a time. Purchased packs unlock 3 parallel tasks per account.</p>
         {balance && balance.refundedDebt > 0 && <p>New purchases first cover {balance.refundedDebt} previously used images that were refunded.</p>}

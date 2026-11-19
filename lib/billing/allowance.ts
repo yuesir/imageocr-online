@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { GUEST_DAILY_LIMIT, USER_DAILY_LIMIT } from './catalog'
 import { BillingError, BillingStorageError } from './server'
 
 export function exhaustedAllowance(authenticated: boolean) {
@@ -6,9 +7,9 @@ export function exhaustedAllowance(authenticated: boolean) {
     error: 'Image allowance exhausted',
     errorCode: 'IMAGE_ALLOWANCE_EXHAUSTED',
     message: authenticated
-      ? 'Your available images have been used. Buy an image pack to continue, or wait until 00:00 UTC for 4 free images.'
-      : 'Your 2 free guest images for today have been used. Sign in to use up to 4 free images per day total, or buy an image pack.',
-    ...(!authenticated ? { loginUrl: '/login?redirectTo=%2Focr' } : {}),
+      ? `Your available images have been used. Buy an image pack to continue, or wait until 00:00 UTC for ${USER_DAILY_LIMIT} free images.`
+      : `You have used your daily guest allowance of ${GUEST_DAILY_LIMIT} free image. Sign in with Google for up to ${USER_DAILY_LIMIT} free images per day total, or buy an image pack.`,
+    ...(!authenticated ? { loginUrl: '/login?next=%2Focr' } : {}),
     pricingUrl: '/pricing',
   }, { status: 402 })
 }

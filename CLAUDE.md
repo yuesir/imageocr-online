@@ -91,22 +91,14 @@ The application supports three OCR processing methods:
     - `files` - Uploaded file metadata
     - `ocr_results` - OCR processing results
     - `result_exports` - Exported result files
-    - `ip_usage` - Anonymous user rate limiting (5 requests/day per IP)
-    - `user_usage` - Authenticated user rate limiting (10 requests/day)
+    - `billing_daily` - Daily usage by guest IP or signed-in account
   - File storage in `ocr-files` bucket
 
 - The `lib/supabase.ts` file includes complete TypeScript type definitions for all database tables.
 
 ### Usage Tracking & Rate Limiting
 
-The application implements a two-tier rate limiting system:
-
-- **Anonymous users**: 5 OCR requests per day (tracked by IP address)
-- **Authenticated users**: 10 OCR requests per day (tracked by user email)
-
-Usage tracking is handled by `lib/ip-usage.ts` with functions:
-- `checkIPDailyLimit()` and `updateIPUsage()` for anonymous users
-- `checkUserDailyLimit()` and `updateUserUsage()` for authenticated users
+Guests get 1 free OCR image per day. Signed-in accounts get 2 per day total, including guest use. Free allowances reset at 00:00 UTC. The billing RPCs enforce the limits and use purchased images after the free allowance.
 
 ### Blog System
 

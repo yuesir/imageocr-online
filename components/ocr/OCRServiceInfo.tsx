@@ -4,7 +4,7 @@ import { GUEST_DAILY_LIMIT, USER_DAILY_LIMIT } from '@/lib/billing/catalog'
 export function OCRPricingInfo() {
   return (
     <>
-      Guests get {GUEST_DAILY_LIMIT} free images per day. Sign in for {USER_DAILY_LIMIT} free images per day total, including guest usage.
+      Guests get {GUEST_DAILY_LIMIT} free image per day. Sign in for {USER_DAILY_LIMIT} free images per day total, including guest usage.
       {' '}Need more? <Link href="/pricing" className="underline underline-offset-2">See one-time image packs</Link>.
     </>
   )

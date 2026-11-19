@@ -2,8 +2,8 @@ import nextEnv from '@next/env'
 import { billingDB, BillingStorageError, rpc } from '../lib/billing/server'
 nextEnv.loadEnvConfig(process.cwd())
 try {
-  await rpc(billingDB(), 'billing_balance', { p_actor: 'guest:read-only-healthcheck', p_guest: 'guest:read-only-healthcheck', p_user: null })
-  console.log('Image allowance service is ready. Guest allowance: 2/day; signed-in allowance: 4/day total.')
+  const balance = await rpc(billingDB(), 'billing_balance', { p_actor: 'guest:read-only-healthcheck', p_guest: 'guest:read-only-healthcheck', p_user: null })
+  console.log(`Image allowance service is ready. Free images remaining for the guest check: ${balance.freeRemaining}.`)
 } catch (error) {
   const code = error instanceof BillingStorageError ? error.publicCode : 'ALLOWANCE_UNAVAILABLE'
   console.error('Image allowance check failed:', code)

@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session, AuthError, AuthChangeEvent } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
@@ -9,10 +9,7 @@ interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
-  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: AuthError | null }>
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
   signOut: () => Promise<{ error: AuthError | null }>
-  resetPassword: (email: string) => Promise<{ error: AuthError | null }>
   updateProfile: (updates: { full_name?: string; avatar_url?: string }) => Promise<{ error: any }>
 }
 
@@ -48,53 +45,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription?.unsubscribe()
   }, [])
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-        },
-      })
-
-      if (error) {
-        toast.error(error.message)
-        return { error }
-      }
-
-      toast.success('Check your email for the confirmation link!')
-      return { error: null }
-    } catch (error) {
-      const authError = error as AuthError
-      toast.error(authError.message)
-      return { error: authError }
-    }
-  }
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        toast.error(error.message)
-        return { error }
-      }
-
-      toast.success('Successfully signed in!')
-      return { error: null }
-    } catch (error) {
-      const authError = error as AuthError
-      toast.error(authError.message)
-      return { error: authError }
-    }
-  }
-
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut()
@@ -106,26 +56,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       toast.error('Error signing out')
       return { error: error as AuthError }
-    }
-  }
-
-  const resetPassword = async (email: string) => {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      })
-
-      if (error) {
-        toast.error(error.message)
-        return { error }
-      }
-
-      toast.success('Password reset email sent!')
-      return { error: null }
-    } catch (error) {
-      const authError = error as AuthError
-      toast.error(authError.message)
-      return { error: authError }
     }
   }
 
@@ -170,10 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     session,
     loading,
-    signUp,
-    signIn,
     signOut,
-    resetPassword,
     updateProfile,
   }
 

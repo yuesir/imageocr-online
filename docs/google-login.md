@@ -1,6 +1,6 @@
 # Google 账号登录配置
 
-本站沿用 Supabase Auth，使用 @supabase/ssr 的 PKCE 流程。Google 登录和邮箱登录共享 Supabase 用户体系；已有数据库新用户 trigger 会创建用户资料。不请求 Google API 权限、离线访问或 Google refresh token。
+本站沿用 Supabase Auth，使用 @supabase/ssr 的 PKCE 流程。网站统一使用 Google 登录。已有数据库新用户 trigger 会创建用户资料。不请求 Google API 权限、离线访问或 Google refresh token。
 
 ## 1. Google Cloud / Google Auth Platform
 
@@ -22,7 +22,7 @@
 
 配置 `NEXT_PUBLIC_SUPABASE_URL` 和 `NEXT_PUBLIC_SUPABASE_ANON_KEY`，二者必须属于上面同一个项目；重新构建部署。无需安装 NextAuth，无需在网站配置 Google Client Secret。
 
-入口：`/login` 和 `/signup`。默认登录后进入首页 `/`；`/login?next=/pricing` 可返回本站指定页面。回调在服务端交换 code，并在同一 redirect response 写入会话 cookies。外部 next URL 和登录循环会回退到首页 `/`；失败只显示固定提示，不暴露 token 或提供方错误。
+登录入口为 `/login`，旧的 `/signup` 地址会跳转到登录页。默认登录后进入首页 `/`；`/login?next=/pricing` 可返回本站指定页面。回调在服务端交换 code，并在同一 redirect response 写入会话 cookies。外部 next URL 和登录循环会回退到首页 `/`；失败只显示固定提示，不暴露 token 或提供方错误。
 
 ## 验收
 

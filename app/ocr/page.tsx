@@ -150,13 +150,7 @@ export default function OCRPage() {
       window.dispatchEvent(new Event('billing:refresh'))
 
       if (!response.ok) {
-        // Handle daily limit exceeded
-        if (response.status === 429) {
-          toast.error(data.message || 'Daily usage limit exceeded. Please try again tomorrow or sign in for 4 daily free images or buy an image pack.')
-        } else {
-          throw new Error(data.error || 'OCR processing failed')
-        }
-        return
+        throw new Error(data.message || data.error || 'OCR processing failed')
       }
 
       setOcrResult({

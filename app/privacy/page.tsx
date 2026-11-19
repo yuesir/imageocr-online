@@ -45,7 +45,7 @@ export default function PrivacyPolicy() {
               
               <h3 className="text-xl font-medium text-foreground  mb-3">2.1 Information You Provide</h3>
               <ul className="list-disc pl-6 text-muted-foreground  mb-4">
-                <li>Account information (email address, username, password)</li>
+                <li>Account information from Google sign-in (email address, display name, profile photo)</li>
                 <li>Profile information (name, preferences)</li>
                 <li>Images and documents you upload for OCR processing</li>
                 <li>Communication data when you contact us</li>
