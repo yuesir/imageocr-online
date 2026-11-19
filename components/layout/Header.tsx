@@ -51,19 +51,12 @@ export function Header() {
                 onSignOut={() => signOut()}
               />
             ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">
-                    <LogIn className="mr-2 hidden h-4 w-4 sm:block" />
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/signup">
-                  <Button size="sm">
-                    Sign Up
-                  </Button>
-                </Link>
-              </>
+              <Link href="/login">
+                <Button variant="ghost" size="sm">
+                  <LogIn className="mr-2 hidden h-4 w-4 sm:block" />
+                  Sign In
+                </Button>
+              </Link>
             )}
           </div>
         </div>

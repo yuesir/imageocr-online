@@ -30,11 +30,8 @@ function getSupabaseClient() {
         getSession: () => Promise.resolve({ data: { session: null }, error: null }),
         getUser: () => Promise.resolve({ data: { user: null }, error: null }),
         onAuthStateChange: () => ({ data: { subscription: null } }),
-        signUp: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
         signInWithOAuth: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
-        signInWithPassword: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') }),
         signOut: () => Promise.resolve({ error: null }),
-        resetPasswordForEmail: () => Promise.resolve({ error: new Error('Supabase not configured') }),
         updateUser: () => Promise.resolve({ data: null, error: new Error('Supabase not configured') })
       },
       from: () => ({

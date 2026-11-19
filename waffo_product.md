@@ -10,7 +10,7 @@ Create fixed-price one-time Waffo Pancake products using display amount strings:
 
 Plus: Just $4 more for 3× the images; 44% lower cost per image than Starter.
 
-Free allowances: guests 2/day, signed-in accounts 4/day total, resetting at 00:00 UTC. Guest use counts toward the signed-in daily allowance. Free images are used first. Successful recognition with no detected text still counts; failed processing does not. PDF and public API access are not included.
+Free allowances: guests 1/day, signed-in accounts 2/day total, resetting at 00:00 UTC. Guest use counts toward the signed-in daily allowance. Free images are used first. Successful recognition with no detected text still counts; failed processing does not. PDF and public API access are not included.
 
 Test store: `STO_4uOBdljErxd4STR1n3ehKJ`. Run `npm run billing:setup` to provision test products; this command does not publish products to production.
 

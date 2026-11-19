@@ -4,6 +4,6 @@ export const PACKAGES = [
   { id: 'max', name: 'Max', cents: 1999, credits: 800 },
 ] as const
 export type PackageId = typeof PACKAGES[number]['id']
-export const GUEST_DAILY_LIMIT = 2
-export const USER_DAILY_LIMIT = 4
+export const GUEST_DAILY_LIMIT = 1
+export const USER_DAILY_LIMIT = 2
 export function findPackage(id: unknown) { return PACKAGES.find(p => p.id === id) }

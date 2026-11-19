@@ -2,7 +2,7 @@
 
 ## Current product model
 
-One-time USD image packs: Starter $5.99 / 100 images, Plus $9.99 / 300, Max $19.99 / 800. Plus is recommended. Paid images never expire. Guests receive 2 free images/day; signed-in accounts receive 4/day total including guest use on the current IP. Free allowance resets at 00:00 UTC and is used first. One successful recognition, including an empty text result, uses one image allowance. Provider failures release the reservation.
+One-time USD image packs: Starter $5.99 / 100 images, Plus $9.99 / 300, Max $19.99 / 800. Plus is recommended. Paid images never expire. Guests receive 1 free image per day. Signed-in accounts receive 2 per day total including guest use on the current IP. Free allowance resets at 00:00 UTC and is used first. One successful recognition, including an empty text result, uses one image allowance. Provider failures release the reservation.
 
 ## Test environment setup
 
@@ -20,7 +20,7 @@ One-time USD image packs: Starter $5.99 / 100 images, Plus $9.99 / 300, Max $19.
 
    The supplied test credentials have been saved locally with file mode 0600; they are not in tracked source. The SDK accepts raw base64, PEM, or escaped-newline PEM. `WAFFO_PRIVATE_KEY_BASE64` is an alternative for base64 of the **whole PEM**. Never use a `NEXT_PUBLIC_` prefix for credentials. Separate test and production keys.
 3. Run `npm run billing:setup`. It verifies the specified store, reuses matching products or creates the three fixed-price **test** one-time products, then appends `WAFFO_PRODUCT_STARTER`, `WAFFO_PRODUCT_PLUS`, and `WAFFO_PRODUCT_MAX` to `.env.local`. USD amounts sent to the SDK are display strings (`"5.99"`, `"9.99"`, `"19.99"`), not integer cents. The script refuses ambiguous products or mismatched prices and never publishes products to production.
-4. Apply migrations in order: `202611160001_billing.sql`, `202611160002_waffo.sql`, then `202611160003_ocr_concurrency.sql`. Existing rows remain attributed to Creem; new orders explicitly use `provider=waffo`, the configured mode and store. The original payment RPC remains for historical migration compatibility; the application uses only the Waffo routes. Back up before applying migrations.
+4. Apply migrations in order: `202611160001_billing.sql`, `202611160002_waffo.sql`, `202611160003_ocr_concurrency.sql`, then `202611190001_ocr_daily_limits.sql`. Existing rows remain attributed to Creem; new orders explicitly use `provider=waffo`, the configured mode and store. The original payment RPC remains for historical migration compatibility; the application uses only the Waffo routes. Back up before applying migrations.
 5. Provide `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and the site URL. Tables have RLS and billing RPCs are service-role only. Deploy behind a trusted proxy that overwrites forwarding headers (e.g. Vercel); do not expose the origin with untrusted forwarding headers. The Vercel config uses Next.js routing; the old SPA rewrites would swallow all API routes.
 6. For callbacks set `WAFFO_WEBHOOK_URL=https://<public-host>/api/billing/webhook`, then rerun `npm run billing:setup` to register `order.completed` and `refund.succeeded` for this test store. Use `ngrok http 3000` locally; localtunnel can strip signature headers. Keep the callback URL on a reachable HTTPS host.
 7. Set a random `CRON_SECRET` and schedule a GET to `/api/billing/reconcile` every five minutes with `Authorization: Bearer <CRON_SECRET>`. A local secret was generated if absent. The endpoint processes three pending events per call; schedule extra calls if the inbox grows. `npm run billing:reconcile` also drains pending events from a trusted server CLI. Scheduling is intentionally not tied to a specific hosting plan.
@@ -74,7 +74,7 @@ Interrupted OCR reservations are deliberately not released automatically, which 
 
 ## Verification and launch gate
 
-Run `npm run check`, `npm run test:billing`, `npm run build`. Tests apply both SQL migrations in isolated in-process PostgreSQL (PGlite), use real SDK signing/verification with ephemeral fixture keys, and mock network responses. They do not write to the live database. PGlite serializes connections; production cross-connection safety relies on the PostgreSQL advisory lock.
+Run `npm run check`, `npm run test:billing`, `npm run build`. Tests apply the billing migrations in isolated in-process PostgreSQL (PGlite), use real SDK signing/verification with ephemeral fixture keys, and mock network responses. They do not write to the live database. PGlite serializes connections; production cross-connection safety relies on the PostgreSQL advisory lock.
 
 SDK installation was blocked by terminal DNS in the implementation environment. For local verification only, the unmodified official SDK source was retrieved through GitHub at commit `69c8878094344fceb1edaed0290a4462b0671b6a` (package version 0.28.0) and compiled into ignored node_modules. The tracked dependency still targets the official npm release. Run `npm ci` with registry access before deployment; this local source build is not a substitute for the published-package deployment check.
 
@@ -98,7 +98,7 @@ Previously committed credential fallback literals were removed during the earlie
 
 Guest free usage does not call Waffo and does not depend on BILLING_ENABLED. It does depend on the Supabase quota tables and RPCs, including while payments are disabled. Run `npm run billing:check` from the same application environment; it only calls the read-only balance function and never consumes an image.
 
-- `IMAGE_ALLOWANCE_EXHAUSTED` (HTTP 402): a successful quota check found no allowance. Guests receive login and pack links; members receive a pack link. Signing in raises the daily total from 2 to 4, not an additional 4.
+- `IMAGE_ALLOWANCE_EXHAUSTED` (HTTP 402): a successful quota check found no allowance. Guests receive login and pack links; members receive a pack link. Signing in raises the daily total from 1 to 2. Guest use counts toward that total.
 - `ALLOWANCE_MIGRATION_REQUIRED` (HTTP 503): apply the billing migration in Supabase and rerun the check.
 - `ALLOWANCE_NOT_CONFIGURED` / `ALLOWANCE_ACCESS_DENIED`: check server-only credentials and permissions.
 - `ALLOWANCE_UNAVAILABLE`: check Supabase project availability and server network connectivity. This is not exhaustion; do not direct the user to pay to fix an infrastructure failure.

@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import Link from 'next/link'
 import { runImageBatch, fetchQueuedOCR } from '@/lib/ocr/batch'
 import { Balance } from '@/components/billing/Balance'
+import { GUEST_DAILY_LIMIT, USER_DAILY_LIMIT } from '@/lib/billing/catalog'
 import { useAuth } from '@/hooks/useAuth'
 
 // Removed OCRResultData interface - unified to use MultiOCRResult
@@ -212,9 +213,9 @@ export function InteractiveOCR() {
     <div className="optical-workbench space-y-6">
       <Balance />
       {allowanceExhausted && <div role="alert" className="rounded-xl border p-4 text-sm">
-        <p>{session ? 'Buy an image pack to continue, or wait for your daily free images to reset.' : 'Your 2 guest images for today have been used. Sign in to use the rest of your 4-image daily free allowance, or buy an image pack.'}</p>
+        <p>{session ? 'Buy an image pack to continue, or wait for your daily free images to reset.' : `You have used your daily guest allowance of ${GUEST_DAILY_LIMIT} free image. Sign in with Google to use the rest of your ${USER_DAILY_LIMIT}-image daily free allowance, or buy an image pack.`}</p>
         <div className="mt-3 flex flex-wrap gap-4">
-          {!session && <Link href="/login?redirectTo=%2Focr" target="_blank" rel="noopener noreferrer" className="font-medium text-primary underline">Sign in ↗</Link>}
+          {!session && <Link href="/login?next=%2Focr" target="_blank" rel="noopener noreferrer" className="font-medium text-primary underline">Sign in ↗</Link>}
           <Link href="/pricing" target="_blank" rel="noopener noreferrer" className="font-medium text-primary underline">Buy image packs ↗</Link>
         </div>
         <p className="mt-2 text-muted-foreground">Your selected images stay in this tab.</p>

@@ -19,7 +19,9 @@ test('catalog and strict USD display-amount boundary', () => {
 test('actual PostgreSQL billing transactions', async t => {
   const db = new PGlite()
   await db.exec(`create schema auth; create table auth.users(id uuid primary key); create role anon; create role authenticated; create role service_role;`)
-  await db.exec(await readFile(new URL('../supabase/migrations/202611160001_billing.sql',import.meta.url),'utf8'))
+  for (const migration of ['202611160001_billing.sql','202611160003_ocr_concurrency.sql','202611190001_ocr_daily_limits.sql']) {
+    await db.exec(await readFile(new URL('../supabase/migrations/'+migration,import.meta.url),'utf8'))
+  }
   const u = '11111111-1111-4111-8111-111111111111'
   await db.query('insert into auth.users(id) values($1)',[u])
   const actor = `user:${u}`
@@ -28,23 +30,26 @@ test('actual PostgreSQL billing transactions', async t => {
   const balance = async (a = actor,guest = 'guest:a') => (await db.query<{r:{freeRemaining:number;paidRemaining:number;refundedDebt:number}}>('select billing_balance($1,$2,$3) r',[a,guest,a.startsWith('user:') ? u : null])).rows[0].r
   const scalar = async (sql:string) => Object.values((await db.query<Record<string, unknown>>(sql)).rows[0])[0]
   try {
-    await t.test('guests get 2; pending prevents concurrent overrun; failure releases',async () => {
+    await t.test('guests get 1; pending prevents concurrent overrun; failure releases',async () => {
+      assert.equal((await balance('guest:a')).freeRemaining,1)
       assert.equal((await reserve('guest:a','guest:a','guest0001')).kind,'reserved')
       assert.equal((await reserve('guest:a','guest:a','guest0001')).kind,'pending')
       assert.equal((await reserve('guest:a','guest:a','guest0001','different')).kind,'conflict')
-      assert.equal((await reserve('guest:a','guest:a','guest0002')).kind,'reserved')
-      assert.equal((await reserve('guest:a','guest:a','guest0003')).kind,'exhausted')
-      await finish('guest:a','guest0002',false)
+      assert.equal((await reserve('guest:a','guest:a','guest0002')).kind,'busy')
+      await finish('guest:a','guest0001',false)
       assert.equal((await balance('guest:a')).freeRemaining,1)
-      assert.equal((await reserve('guest:a','guest:a','guest0002')).kind,'reserved')
-      await finish('guest:a','guest0001',true); await finish('guest:a','guest0002',true)
+      assert.equal((await reserve('guest:a','guest:a','guest0001')).kind,'reserved')
+      await finish('guest:a','guest0001',true)
       assert.equal((await reserve('guest:a','guest:a','guest0001')).kind,'replay')
+      assert.equal((await reserve('guest:a','guest:a','guest0002')).kind,'exhausted')
+      assert.equal((await balance('guest:a')).freeRemaining,0)
     })
-    await t.test('login includes guest use; free first; signed-in cap 4',async () => {
-      assert.equal((await balance()).freeRemaining,2)
-      await reserve(actor,'guest:a','user0001'); await finish(actor,'user0001',true)
-      await reserve(actor,'guest:a','user0002'); await finish(actor,'user0002',true)
-      assert.equal((await reserve(actor,'guest:a','user0003')).kind,'exhausted')
+    await t.test('login includes guest use; free first; signed-in cap 2',async () => {
+      assert.equal((await balance(actor,'guest:unused')).freeRemaining,2)
+      assert.equal((await balance()).freeRemaining,1)
+      assert.equal((await reserve(actor,'guest:a','user0001')).kind,'reserved')
+      await finish(actor,'user0001',true)
+      assert.equal((await reserve(actor,'guest:a','user0002')).kind,'exhausted')
       assert.equal((await balance()).freeRemaining,0)
     })
     const order = '22222222-2222-4222-8222-222222222222'
@@ -87,13 +92,14 @@ test('actual PostgreSQL billing transactions', async t => {
     })
     await t.test('UTC rollover resets free quota and preserves wallet',async () => {
       await db.exec("update billing_daily set day=day-1")
-      assert.equal((await balance()).freeRemaining,4)
+      assert.equal((await balance()).freeRemaining,2)
       assert.equal((await balance()).refundedDebt,1)
       await reserve(actor,'guest:a','newday01'); await finish(actor,'newday01',true)
-      assert.equal((await balance()).freeRemaining,3)
+      assert.equal((await balance()).freeRemaining,1)
     })
     await t.test('overlapping reservations cannot spend a single purchased image twice',async () => {
-      await db.query('update billing_daily set used=4 where actor=$1',[actor])
+      await db.query('update billing_daily set used=2 where actor=$1',[actor])
+      await db.query("insert into billing_orders(id,user_id,package_id,amount,credits,product_id,status,paid_at) values($1,$2,'plus',999,300,'prod_plus','paid',now())", ['33333333-3333-4333-8333-333333333333',u])
       await db.query('update billing_wallets set balance=1 where user_id=$1',[u])
       const attempts=await Promise.all(Array.from({length:8},(_,i)=>reserve(actor,'guest:a',`parallel${i}`)))
       assert.equal(attempts.filter(r=>r.kind==='reserved').length,1)
@@ -146,12 +152,13 @@ test('OCR route boundary reserves/releases, replays and fails closed', async () 
     assert.equal(guestExhausted.status,402)
     const guestMessage = await guestExhausted.json()
     assert.equal(guestMessage.errorCode,'IMAGE_ALLOWANCE_EXHAUSTED')
-    assert.match(guestMessage.message,/2 free guest images/)
+    assert.match(guestMessage.message,/1 free image.*2 free images/)
     assert.match(guestMessage.loginUrl,/^\/login/)
     assert.equal(guestMessage.pricingUrl,'/pricing')
     const memberExhausted = await handler(req(true))
     const memberMessage = await memberExhausted.json()
     assert.equal(memberExhausted.status,402)
+    assert.match(memberMessage.message,/00:00 UTC for 2 free images/)
     assert.equal(memberMessage.loginUrl,undefined)
     assert.equal(memberMessage.pricingUrl,'/pricing')
     reservation={kind:'busy',concurrencyLimit:3}
@@ -311,7 +318,7 @@ test('webhook rejects bad signatures and never acknowledges a failed durable wri
 test('paid accounts get 3 atomic OCR slots; free users get 1 across providers/tabs',async()=>{
  const db=new PGlite()
  await db.exec('create schema auth;create table auth.users(id uuid primary key);create role anon;create role authenticated;create role service_role;')
- for(const migration of ['202611160001_billing.sql','202611160002_waffo.sql','202611160003_ocr_concurrency.sql']) await db.exec(await readFile(new URL('../supabase/migrations/'+migration,import.meta.url),'utf8'))
+ for(const migration of ['202611160001_billing.sql','202611160002_waffo.sql','202611160003_ocr_concurrency.sql','202611190001_ocr_daily_limits.sql']) await db.exec(await readFile(new URL('../supabase/migrations/'+migration,import.meta.url),'utf8'))
  await db.query('insert into auth.users(id) values($1)',[TEST_USER])
  const actor='user:'+TEST_USER
  const reserve=async(id:string)=> (await db.query<{r:{kind:string;concurrencyLimit?:number}}> ('select billing_reserve($1,$2,$3,$4,$5) r',[actor,'guest:parallel',TEST_USER,id,id])).rows[0].r
@@ -323,10 +330,11 @@ test('paid accounts get 3 atomic OCR slots; free users get 1 across providers/ta
   assert.equal(await used(),1)
   await finish('free0001',false)
   await db.query(`insert into billing_orders(id,user_id,package_id,amount,credits,product_id,status,paid_at) values($1,$2,'plus',999,300,'test-product','paid',now())`,[TEST_LOCAL,TEST_USER])
+  await db.query('insert into billing_wallets(user_id,balance) values($1,300)',[TEST_USER])
   const reservations=await Promise.all(['paid0001','paid0002','paid0003','paid0004'].map(reserve))
   assert.deepEqual(reservations.map(r=>r.kind),['reserved','reserved','reserved','busy'])
   assert.equal(reservations[3].concurrencyLimit,3)
-  assert.equal(await used(),3)
+  assert.equal(await used(),2)
   assert.equal((await reserve('paid0001')).kind,'pending')
   await finish('paid0002',true)
   assert.equal((await reserve('paid0002')).kind,'replay')
